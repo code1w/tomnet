@@ -1,5 +1,6 @@
-#ifndef  TOM_NET_ASIO_NETWORK
-#define  TOM_NET_ASIO_NETWORK
+#ifndef  NET_ASIO_NETWORK_H
+#define  NET_ASIO_NETWORK_H
+
 #include "tomnet.h"
 #include "message_queue.h"
 #include "asio_tcp_server.h"
@@ -10,7 +11,7 @@
 #include "network_traffic.h"
 #include "asio_handler.h"
 
-namespace tomnet
+namespace tom
 {
 namespace net
 {

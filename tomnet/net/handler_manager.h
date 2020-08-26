@@ -1,5 +1,5 @@
-#ifndef  TOM_NET_HANDLER_MANAGER_H
-#define  TOM_NET_HANDLER_MANAGER_H
+#ifndef  NET_HANDLER_MANAGER_H
+#define  NET_HANDLER_MANAGER_H
 
 #include "tomnet.h"
 #include "base/noncopyable.h"
@@ -13,7 +13,7 @@
 
 
 #define MAX_HANDLE_COUNT 50000
-namespace tomnet
+namespace tom
 {
 	namespace net
 	{

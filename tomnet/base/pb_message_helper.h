@@ -1,5 +1,5 @@
-#ifndef BASE_MESSAGE_HELPER_H
-#define BASE_MESSAGE_HELPER_H
+#ifndef BASE_PB_MESSAGE_HELPER_H
+#define BASE_PB_MESSAGE_HELPER_H
 
 #include "codec.h"
 

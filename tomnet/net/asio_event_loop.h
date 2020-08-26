@@ -1,6 +1,6 @@
 
-#ifndef  TOM_NET_ASIO_EVENT_LOOP_H
-#define  TOM_NET_ASIO_EVENT_LOOP_H
+#ifndef  NET_ASIO_EVENT_LOOP_H
+#define  NET_ASIO_EVENT_LOOP_H
 
 #include "server_status.h"
 #ifdef __GNUC__
@@ -18,7 +18,7 @@
 #include <mutex>
 #include <atomic>
 
-namespace tomnet
+namespace tom
 {
 namespace net
 {

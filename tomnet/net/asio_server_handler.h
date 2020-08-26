@@ -1,12 +1,12 @@
-#ifndef  TOM_NET_ASIO_SERVER_HANDLER_H
-#define  TOM_NET_ASIO_SERVER_HANDLER_H
-#include <memory>
+#ifndef  NET_ASIO_SERVER_HANDLER_H
+#define  NET_ASIO_SERVER_HANDLER_H
 
+#include <memory>
 #include "boost/asio.hpp"
 #include "tomnet.h"
-#include " TOM_NET_define.h"
+#include "net_define.h"
 #include "asio_handler.h"
-namespace tomnet {
+namespace tom {
 class Buffer;
 namespace net {
 class AsioEventLoop;
@@ -37,5 +37,5 @@ class AsioServerHandler : public AsiokHandler,
 };
 
 }  // namespace net
-}  // namespace tomnet
+}  // namespace tom
 #endif  //  TOM_NET_ASIO_SERVER_HANDLER_H

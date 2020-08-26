@@ -386,6 +386,8 @@ class Buffer : public noncopyable
 
 };
 
+typedef std::shared_ptr<tom::Buffer> BufferPtr;
+
 
 }  // namespace tom
 

@@ -2,7 +2,7 @@
 #include "network_traffic.h"
 #include "asio_handler.h"
 
-namespace tomnet
+namespace tom
 {
 	namespace net
 	{

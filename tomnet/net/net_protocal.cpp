@@ -8,7 +8,7 @@
 #include <arpa/inet.h>  // for ntohl()
 #endif  // _WIN32
 
-namespace tomnet
+namespace tom
 {
 	namespace net
 	{

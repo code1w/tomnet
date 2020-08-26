@@ -5,10 +5,10 @@
 #include <arpa/inet.h>  // for ntohl()
 #endif  // _WIN32
 
-#include "gamesh_net/net_base.h"
-#include "common/buffer.h"
-#include "common/codec/pb_dispatcher.h"
-#include "common/pb_message_helper.h"
+#include "net/tomnet.h"
+#include "base/buffer.h"
+#include "base/pb_dispatcher.h"
+#include "base/pb_message_helper.h"
 
 #include "net_msg_test_help.h"
 
@@ -27,13 +27,13 @@
 std::string style = "";
 
 
-gamesh::net::IMessageQueue* Q_ = nullptr;
-gamesh::pb::ProtobufDispatcher gDispatcher_;
+tom::net::IMessageQueue* Q_ = nullptr;
+tom::pb::ProtobufDispatcher gDispatcher_;
 size_t total_count = 1;
 std::vector<uint32_t> handles_;
 
 
-void OnRecvPacket(uint32_t handle, void* ud, const std::shared_ptr<gamesh::Buffer>& packet, gamesh::net::MsgHeaderProtocal headerprotocal = gamesh::net::nametype) 
+void OnRecvPacket(uint32_t handle, void* ud, const std::shared_ptr<tom::Buffer>& packet, tom::net::MsgHeaderProtocal headerprotocal = tom::net::nametype) 
 {
     auto fn = [](int32_t id) -> std::string {
         return "bus.CommonMessage";
@@ -41,14 +41,14 @@ void OnRecvPacket(uint32_t handle, void* ud, const std::shared_ptr<gamesh::Buffe
 
     std::size_t qsize = Q_->Size();
     {
-        auto header = std::make_shared<gamesh::net::MessageHeader>();
-        auto msg = gamesh::pb::decode(packet, header, headerprotocal, fn);
-        gDispatcher_.onMessage(handle, ud, header, msg);
+        auto header = std::make_shared<tom::net::MessageHeader>();
+        auto msg = tom::pb::decode(packet, header, headerprotocal, fn);
+        gDispatcher_.onMessage(handle, ud, msg);
     }
 
 }
 
-int ProcessNetPackect(gamesh::net::IMessageQueue* msg_queue)
+int ProcessNetPackect(tom::net::IMessageQueue* msg_queue)
 {
     
     int nProcessPacketCount = 0;
@@ -56,9 +56,9 @@ int ProcessNetPackect(gamesh::net::IMessageQueue* msg_queue)
 
     if (packet)
     {
-      gamesh::net::NetContext* context =
-          (gamesh::net::NetContext*)packet->peek();
-      packet->retrieve(sizeof(gamesh::net::NetContext));
+      tom::net::NetContext* context =
+          (tom::net::NetContext*)packet->peek();
+      packet->retrieve(sizeof(tom::net::NetContext));
         switch (context->evetype_)
         {
         case EVENT_ACCEPT:
@@ -166,10 +166,6 @@ void change_limit() {
 
 int main(int argc, char** argv)
 {
-   // TestConcurrentqueue();
-    //TestEcodeAndDecode();
-    //TestEcodeAndDecodeDaobatuProto();
-    //TestEcodeAndDecodeDaobatuProtoRegister();
     if (argc < 2)
     {
         return usage();

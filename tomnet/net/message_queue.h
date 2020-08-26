@@ -1,5 +1,5 @@
-#ifndef  TOM_NET_MESSAGE_QUEUE
-#define  TOM_NET_MESSAGE_QUEUE
+#ifndef  NET_MESSAGE_QUEUE
+#define  NET_MESSAGE_QUEUE
 
 #include "tomnet.h"
 
@@ -18,7 +18,7 @@
 #include <list>
 #include <queue>
 
-namespace tomnet
+namespace tom
 {
 namespace net 
 {

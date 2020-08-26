@@ -1,9 +1,9 @@
-#ifndef  TOM_NET_ASIO_TCP_SERVER_H
-#define  TOM_NET_ASIO_TCP_SERVER_H
+#ifndef  NET_ASIO_TCP_SERVER_H
+#define  NET_ASIO_TCP_SERVER_H
 #include "tomnet.h"
 #include "base/noncopyable.h"
 #include "asio_channel.h"
-#include " TOM_NET_define.h"
+#include "net_define.h"
 #include "event_loop_thread.h"
 
 
@@ -11,7 +11,7 @@
 #include "boost/asio.hpp"
 #include <memory>
 
-namespace tomnet
+namespace tom
 {
 	namespace net
 	{

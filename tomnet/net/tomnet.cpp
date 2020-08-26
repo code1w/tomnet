@@ -1,7 +1,7 @@
 #include "tomnet.h"
 #include "asio_network.h"
 
-namespace tomnet
+namespace tom
 {
 namespace net
 {
@@ -16,22 +16,22 @@ namespace net
 	MsgHeaderProtocal(*GetLinkMsgHeaderProtocal)(uint32_t handle) = 0;
 
 
-#define SETUP_ TOM_NET_DRIVER( PIX, FNAME ) 	FNAME = tom::net::PIX##FNAME 
+#define SETUP_NET_DRIVER( PIX, FNAME ) 	FNAME = tom::net::PIX##FNAME 
 
 
 	bool CreateNetwork(NetDriver type)
 	{
 		if (type == asio)
 		{
-			SETUP_ TOM_NET_DRIVER(Asio_, InitNetwork);
-			SETUP_ TOM_NET_DRIVER(Asio_, StartNetService);
-			SETUP_ TOM_NET_DRIVER(Asio_, CloseNetService);
-			SETUP_ TOM_NET_DRIVER(Asio_, Connect);
-			SETUP_ TOM_NET_DRIVER(Asio_, SendPacket);
-			SETUP_ TOM_NET_DRIVER(Asio_, CloseLink);
-			SETUP_ TOM_NET_DRIVER(Asio_, SetUserData);
-			SETUP_ TOM_NET_DRIVER(Asio_, SendBuffer);
-			SETUP_ TOM_NET_DRIVER(Asio_, GetLinkMsgHeaderProtocal);
+			SETUP_NET_DRIVER(Asio_, InitNetwork);
+			SETUP_NET_DRIVER(Asio_, StartNetService);
+			SETUP_NET_DRIVER(Asio_, CloseNetService);
+			SETUP_NET_DRIVER(Asio_, Connect);
+			SETUP_NET_DRIVER(Asio_, SendPacket);
+			SETUP_NET_DRIVER(Asio_, CloseLink);
+			SETUP_NET_DRIVER(Asio_, SetUserData);
+			SETUP_NET_DRIVER(Asio_, SendBuffer);
+			SETUP_NET_DRIVER(Asio_, GetLinkMsgHeaderProtocal);
 
 		}
 		return true;
@@ -44,4 +44,4 @@ namespace net
 
 
 } // namespace net
-} // namespace tomnet
+} // namespace tom

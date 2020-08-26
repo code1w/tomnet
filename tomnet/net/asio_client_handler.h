@@ -1,12 +1,12 @@
-#ifndef  TOM_NET_ASIO_CLIENT_HANDLER_H
-#define  TOM_NET_ASIO_CLIENT_HANDLER_H
+#ifndef  NET_ASIO_CLIENT_HANDLER_H
+#define  NET_ASIO_CLIENT_HANDLER_H
 
 #include "tomnet.h"
 #include "asio_channel.h"
 #include "asio_handler.h"
 #include "boost/asio.hpp"
 #include <memory>
-namespace tomnet {
+namespace tom {
 class Buffer;
 namespace net {
 	class AsioEventLoop;
@@ -35,9 +35,8 @@ namespace net {
 		 int32_t OnDisConnected();
 		 int32_t OnReConnected(uint32_t);
 		 int32_t SendPacket(const char* data, uint16_t size);
-		 void    CloseLink(uint32_t handle);
+		 void  CloseLink(uint32_t handle);
 		 void  SetHandler(uint32_t handler);
-		 int32_t OnRecvPbMessage(const std::shared_ptr<google::protobuf::Message>& msg);
 		uint64_t AsyncConnect(const char* addr, uint16_t port);
 
 	};

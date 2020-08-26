@@ -1,5 +1,6 @@
-#ifndef _ TOM_ TOM_NET_NETWORK_TRAFFIC_H_
-#define _ TOM_ TOM_NET_NETWORK_TRAFFIC_H_
+#ifndef NET_NETWORK_TRAFFIC_H
+#define NET_NETWORK_TRAFFIC_H
+
 #include "tomnet.h"
 #include "base/noncopyable.h"
 #include "boost/asio.hpp"
@@ -10,7 +11,7 @@
 #include <atomic>
 
 #define MAX_HANDLE_COUNT 50000
-namespace tomnet
+namespace tom
 {
 	namespace net
 	{

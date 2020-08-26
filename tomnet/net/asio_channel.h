@@ -1,5 +1,5 @@
-#ifndef  TOM_NET_ASIO_CHANNEL_H
-#define  TOM_NET_ASIO_CHANNEL_H
+#ifndef  NET_ASIO_CHANNEL_H
+#define  NET_ASIO_CHANNEL_H
 
 #include "net_define.h"
 #include "base/noncopyable.h"
@@ -21,7 +21,7 @@
 #include <atomic>
 #include <queue>
 
-namespace tomnet
+namespace tom
 {
 	namespace net
 	{

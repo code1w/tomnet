@@ -12,7 +12,7 @@
 #include <iostream>
 #include <stdio.h>
 
-namespace tomnet
+namespace tom
 {
 	namespace net
 	{

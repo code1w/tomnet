@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.7)
 set(CMAKE_MACOSX_RPATH 1)
 include(${CMAKE_ROOT}/Modules/ExternalProject.cmake)
-project(tomnet  C CXX)
+project(tomnet CXX)
 
 enable_testing()
 if(NOT CMAKE_BUILD_TYPE)
@@ -10,7 +10,7 @@ endif()
 
 if(CMAKE_PROJECT_NAME STREQUAL "tomnet")
 option(TOMNET_BUILD_EXAMPLES "Build Tomnet examples" ON)
-endif
+endif()
 
 if(WIN32)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W3 /O2 /bigobj")
@@ -71,6 +71,13 @@ endif()
 
 endif(WIN32)
 
+include_directories(${PROJECT_SOURCE_DIR})
+include_directories(${PROJECT_SOURCE_DIR}/3rd/)
+include_directories(${PROJECT_SOURCE_DIR}/tomnet/)
 
-include_directories(${CPP_REDIS_INCLUDES} ${DEPS_INCLUDES})
+if(TOMNET_BUILD_EXAMPLES)
+  add_subdirectory(examples)
+endif() 
+
+add_subdirectory(tomnet/net)
 

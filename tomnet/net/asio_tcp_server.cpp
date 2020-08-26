@@ -4,13 +4,13 @@
 #include "asio_server_handler.h"
 #include "event_loop_thread_pool.h"
 #include "asio_event_loop.h"
-#include " TOM_NET_define.h"
+#include "net_define.h"
 
 #include "boost/bind/bind.hpp"
 
 #include <stdio.h>
 
-namespace tomnet
+namespace tom
 {
 	namespace net
 	{

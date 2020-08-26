@@ -5,7 +5,7 @@
 #include <time.h>
 #include <string>
 
-namespace tomnet
+namespace tom
 {
 	namespace net
 	{

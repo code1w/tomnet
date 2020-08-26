@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 2.8.7)
-project(libtomnet CXX)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -g")
-file(ALL_FILES  *.h *.inl *.cpp *.c *.cc *.cxx)
+file(GLOB_RECURSE SRCS_LIST  *.h *.inl *.cpp *.c *.cc *.cxx)
 
 #option(ENABLE_ TOM_ TOM_NET_TEST "enable gamesh net test" OFF)
 #if(ENABLE_ TOM_ TOM_NET_TEST)
@@ -22,15 +20,8 @@ file(ALL_FILES  *.h *.inl *.cpp *.c *.cc *.cxx)
 #    message("------------gamesh_net Options -------------")
 #    message("CMAKE_CXX_FLAGS : ${CMAKE_CXX_FLAGS}")
 #endif()
-
-source_group_by_dir("${ALL_FILES}")
-
-add_definitions(-D TOM_ TOM_NET_DLL_EXPORT)
-add_library(gamesh_net SHARED ${ALL_FILES})
-proj_directory(gamesh_net)
-add_dependencies(gamesh_net gamesh)
-
-set_target_properties(gamesh_net PROPERTIES
-    CXX_STANDARD 17
-)
-target_link_libraries(gamesh_net ${PLAT_LIBS} gamesh)
+set(ALL_FILES ${SRCS_LIST})
+add_library(tomnet SHARED ${ALL_FILES})
+if(NOT WIN32)
+    target_link_libraries(tomnet pthread rt)
+endif()

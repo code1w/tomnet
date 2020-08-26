@@ -1,12 +1,12 @@
-#ifndef TOME TOM_NET_ TOM_NET_BASE
-#define TOME TOM_NET_ TOM_NET_BASE
+#ifndef NET_TOMNET_BASE
+#define NET_TOMNET_BASE
 
 #include <memory>
 
 #include "base/buffer.h"
 #include "dll_export.h"
 
-#include <google/protobuf/message.h>
+//#include <google/protobuf/message.h>
 
 #ifdef  TOM_NET_EXPORTS
 #define  TOM_NET_API __declspec(dllexport)
@@ -31,7 +31,7 @@ namespace tom {
 class Buffer;
 }
 
-namespace tomnet {
+namespace tom {
 namespace net {
 
 class NetworkPacket;
@@ -117,19 +117,19 @@ class IMessageQueue {
     virtual std::size_t Size() = 0;
 };
 
- TOM_ TOM_NET_DLL_C_DECL int32_t (*InitNetwork)(uint32_t threads);
- TOM_ TOM_NET_DLL_C_DECL uint64_t (*StartNetService)(const char* address, uint16_t port, IMessageQueue** q, uint32_t , uint32_t , uint16_t, MsgHeaderProtocal, void*);
- TOM_ TOM_NET_DLL_C_DECL int32_t (*CloseNetService)(uint64_t server_h);
- TOM_ TOM_NET_DLL_C_DECL int32_t (*Connect)(const char* ip, uint16_t port,IMessageQueue** q,uint32_t , uint32_t , MsgHeaderProtocal, void*);
- TOM_ TOM_NET_DLL_C_DECL int32_t (*SendPacket)(uint32_t handle, const char* data,uint16_t size);
- TOM_ TOM_NET_DLL_C_DECL int32_t (*SendBuffer)(uint32_t handle, const tom::Buffer& b1,const tom::Buffer& b2);
- TOM_ TOM_NET_DLL_C_DECL int32_t (*CloseLink)(uint32_t handle);
- TOM_ TOM_NET_DLL_C_DECL int32_t (*SetUserData)(uint32_t handle, void* ud);
- TOM_ TOM_NET_DLL_C_DECL MsgHeaderProtocal (*GetLinkMsgHeaderProtocal)(uint32_t handle);
- TOM_ TOM_NET_DLL_C_DECL bool CreateNetwork(NetDriver);
- TOM_ TOM_NET_DLL_C_DECL void DestroyNetwork();
+ TOM_TOM_NET_DLL_DECL int32_t (*InitNetwork)(uint32_t threads);
+ TOM_TOM_NET_DLL_C_DECL uint64_t (*StartNetService)(const char* address, uint16_t port, IMessageQueue** q, uint32_t , uint32_t , uint16_t, MsgHeaderProtocal, void*);
+ TOM_TOM_NET_DLL_C_DECL int32_t (*CloseNetService)(uint64_t server_h);
+ TOM_TOM_NET_DLL_C_DECL int32_t (*Connect)(const char* ip, uint16_t port,IMessageQueue** q,uint32_t , uint32_t , MsgHeaderProtocal, void*);
+ TOM_TOM_NET_DLL_C_DECL int32_t (*SendPacket)(uint32_t handle, const char* data,uint16_t size);
+ TOM_TOM_NET_DLL_C_DECL int32_t (*SendBuffer)(uint32_t handle, const tom::Buffer& b1,const tom::Buffer& b2);
+ TOM_TOM_NET_DLL_C_DECL int32_t (*CloseLink)(uint32_t handle);
+ TOM_TOM_NET_DLL_C_DECL int32_t (*SetUserData)(uint32_t handle, void* ud);
+ TOM_TOM_NET_DLL_C_DECL MsgHeaderProtocal (*GetLinkMsgHeaderProtocal)(uint32_t handle);
+ TOM_TOM_NET_DLL_C_DECL bool CreateNetwork(NetDriver);
+ TOM_TOM_NET_DLL_C_DECL void DestroyNetwork();
 
 }  // namespace net
-}  // namespace tomnet
+}  // namespace tom
 
 #endif

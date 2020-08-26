@@ -1,7 +1,7 @@
 // modify from 360 evpp
 
-#ifndef  TOM_NET_EVENT_LOOP_THREAD_POOL_H
-#define  TOM_NET_EVENT_LOOP_THREAD_POOL_H
+#ifndef  NET_EVENT_LOOP_THREAD_POOL_H
+#define  NET_EVENT_LOOP_THREAD_POOL_H
 
 #include <atomic>
 #include <functional>
@@ -12,7 +12,7 @@
 #include "server_status.h"
 #include "base/noncopyable.h"
 
-namespace tomnet
+namespace tom
 {
 namespace net
 {

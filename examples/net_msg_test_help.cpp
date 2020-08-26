@@ -1,7 +1,7 @@
 #include "net_msg_test_help.h"
 
-#include "common/pb_message_helper.h"
-#include "common/codec/pb_dispatcher.h"
+#include "base/pb_message_helper.h"
+#include "base/pb_dispatcher.h"
 
 #include <functional>
 #ifdef WIN32
@@ -13,7 +13,7 @@
 
 #include <vector>
 
-extern gamesh::pb::ProtobufDispatcher gDispatcher_;
+extern tom::pb::ProtobufDispatcher gDispatcher_;
 extern size_t total_count;
 
 extern std::vector<uint32_t> handles_;
@@ -21,7 +21,7 @@ extern std::vector<uint32_t> handles_;
 
 
 
-void OnAccept(uint32_t handle,void* ud, const gamesh::BufferPtr& msg) {
+void OnAccept(uint32_t handle,void* ud, const tom::BufferPtr& msg) {
 	//std::cout << "accept new connect  " << handle << std::endl;
 	if(total_count)
 	{
@@ -35,41 +35,37 @@ void OnAccept(uint32_t handle,void* ud, const gamesh::BufferPtr& msg) {
 }
 
 
-void OnConnected(uint32_t handle, void* ud, const gamesh::BufferPtr& msg) {
-	//std::cout << " connected remote server handle : " << handle << std::endl;
-	//gamesh::net::CloseLink(handle);
+void OnConnected(uint32_t handle, void* ud, const tom::BufferPtr& msg) {
 	Client* c = (Client*)ud;
-//	SendInfoList(handle);
-	SendDaobatuRegServer(handle);
-	//handles_.push_back(handle);
+	SendInfoList(handle);
 }
 
-void OnReConnected(uint32_t handle,void* ud, const gamesh::BufferPtr& msg) {
+void OnReConnected(uint32_t handle,void* ud, const tom::BufferPtr& msg) {
 	//std::cout << " connected remote server handle : " << handle << std::endl;
-	//gamesh::net::CloseLink(handle);
+	//tom::net::CloseLink(handle);
 	SendInfoList(handle);
 	//handles_.push_back(handle);
 }
 
 
 
-void OnConnectFail(uint32_t handle, void* ud, const gamesh::BufferPtr& msg) {
+void OnConnectFail(uint32_t handle, void* ud, const tom::BufferPtr& msg) {
 	//std::cout << " connected remote server handle : " << handle << std::endl;
-	//gamesh::net::CloseLink(handle);
+	//tom::net::CloseLink(handle);
 
 }
-void OnClose(uint32_t handle,void* ud, const gamesh::BufferPtr& msg)
+void OnClose(uint32_t handle,void* ud, const tom::BufferPtr& msg)
 {
-	//gamesh::net::CloseLink(handle);
+	//tom::net::CloseLink(handle);
 	//std::cout << "net close handle " << handle << std::endl;
 }
 
-void OnError(uint32_t handle, const gamesh::BufferPtr& msg) {
+void OnError(uint32_t handle, const tom::BufferPtr& msg) {
 
 }
 
 
-void OnPersonaInfoList(uint32_t handle, void* ud,const gamesh::HeaderPtr& header, const std::shared_ptr<tellist::personal_info_list>& message)
+void OnPersonaInfoList(uint32_t handle, void* ud, const std::shared_ptr<tellist::personal_info_list>& message)
 {
 	//std::cout << "Recv pb msg handler : " << handle << ", msgname: " << message->GetTypeName() << std::endl;
 #if 0
@@ -87,33 +83,13 @@ void OnPersonaInfoList(uint32_t handle, void* ud,const gamesh::HeaderPtr& header
 
 }
 
-void OnBufCommonMessage(uint32_t nethandle, void* ud, const gamesh::HeaderPtr& header, const std::shared_ptr<bus::CommonMessage>& message)
-{
-	auto code = message->code();
-	//std::cout << "Recv pb msg handler : " << handle << ", msgname: " << message->GetTypeName() << std::endl;
-#if 0
-	int info_size = message->info_size();
-	for (int idx = 0; idx < info_size; idx++)
-	{
-		auto info = message->mutable_info(idx);
-		uint32_t id = info->id();
-		std::string name = info->name();
-		uint32_t age = info->age();
-		uint64_t gender = info->gender();
-	}
-#endif
-	//SendInfoList(handle);
 
-}
 
 
 void RegisterCb()
 {
 	gDispatcher_.registerMessageCallback<tellist::personal_info_list>(
-		std::bind(OnPersonaInfoList, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,std::placeholders::_4));
-
-	gDispatcher_.registerMessageCallback<bus::CommonMessage>(
-		std::bind(OnBufCommonMessage, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,std::placeholders::_4));
+		std::bind(OnPersonaInfoList, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 }
 
 
@@ -131,7 +107,7 @@ void SendInfoList(uint32_t handle)
 	uint64_t phone;
 	for (idx = 0; idx < 44 * total_count; idx++) {
 		id = idx;
-		sprintf(name, "zhang %u", id);
+		sprintf(name, "tom %u", id);
 		age = 13 + idx;
 		gender = id % 3;
 		phone = static_cast<uint64_t>(1234567890 + id);
@@ -143,48 +119,15 @@ void SendInfoList(uint32_t handle)
 		info->set_gender((tellist::gender_type)(gender));
 		info->set_phone_num(phone);
 	}
-    gamesh::SendMsg(handle, info_list);
-}
-
-void SendSSCommonMsg(uint32_t handle)
-{
-	ss_proto::CommonMessage msg;
-	ss_proto::ServerReport* report = msg.mutable_serverreport();
-    report->set_ip("127.0.0.1");
-	report->set_count(1000000);
-	report->set_port(8888);
-	msg.set_code(ss_proto::NONE);
-	gamesh::SendMsg(handle, msg);
-}
-
-void SendDaobatuRegServer(uint32_t handle)
-{
-	bus::CommonMessage msg;
-	msg.set_code(bus::REG_SVR);
-	bus::RegSvrInfo* regs = msg.mutable_svrinfo();
-	bus::NewSvrInfo* src =  regs->mutable_src();
-	src->set_id(1);
-	src->set_ip("127.0.0.1");
-	src->set_port("1234");
-
-	bus::NewSvrInfo* dest =  regs->mutable_dest();
-	dest->set_id(2);
-	dest->set_ip("127.0.0.1");
-	dest->set_port("5678");
-
-	auto buffer = std::make_shared<gamesh::Buffer>();
-	int totalsize = gamesh::pb::encode(msg, buffer.get(), gamesh::net::seqidzip);
-	//gamesh::SendMsg(handle, msg);
-	gamesh::SendMsg(handle, msg, 1, 0, 0);
-
+    tom::SendMsg(handle, info_list);
 }
 
 
 void TestConcurrentqueue()
 {
 	{
-		auto packet = std::make_shared<gamesh::Buffer>();
-		moodycamel::ConcurrentQueue<std::shared_ptr<gamesh::Buffer>> wbufferlist_;
+		auto packet = std::make_shared<tom::Buffer>();
+		moodycamel::ConcurrentQueue<std::shared_ptr<tom::Buffer>> wbufferlist_;
 		wbufferlist_.enqueue(packet);
 	}
 
@@ -204,7 +147,7 @@ void TestEcodeAndDecode()
 	uint64_t phone;
 	for (idx = 0; idx < 44  ; idx++) {
 		id = idx;
-		sprintf(name, "zhang %u", id);
+		sprintf(name, "tom %u", id);
 		age = 13 + idx;
 		gender = id % 3;
 		phone = static_cast<uint64_t>(1234567890 + id);
@@ -218,50 +161,10 @@ void TestEcodeAndDecode()
 	}
 
 	
-	auto buffer = std::make_shared<gamesh::Buffer>();
-	int totalsize = gamesh::pb::encode(info_list, buffer.get());
-	auto header = std::make_shared<gamesh::net::MessageHeader>();
-	gamesh::pb::decode(buffer,header);
+	auto buffer = std::make_shared<tom::Buffer>();
+	int totalsize = tom::pb::encode(info_list, buffer.get());
+	auto header = std::make_shared<tom::net::MessageHeader>();
+	tom::pb::decode(buffer,header);
 
 }
 
-void TestEcodeAndDecodeDaobatuProto()
-{
-	ss_proto::CommonMessage msg;
-	ss_proto::ServerReport* report = msg.mutable_serverreport();
-	report->set_ip("127.0.0.1");
-	report->set_count(1000000);
-	report->set_port(8888);
-	msg.set_code(ss_proto::NONE);
-
-	auto buffer = std::make_shared<gamesh::Buffer>();
-	int totalsize = gamesh::pb::encode(msg, buffer.get(), gamesh::net::seqidzip);
-	auto header = std::make_shared<gamesh::net::MessageHeader>();
-	gamesh::pb::decode(buffer,header, gamesh::net::seqidzip);
-
-}
-
-
-
-void TestEcodeAndDecodeDaobatuProtoRegister()
-{
-	bus::CommonMessage msg;
-	msg.set_code(bus::REG_SVR);
-	bus::RegSvrInfo* regs = msg.mutable_svrinfo();
-	bus::NewSvrInfo* src =  regs->mutable_src();
-	src->set_id(1);
-	src->set_ip("127.0.0.1");
-	src->set_port("1234");
-
-	bus::NewSvrInfo* dest =  regs->mutable_dest();
-	dest->set_id(2);
-	dest->set_ip("127.0.0.1");
-	dest->set_port("5678");
-
-	auto buffer = std::make_shared<gamesh::Buffer>();
-	int totalsize = gamesh::pb::encode(msg, buffer.get(), gamesh::net::seqidzip);
-	auto header = std::make_shared<gamesh::net::MessageHeader>();
-	gamesh::pb::decode(buffer, header,gamesh::net::seqidzip);
-	//gamesh::SendMsg(handle, msg);
-
-}

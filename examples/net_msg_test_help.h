@@ -6,12 +6,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <mutex>
-#include "common/buffer.h"
-#include "tellist.pb.h"
-#include "ss_proto.pb.h"
-#include "bus.pb.h"
-#include "common/codec.h"
+#include "base/buffer.h"
+#include "net/net_define.h"
 
+#include "tellist.pb.h"
+#include "base/codec.h"
 #include <concurrentqueue/concurrentqueue.h>
 
 struct Client
@@ -31,21 +30,16 @@ struct Server
  void client(char const* host, char const* port, int thread_count, size_t total_count, size_t session_count);
  void server(char const* host, char const* port, int thread_count, size_t total_count);
 
- void OnAccept(uint32_t handle, void* ud,const gamesh::BufferPtr& msg);
- void OnConnected(uint32_t handle, void* ud,  const gamesh::BufferPtr& msg);
- void OnReConnected(uint32_t handle, void* ud, const gamesh::BufferPtr& msg);
- void OnClose(uint32_t handle, void* ud, const gamesh::BufferPtr& msg);
- void OnError(uint32_t handle, void* ud, const gamesh::BufferPtr& msg);
- void OnConnectFail(uint32_t handle, void* ud,const gamesh::BufferPtr& msg);
+ void OnAccept(uint32_t handle, void* ud,const tom::BufferPtr& msg);
+ void OnConnected(uint32_t handle, void* ud,  const tom::BufferPtr& msg);
+ void OnReConnected(uint32_t handle, void* ud, const tom::BufferPtr& msg);
+ void OnClose(uint32_t handle, void* ud, const tom::BufferPtr& msg);
+ void OnError(uint32_t handle, void* ud, const tom::BufferPtr& msg);
+ void OnConnectFail(uint32_t handle, void* ud,const tom::BufferPtr& msg);
  void SendInfoList(uint32_t handle);
- void SendSSCommonMsg(uint32_t handle);
 
  void RegisterCb();
- void OnPersonaInfoList(uint32_t nethandle, void* ud, const gamesh::HeaderPtr& header, const std::shared_ptr<tellist::personal_info_list>& message);
- void OnBufCommonMessage(uint32_t nethandle, void* ud,const gamesh::HeaderPtr& header, const std::shared_ptr<bus::CommonMessage>& message);
+ void OnPersonaInfoList(uint32_t nethandle, void* ud, const std::shared_ptr<tellist::personal_info_list>& message);
 
  void TestConcurrentqueue();
  void TestEcodeAndDecode();
- void TestEcodeAndDecodeDaobatuProto();
- void TestEcodeAndDecodeDaobatuProtoRegister();
- void SendDaobatuRegServer(uint32_t handle);

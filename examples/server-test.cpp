@@ -9,12 +9,12 @@
 #include <queue>
 #include <stack>
 #include <thread>
-#include "gamesh_net/net_base.h"
-#include "common/buffer.h"
-#include "common/pb_message_helper.h"
+#include "net/tomnet.h"
+#include "base/buffer.h"
+#include "base/pb_message_helper.h"
 #include "net_msg_test_help.h"
 
-extern gamesh::net::IMessageQueue* Q_;
+extern tom::net::IMessageQueue* Q_;
 extern size_t total_count;
 void server(char const* host, char const* port, int thread_count, size_t totalcount)
 {
@@ -27,11 +27,11 @@ void server(char const* host, char const* port, int thread_count, size_t totalco
 	s->ip = std::string(host);
 	s->port = atoi(port);
 
-	gamesh::net::CreateNetwork(gamesh::net::asio);
-	gamesh::net::InitNetwork(thread_count);
+	tom::net::CreateNetwork(tom::net::asio);
+	tom::net::InitNetwork(thread_count);
 	total_count = totalcount;
 	std::cout << "Server Start tid:" << std::this_thread::get_id() <<", packlen "<<total_count<< std::endl;
-	if (!gamesh::net::StartNetService(host, atoi(port), &Q_, 10000, 25000, 100, gamesh::net::nametype, s))
+	if (!tom::net::StartNetService(host, atoi(port), &Q_, 10000, 25000, 100, tom::net::nametype, s))
 	{
 		std::cout<< "start net fail port " << atoi(port)<< std::endl;
 	}

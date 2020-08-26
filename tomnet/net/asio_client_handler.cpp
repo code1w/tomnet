@@ -11,7 +11,7 @@
 
 
 #define CONNECT_TIME_OUT 200
-namespace tomnet {
+namespace tom {
 namespace net {
 
 	AsioClientHandler::AsioClientHandler(AsioEventLoop* loop, IMessageQueue* queue, uint32_t handle)

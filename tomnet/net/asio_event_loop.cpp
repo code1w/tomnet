@@ -2,7 +2,7 @@
 #include "asio_event_loop.h"
 
 #include <stdio.h>
-namespace tomnet
+namespace tom
 {
 namespace net{
 	AsioEventLoop::AsioEventLoop():notified_(false), pending_functor_count_(0)

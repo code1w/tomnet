@@ -7,7 +7,7 @@
 #include "base/buffer.h"
 #include "boost/asio.hpp"
 
-namespace tomnet {
+namespace tom {
 namespace net {
 	AsioServerHandler::AsioServerHandler(AsioEventLoop* loop, IMessageQueue* queue)
 		:msgqueue_(queue)

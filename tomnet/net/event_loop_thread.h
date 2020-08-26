@@ -1,7 +1,7 @@
 // modify from evpp
 
-#ifndef  TOM_NET_EVENT_LOOP_THREAD_H
-#define  TOM_NET_EVENT_LOOP_THREAD_H
+#ifndef  NET_EVENT_LOOP_THREAD_H
+#define  NET_EVENT_LOOP_THREAD_H
 
 #include <thread>
 #include <mutex>
@@ -13,7 +13,7 @@
 #include "server_status.h"
 
 
-namespace tomnet
+namespace tom
 {
 namespace net
 {

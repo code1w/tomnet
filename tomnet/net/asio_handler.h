@@ -1,11 +1,11 @@
-#ifndef  TOM_NET_ASIO_HANDLER_H
-#define  TOM_NET_ASIO_HANDLER_H
+#ifndef  NET_ASIO_HANDLER_H
+#define  NET_ASIO_HANDLER_H
 
 #include "tomnet.h"
 #include "base/buffer.h"
 #include <memory>
 
-namespace tomnet {
+namespace tom {
 namespace net {
 class AsiokHandler {
 protected:

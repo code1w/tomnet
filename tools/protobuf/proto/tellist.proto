@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package tellist;
+
+enum gender_type
+{
+	MALE	= 0;
+	FEMALE	= 1;
+	OTHER	= 2;
+}
+
+message personal_info
+{
+	 uint32			id = 1;
+	 string			name = 2;
+	 uint32			age = 3;
+	 gender_type	gender = 4;
+	 uint64			phone_num = 5;
+}
+
+message personal_info_list
+{
+	repeated personal_info	info = 1;
+}
+

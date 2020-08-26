@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <memory>
 
-namespace tomnet {
+namespace tom {
 	namespace net
 	{
 		MessageQueue::MessageQueue()

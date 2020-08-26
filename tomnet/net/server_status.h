@@ -1,12 +1,12 @@
 // Modified from evpp project https://github.com/Qihoo360/evpp/
 
-#ifndef  TOM_NET_SERVER_STATUS_H
-#define  TOM_NET_SERVER_STATUS_H
+#ifndef  NET_SERVER_STATUS_H
+#define  NET_SERVER_STATUS_H
 
 #include <atomic>
 #include <string>
 
-namespace tomnet {
+namespace tom {
 #ifndef H_CASE_STRING_BIGIN
 #define H_CASE_STRING_BIGIN(state) switch(state){
 #define H_CASE_STRING(state) case state:return #state;break;

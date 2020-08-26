@@ -1,8 +1,8 @@
 #include "event_loop_thread_pool.h"
 #include "asio_event_loop.h"
 
-#include " TOM_NET_define.h"
-namespace tomnet
+#include "net_define.h"
+namespace tom
 {
 	namespace net
 	{
