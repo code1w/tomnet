@@ -74,6 +74,7 @@ endif(WIN32)
 include_directories(${PROJECT_SOURCE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/3rd/)
 include_directories(${PROJECT_SOURCE_DIR}/tomnet/)
+link_directories(${PROJECT_SOURCE_DIR}/deps/lib_${BUILD_OS}/${BUILD_TYPE_SUFFIX})
 
 if(TOMNET_BUILD_EXAMPLES)
   add_subdirectory(examples)
