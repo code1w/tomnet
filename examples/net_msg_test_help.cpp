@@ -65,7 +65,7 @@ void OnError(uint32_t handle, const tom::BufferPtr& msg) {
 }
 
 
-void OnPersonaInfoList(uint32_t handle, void* ud, const std::shared_ptr<tellist::personal_info_list>& message)
+void OnPersonaInfoList(uint32_t handle, void* ud, const std::shared_ptr<Tom::personal_info_list>& message)
 {
 	//std::cout << "Recv pb msg handler : " << handle << ", msgname: " << message->GetTypeName() << std::endl;
 #if 0
@@ -88,15 +88,15 @@ void OnPersonaInfoList(uint32_t handle, void* ud, const std::shared_ptr<tellist:
 
 void RegisterCb()
 {
-	gDispatcher_.registerMessageCallback<tellist::personal_info_list>(
+	gDispatcher_.registerMessageCallback<Tom::personal_info_list>(
 		std::bind(OnPersonaInfoList, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 }
 
 
 void SendInfoList(uint32_t handle)
 {
-	tellist::personal_info* info;
-	tellist::personal_info_list info_list;
+	Tom::personal_info* info;
+	Tom::personal_info_list info_list;
 
 	// 构造1K的包
 	int32_t idx = 0;
@@ -116,7 +116,7 @@ void SendInfoList(uint32_t handle)
 		info->set_id(id);
 		info->set_name(name);
 		info->set_age(age);
-		info->set_gender((tellist::gender_type)(gender));
+		info->set_gender((Tom::gender_type)(gender));
 		info->set_phone_num(phone);
 	}
     tom::SendMsg(handle, info_list);
@@ -135,8 +135,8 @@ void TestConcurrentqueue()
 
 void TestEcodeAndDecode()
 {
-	tellist::personal_info* info;
-	tellist::personal_info_list info_list;
+	Tom::personal_info* info;
+	Tom::personal_info_list info_list;
 
 	// 构造1K的包
 	int32_t idx = 0;
@@ -156,7 +156,7 @@ void TestEcodeAndDecode()
 		info->set_id(id);
 		info->set_name(name);
 		info->set_age(age);
-		info->set_gender((tellist::gender_type)(gender));
+		info->set_gender((Tom::gender_type)(gender));
 		info->set_phone_num(phone);
 	}
 

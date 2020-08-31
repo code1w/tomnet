@@ -30,6 +30,7 @@ namespace tom {
         
         typedef std::shared_ptr<google::protobuf::Message> MessagePtr;
 
+
         static int msgsize(const google::protobuf::Message& message)
         {
 #if GOOGLE_PROTOBUF_VERSION > 3009002
@@ -39,6 +40,7 @@ namespace tom {
 #endif
             return body_size;
         }
+
 
         static int encode_default_header(const google::protobuf::Message& message, tom::Buffer* buf, int body_size) 
         {

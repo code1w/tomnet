@@ -81,4 +81,6 @@ if(TOMNET_BUILD_EXAMPLES)
 endif() 
 
 add_subdirectory(tomnet/net)
+add_subdirectory(tomnet/base)
+
 

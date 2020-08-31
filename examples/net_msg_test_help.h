@@ -39,7 +39,7 @@ struct Server
  void SendInfoList(uint32_t handle);
 
  void RegisterCb();
- void OnPersonaInfoList(uint32_t nethandle, void* ud, const std::shared_ptr<tellist::personal_info_list>& message);
+ void OnPersonaInfoList(uint32_t nethandle, void* ud, const std::shared_ptr<Tom::personal_info_list>& message);
 
  void TestConcurrentqueue();
  void TestEcodeAndDecode();

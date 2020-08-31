@@ -3,7 +3,7 @@
 #include "asio_event_loop.h"
 #include "event_loop_thread_pool.h"
 #include "network_traffic.h"
-#include "base/codec.h"
+//#include "base/codec.h"
 
 #include "boost/asio.hpp"
 #include "boost/system/system_error.hpp"
