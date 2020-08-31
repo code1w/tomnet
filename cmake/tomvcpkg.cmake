@@ -34,15 +34,16 @@ else()
     if( DEFINED ENV{VcpkgIncludeDir})
         include_directories($ENV{VcpkgIncludeDir})
     endif()
-
-    if(DEFINED ENV{VcpkgReleaseLibDir})
-        link_directories($ENV{VcpkgReleaseLibDir})
+    
+    if(CMAKE_BUILD_TYPE STREQUAL "Release")
+        if(DEFINED ENV{VcpkgReleaseLibDir})
+            link_directories($ENV{VcpkgReleaseLibDir})
+        endif()
+    else()
+        if(DEFINED ENV{VcpkgDebugLibDir})
+            link_directories($ENV{VcpkgDebugLibDir})
+        endif()
     endif()
-
-    if(DEFINED ENV{VcpkgDebugLibDir})
-        link_directories($ENV{VcpkgDebugLibDir})
-    endif()
-
 
 
     #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
