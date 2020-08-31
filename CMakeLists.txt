@@ -10,6 +10,7 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 include(${PROJECT_SOURCE_DIR}/cmake/tomvcpkg.cmake)
+include(${PROJECT_SOURCE_DIR}/cmake/vs_dir_proj.cmake)
 
 
 if(CMAKE_PROJECT_NAME STREQUAL "tomnet")
