@@ -9,6 +9,7 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "Release")
 endif()
 
+include(${PROJECT_SOURCE_DIR}/cmake/build_config.cmake)
 include(${PROJECT_SOURCE_DIR}/cmake/tomvcpkg.cmake)
 include(${PROJECT_SOURCE_DIR}/cmake/vs_dir_proj.cmake)
 
