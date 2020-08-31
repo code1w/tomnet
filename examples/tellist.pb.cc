@@ -59,7 +59,7 @@ static const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* file_level_enum_descriptor
 static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_tellist_2eproto = nullptr;
 
 const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_tellist_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  PROTOBUF_FIELD_OFFSET(::Tom::personal_info, _has_bits_),
+  ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::Tom::personal_info, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
@@ -69,11 +69,6 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_tellist_2eproto::offsets[] PRO
   PROTOBUF_FIELD_OFFSET(::Tom::personal_info, age_),
   PROTOBUF_FIELD_OFFSET(::Tom::personal_info, gender_),
   PROTOBUF_FIELD_OFFSET(::Tom::personal_info, phone_num_),
-  1,
-  0,
-  2,
-  4,
-  3,
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::Tom::personal_info_list, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -82,8 +77,8 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_tellist_2eproto::offsets[] PRO
   PROTOBUF_FIELD_OFFSET(::Tom::personal_info_list, info_),
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  { 0, 10, sizeof(::Tom::personal_info)},
-  { 15, -1, sizeof(::Tom::personal_info_list)},
+  { 0, -1, sizeof(::Tom::personal_info)},
+  { 10, -1, sizeof(::Tom::personal_info_list)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
@@ -97,7 +92,8 @@ const char descriptor_table_protodef_tellist_2eproto[] PROTOBUF_SECTION_VARIABLE
   "gender\030\004 \001(\0162\020.Tom.gender_type\022\021\n\tphone_"
   "num\030\005 \001(\004\"6\n\022personal_info_list\022 \n\004info\030"
   "\001 \003(\0132\022.Tom.personal_info*.\n\013gender_type"
-  "\022\010\n\004MALE\020\000\022\n\n\006FEMALE\020\001\022\t\n\005OTHER\020\002"
+  "\022\010\n\004MALE\020\000\022\n\n\006FEMALE\020\001\022\t\n\005OTHER\020\002b\006proto"
+  "3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_tellist_2eproto_deps[1] = {
 };
@@ -107,7 +103,7 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_tel
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_tellist_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_tellist_2eproto = {
-  false, false, descriptor_table_protodef_tellist_2eproto, "tellist.proto", 233,
+  false, false, descriptor_table_protodef_tellist_2eproto, "tellist.proto", 241,
   &descriptor_table_tellist_2eproto_once, descriptor_table_tellist_2eproto_sccs, descriptor_table_tellist_2eproto_deps, 2, 0,
   schemas, file_default_instances, TableStruct_tellist_2eproto::offsets,
   file_level_metadata_tellist_2eproto, 2, file_level_enum_descriptors_tellist_2eproto, file_level_service_descriptors_tellist_2eproto,
@@ -138,22 +134,6 @@ void personal_info::InitAsDefaultInstance() {
 }
 class personal_info::_Internal {
  public:
-  using HasBits = decltype(std::declval<personal_info>()._has_bits_);
-  static void set_has_id(HasBits* has_bits) {
-    (*has_bits)[0] |= 2u;
-  }
-  static void set_has_name(HasBits* has_bits) {
-    (*has_bits)[0] |= 1u;
-  }
-  static void set_has_age(HasBits* has_bits) {
-    (*has_bits)[0] |= 4u;
-  }
-  static void set_has_gender(HasBits* has_bits) {
-    (*has_bits)[0] |= 16u;
-  }
-  static void set_has_phone_num(HasBits* has_bits) {
-    (*has_bits)[0] |= 8u;
-  }
 };
 
 personal_info::personal_info(::PROTOBUF_NAMESPACE_ID::Arena* arena)
@@ -163,11 +143,10 @@ personal_info::personal_info(::PROTOBUF_NAMESPACE_ID::Arena* arena)
   // @@protoc_insertion_point(arena_constructor:Tom.personal_info)
 }
 personal_info::personal_info(const personal_info& from)
-  : ::PROTOBUF_NAMESPACE_ID::Message(),
-      _has_bits_(from._has_bits_) {
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  if (from._internal_has_name()) {
+  if (!from._internal_name().empty()) {
     name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_name(),
       GetArena());
   }
@@ -217,71 +196,55 @@ void personal_info::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  cached_has_bits = _has_bits_[0];
-  if (cached_has_bits & 0x00000001u) {
-    name_.ClearNonDefaultToEmpty();
-  }
-  if (cached_has_bits & 0x0000001eu) {
-    ::memset(&id_, 0, static_cast<size_t>(
-        reinterpret_cast<char*>(&gender_) -
-        reinterpret_cast<char*>(&id_)) + sizeof(gender_));
-  }
-  _has_bits_.Clear();
+  name_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  ::memset(&id_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&gender_) -
+      reinterpret_cast<char*>(&id_)) + sizeof(gender_));
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
 const char* personal_info::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
-  _Internal::HasBits has_bits{};
   ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
   while (!ctx->Done(&ptr)) {
     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     CHK_(ptr);
     switch (tag >> 3) {
-      // optional uint32 id = 1;
+      // uint32 id = 1;
       case 1:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
-          _Internal::set_has_id(&has_bits);
           id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      // optional string name = 2;
+      // string name = 2;
       case 2:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
           auto str = _internal_mutable_name();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-          #ifndef NDEBUG
-          ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "Tom.personal_info.name");
-          #endif  // !NDEBUG
+          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "Tom.personal_info.name"));
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      // optional uint32 age = 3;
+      // uint32 age = 3;
       case 3:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 24)) {
-          _Internal::set_has_age(&has_bits);
           age_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      // optional .Tom.gender_type gender = 4;
+      // .Tom.gender_type gender = 4;
       case 4:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 32)) {
           ::PROTOBUF_NAMESPACE_ID::uint64 val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
-          if (PROTOBUF_PREDICT_TRUE(::Tom::gender_type_IsValid(val))) {
-            _internal_set_gender(static_cast<::Tom::gender_type>(val));
-          } else {
-            ::PROTOBUF_NAMESPACE_ID::internal::WriteVarint(4, val, mutable_unknown_fields());
-          }
+          _internal_set_gender(static_cast<::Tom::gender_type>(val));
         } else goto handle_unusual;
         continue;
-      // optional uint64 phone_num = 5;
+      // uint64 phone_num = 5;
       case 5:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 40)) {
-          _Internal::set_has_phone_num(&has_bits);
           phone_num_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
@@ -301,7 +264,6 @@ const char* personal_info::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_
     }  // switch
   }  // while
 success:
-  _has_bits_.Or(has_bits);
   return ptr;
 failure:
   ptr = nullptr;
@@ -315,38 +277,37 @@ failure:
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  cached_has_bits = _has_bits_[0];
-  // optional uint32 id = 1;
-  if (cached_has_bits & 0x00000002u) {
+  // uint32 id = 1;
+  if (this->id() != 0) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteUInt32ToArray(1, this->_internal_id(), target);
   }
 
-  // optional string name = 2;
-  if (cached_has_bits & 0x00000001u) {
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::VerifyUTF8StringNamedField(
+  // string name = 2;
+  if (this->name().size() > 0) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
       this->_internal_name().data(), static_cast<int>(this->_internal_name().length()),
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::SERIALIZE,
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
       "Tom.personal_info.name");
     target = stream->WriteStringMaybeAliased(
         2, this->_internal_name(), target);
   }
 
-  // optional uint32 age = 3;
-  if (cached_has_bits & 0x00000004u) {
+  // uint32 age = 3;
+  if (this->age() != 0) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteUInt32ToArray(3, this->_internal_age(), target);
   }
 
-  // optional .Tom.gender_type gender = 4;
-  if (cached_has_bits & 0x00000010u) {
+  // .Tom.gender_type gender = 4;
+  if (this->gender() != 0) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteEnumToArray(
       4, this->_internal_gender(), target);
   }
 
-  // optional uint64 phone_num = 5;
-  if (cached_has_bits & 0x00000008u) {
+  // uint64 phone_num = 5;
+  if (this->phone_num() != 0) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteUInt64ToArray(5, this->_internal_phone_num(), target);
   }
@@ -367,43 +328,40 @@ size_t personal_info::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  cached_has_bits = _has_bits_[0];
-  if (cached_has_bits & 0x0000001fu) {
-    // optional string name = 2;
-    if (cached_has_bits & 0x00000001u) {
-      total_size += 1 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
-          this->_internal_name());
-    }
-
-    // optional uint32 id = 1;
-    if (cached_has_bits & 0x00000002u) {
-      total_size += 1 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::UInt32Size(
-          this->_internal_id());
-    }
-
-    // optional uint32 age = 3;
-    if (cached_has_bits & 0x00000004u) {
-      total_size += 1 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::UInt32Size(
-          this->_internal_age());
-    }
-
-    // optional uint64 phone_num = 5;
-    if (cached_has_bits & 0x00000008u) {
-      total_size += 1 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::UInt64Size(
-          this->_internal_phone_num());
-    }
-
-    // optional .Tom.gender_type gender = 4;
-    if (cached_has_bits & 0x00000010u) {
-      total_size += 1 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::EnumSize(this->_internal_gender());
-    }
-
+  // string name = 2;
+  if (this->name().size() > 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_name());
   }
+
+  // uint32 id = 1;
+  if (this->id() != 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::UInt32Size(
+        this->_internal_id());
+  }
+
+  // uint32 age = 3;
+  if (this->age() != 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::UInt32Size(
+        this->_internal_age());
+  }
+
+  // uint64 phone_num = 5;
+  if (this->phone_num() != 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::UInt64Size(
+        this->_internal_phone_num());
+  }
+
+  // .Tom.gender_type gender = 4;
+  if (this->gender() != 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::EnumSize(this->_internal_gender());
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
         _internal_metadata_, total_size, &_cached_size_);
@@ -435,24 +393,20 @@ void personal_info::MergeFrom(const personal_info& from) {
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  cached_has_bits = from._has_bits_[0];
-  if (cached_has_bits & 0x0000001fu) {
-    if (cached_has_bits & 0x00000001u) {
-      _internal_set_name(from._internal_name());
-    }
-    if (cached_has_bits & 0x00000002u) {
-      id_ = from.id_;
-    }
-    if (cached_has_bits & 0x00000004u) {
-      age_ = from.age_;
-    }
-    if (cached_has_bits & 0x00000008u) {
-      phone_num_ = from.phone_num_;
-    }
-    if (cached_has_bits & 0x00000010u) {
-      gender_ = from.gender_;
-    }
-    _has_bits_[0] |= cached_has_bits;
+  if (from.name().size() > 0) {
+    _internal_set_name(from._internal_name());
+  }
+  if (from.id() != 0) {
+    _internal_set_id(from._internal_id());
+  }
+  if (from.age() != 0) {
+    _internal_set_age(from._internal_age());
+  }
+  if (from.phone_num() != 0) {
+    _internal_set_phone_num(from._internal_phone_num());
+  }
+  if (from.gender() != 0) {
+    _internal_set_gender(from._internal_gender());
   }
 }
 
@@ -477,7 +431,6 @@ bool personal_info::IsInitialized() const {
 void personal_info::InternalSwap(personal_info* other) {
   using std::swap;
   _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
-  swap(_has_bits_[0], other->_has_bits_[0]);
   name_.Swap(&other->name_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
       PROTOBUF_FIELD_OFFSET(personal_info, gender_)

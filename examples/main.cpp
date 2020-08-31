@@ -180,9 +180,9 @@ int main(int argc, char** argv)
         return usage();
     }
 
-    if (!strcmp(argv[1], "client"))
+    if (!strcmp(argv[1], "c"))
     {
-        style = "client";
+        style = "c";
         const char* host = argv[2];
         const char* port = argv[3];
         int thread_count = atoi(argv[4]);
@@ -191,8 +191,8 @@ int main(int argc, char** argv)
         client(host, port, thread_count, total_count, session_count);
 
     }
-    else if (!strcmp(argv[1], "server")) {
-        style = "server";
+    else if (!strcmp(argv[1], "s")) {
+        style = "s";
         const char* host = argv[2];
         const char* port = argv[3];
         int thread_count = atoi(argv[4]);

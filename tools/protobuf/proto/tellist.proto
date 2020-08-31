@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package tellist;
+package Tom;
 
 enum gender_type
 {

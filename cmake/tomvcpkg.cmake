@@ -31,24 +31,31 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 else()
     set(BUILD_OS win)
 
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
-    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MDd")
-    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MD")
-    set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} /MD")
-    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} /MD")
+    if( DEFINED ENV{VcpkgIncludeDir})
+        include_directories($ENV{VcpkgIncludeDir})
+    endif()
 
-    set(DEFINITIONS -DWIN32_LEAN_AND_MEAN -D_WIN32=0x0601 -D_CRT_SECURE_NO_WARNINGS -DPROTOBUF_USE_DLLS)
+    if(DEFINED ENV{VcpkgReleaseLibDir})
+        link_directories($ENV{VcpkgReleaseLibDir})
+    endif()
 
-    set(BOST_D_BUILD_SUFFIX -vc140-mt-gd)
-    set(BOST_BUILD_SUFFIX -vc140-mt)
-    set(LIB_PREFIX lib)
-    set(THREAD)
-    set(VCPKG_INSTALL ${PROJECT_SOURCE_DIR}/vcpkg/installed/x64-windows)
+    if(DEFINED ENV{VcpkgDebugLibDir})
+        link_directories($ENV{VcpkgDebugLibDir})
+    endif()
 
-    set(PLAT_LIBS ws2_32)
-    add_definitions(-wd4251)
-    add_definitions(-wd4275)
-    add_definitions(-wd4819)
+
+
+    #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
+    #set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MDd")
+    #set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MD")
+    #set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} /MD")
+    #set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} /MD")
+
+    #set(DEFINITIONS -DWIN32_LEAN_AND_MEAN -D_WIN32=0x0601 -D_CRT_SECURE_NO_WARNINGS -DPROTOBUF_USE_DLLS)
+    #set(PLAT_LIBS ws2_32)
+    #add_definitions(-wd4251)
+    #add_definitions(-wd4275)
+    #add_definitions(-wd4819)
 endif()
 
 set(BIN_OUTPUT ${PROJECT_SOURCE_DIR}/bin)
@@ -65,62 +72,3 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE          ${BIN_OUTPUT}/release/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO   ${BIN_OUTPUT}/release/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_MINSIZEREL       ${BIN_OUTPUT}/release/lib)
 
-set(
-    PB_LIBS
-    protobuf::libprotobuf
-    protobuf::libprotoc
-)
-
-set(
-    ASIO_LIBS
-    debug boost_coroutine${BOST_D_BUILD_SUFFIX}
-    debug boost_thread${BOST_D_BUILD_SUFFIX}
-    debug boost_system${BOST_D_BUILD_SUFFIX}
-    debug boost_context${BOST_D_BUILD_SUFFIX}
-    debug boost_date_time${BOST_D_BUILD_SUFFIX}
-    debug boost_chrono${BOST_D_BUILD_SUFFIX}
-    debug boost_filesystem${BOST_D_BUILD_SUFFIX}
-    debug boost_regex${BOST_D_BUILD_SUFFIX}
-    debug boost_atomic${BOST_D_BUILD_SUFFIX}
-    optimized boost_coroutine${BOST_BUILD_SUFFIX}
-    optimized boost_thread${BOST_BUILD_SUFFIX}
-    optimized boost_system${BOST_BUILD_SUFFIX}
-    optimized boost_context${BOST_BUILD_SUFFIX}
-    optimized boost_date_time${BOST_BUILD_SUFFIX}
-    optimized boost_chrono${BOST_BUILD_SUFFIX}
-    optimized boost_filesystem${BOST_BUILD_SUFFIX}
-    optimized boost_regex${BOST_BUILD_SUFFIX}
-    optimized boost_atomic${BOST_BUILD_SUFFIX}
-    ${LIB_PREFIX}ssl
-)
-
-set(
-    COMMON_LIBS
-    ${PLAT_LIBS}
-    log4cxx
-    ${PB_LIBS}
-)
-
-set(
-    SVR_COMMON_LIBS
-    ${COMMON_LIBS}
-    ${ASIO_LIBS}
-    libgo
-)
-
-set(
-    NATS
-    debug natsd
-    debug natsd
-    optimized nats
-    optimized nats
-)
-
-set(
-    GTEST
-    debug gtestd
-    debug gmockd
-    optimized gtest
-    optimized gmock
-    ${THREAD}
-)
