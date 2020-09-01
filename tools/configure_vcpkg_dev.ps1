@@ -2,6 +2,10 @@
 #在Windows平台用管理权限执行此脚本
 #VcpkgDirRoot 为你的vcpkg的安装目录
 
+#如果系统禁止运行脚本, 在powershell控制台中执行以下命令
+#  set-ExecutionPolicy RemoteSigned
+
+
 [string]$VcpkgInstalledDir= "E:/zxb/env/vcpkg/installed/"
 [string]$VcpkgBuildPlatform= "x64-windows"
 
