@@ -5,7 +5,7 @@
 #include "event_loop_thread_pool.h"
 #include "handler_manager.h"
 #include "base/buffer.h"
-#include "boost/asio.hpp"
+#include "asio/asio.hpp"
 
 namespace tom {
 namespace net {
@@ -113,7 +113,7 @@ namespace net {
 		return 0;
 	}
 
-	boost::asio::ip::tcp::socket& AsioServerHandler::Socket()
+	asio::ip::tcp::socket& AsioServerHandler::Socket()
 	{
 		return channel_->Socket();
 	}

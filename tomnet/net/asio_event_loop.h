@@ -12,7 +12,7 @@
 #include <concurrentqueue/concurrentqueue.h>
 #endif // __GNUC__
 #include "base/noncopyable.h"
-#include "boost/asio.hpp"
+#include "asio/asio.hpp"
 
 #include <functional>
 #include <mutex>
@@ -27,8 +27,8 @@ namespace net
 	public:
 		typedef std::function<void()> Functor;
 	private:
-		boost::asio::io_service io_service_;
-		std::shared_ptr<boost::asio::io_service::work> io_work_;
+		asio::io_service io_service_;
+		std::shared_ptr<asio::io_service::work> io_work_;
 		std::thread::id tid_;
 		std::mutex mutex_;
 		std::atomic<bool> notified_;
@@ -65,7 +65,7 @@ namespace net
 		//InvokeTimerPtr RunEvery(Duration interval, Functor&& f);
 
 	public:
-		boost::asio::io_service& io_service() {
+		asio::io_service& io_service() {
 			return io_service_;
 		}
 		bool IsInLoopThread() const {

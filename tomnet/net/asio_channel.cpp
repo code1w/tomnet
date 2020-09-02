@@ -3,15 +3,11 @@
 #include "asio_event_loop.h"
 #include "event_loop_thread_pool.h"
 #include "network_traffic.h"
-//#include "base/codec.h"
-
-#include "boost/asio.hpp"
-//#include "asio/include/asio.hpp"
-#include "boost/system/system_error.hpp"
-#include "boost/bind/bind.hpp"
+#include "asio/asio.hpp"
 
 #include <iostream>
 #include <stdio.h>
+#include <chrono>
 
 namespace tom
 {
@@ -45,10 +41,10 @@ namespace tom
 			remoteip_  = ip;
 			remoteport_ = port;
 
-			boost::system::error_code ec;
-			boost::asio::ip::address_v4 addr(boost::asio::ip::address_v4::from_string(ip, ec));
-			socket_.async_connect(boost::asio::ip::tcp::endpoint(addr, port),
-				[this, tryconnect, self = shared_from_this()](const boost::system::error_code& error)
+			std::error_code ec;
+			asio::ip::address_v4 addr(asio::ip::address_v4::from_string(ip, ec));
+			socket_.async_connect(asio::ip::tcp::endpoint(addr, port),
+				[this, tryconnect, self = shared_from_this()](const std::error_code& error)
 			{
 
 				if(error)
@@ -68,16 +64,16 @@ namespace tom
 			});
 		}
 
-		boost::asio::ip::tcp::socket& AsioChannel::Socket()
+		asio::ip::tcp::socket& AsioChannel::Socket()
 		{
 			return socket_;
 		}
 
-		void AsioChannel::AsyncReadError(const boost::system::error_code& err)
+		void AsioChannel::AsyncReadError(const std::error_code& err)
 		{
 			switch(err.value())
 			{
-			case boost::asio::error::connection_reset:
+			case asio::error::connection_reset:
 			{
 				CloseSocket();
 				if(disconnectcb_)
@@ -88,10 +84,10 @@ namespace tom
 				DoReConnect(remoteip_, remoteport_);
 			}
 			break;
-			case boost::asio::error::eof:
-			case boost::asio::error::operation_aborted:
-			case boost::asio::error::bad_descriptor:
-			case boost::asio::error::connection_aborted:
+			case asio::error::eof:
+			case asio::error::operation_aborted:
+			case asio::error::bad_descriptor:
+			case asio::error::connection_aborted:
 			default:
 			break;
 			}
@@ -99,13 +95,13 @@ namespace tom
 
 		void AsioChannel::SetSocketOpt()
 		{
-			boost::asio::ip::tcp::no_delay no_delay(true);
+			asio::ip::tcp::no_delay no_delay(true);
 			socket_.set_option(no_delay);
-			boost::asio::socket_base::receive_buffer_size recvbuf(MAX_PACKET_SIZE);
+			asio::socket_base::receive_buffer_size recvbuf(MAX_PACKET_SIZE);
 			socket_.set_option(recvbuf);
-			boost::asio::socket_base::receive_buffer_size sendbuf(MAX_PACKET_SIZE);
+			asio::socket_base::receive_buffer_size sendbuf(MAX_PACKET_SIZE);
 			socket_.set_option(sendbuf);
-			boost::asio::socket_base::reuse_address reuse(true);
+			asio::socket_base::reuse_address reuse(true);
 			socket_.set_option(reuse);
 		}
 
@@ -128,9 +124,9 @@ namespace tom
 		void AsioChannel::ReadPacketLen()
 		{
 			nsize_ = 0;
-			boost::asio::async_read(socket_, boost::asio::buffer(&nsize_, sizeof(int32_t)),
+			asio::async_read(socket_, asio::buffer(&nsize_, sizeof(int32_t)),
 				[this,self = shared_from_this()](
-					const boost::system::error_code& err, size_t cb){
+					const std::error_code& err, size_t cb){
 
 				if(err)
 				{
@@ -171,9 +167,9 @@ namespace tom
 			post->append(static_cast<const void*>(&context), sizeof(NetContext));
 			post->appendInt32(bsize);
 #endif 
-			boost::asio::async_read(socket_, boost::asio::buffer(post->beginWrite(), bsize),
+			asio::async_read(socket_, asio::buffer(post->beginWrite(), bsize),
 				[this,self = shared_from_this(), bsize, post](
-					const boost::system::error_code& err, size_t cb){
+					const std::error_code& err, size_t cb){
 				if (!err)
 				{
 					assert(cb == bsize);
@@ -258,7 +254,7 @@ namespace tom
 		}
 
 
-		void  AsioChannel::AsyncWriteSomeCallback(const boost::system::error_code& error, const std::shared_ptr<tom::Buffer>& packet, std::size_t writen)
+		void  AsioChannel::AsyncWriteSomeCallback(const std::error_code& error, const std::shared_ptr<tom::Buffer>& packet, std::size_t writen)
 		{
 			if (error)
 			{
@@ -306,21 +302,21 @@ namespace tom
 
 		void AsioChannel::AsyncSendData(const std::shared_ptr<tom::Buffer>& packet)
 		{
-
 			sendding_.store(true);
-			socket_.async_write_some(boost::asio::buffer(packet->peek(), packet->readableBytes()),
-				boost::bind(&AsioChannel::AsyncWriteSomeCallback, this,
-					boost::asio::placeholders::error, packet,
-					boost::asio::placeholders::bytes_transferred));
+			socket_.async_write_some(asio::buffer(packet->peek(), packet->readableBytes()),
+				[this, packet](const const std::error_code& err, std::size_t writen)
+				{
+					AsyncWriteSomeCallback(err,packet,writen);
+				});
 		}
 
 		void AsioChannel::DoReConnect(const std::string& ip, uint16_t port)
 		{ 
 			start_ = false;
-			boost::system::error_code ec;
-			boost::asio::ip::address_v4 addr(boost::asio::ip::address_v4::from_string(ip, ec));
-			socket_.async_connect(boost::asio::ip::tcp::endpoint(addr, port),
-				[this, self = shared_from_this(), ip, port](const boost::system::error_code& error){
+			std::error_code ec;
+			asio::ip::address_v4 addr(asio::ip::address_v4::from_string(ip, ec));
+			socket_.async_connect(asio::ip::tcp::endpoint(addr, port),
+				[this, self = shared_from_this(), ip, port](const std::error_code& error){
 				if (!error)
 				{
 					reconnectimer_.cancel();
@@ -340,9 +336,9 @@ namespace tom
 
 		void AsioChannel::DelayReConnect(const std::string& ip, uint16_t port)
 		{
-			reconnectimer_.expires_from_now(boost::posix_time::millisec(RECONNECTTIME));
+			reconnectimer_.expires_from_now(std::chrono::milliseconds(RECONNECTTIME));
 			reconnectimer_.async_wait(
-				[this, self = shared_from_this(), ip, port](const boost::system::error_code& error)
+				[this, self = shared_from_this(), ip, port](const std::error_code& error)
 			{
 				DoReConnect(ip ,port);
 			});
@@ -352,8 +348,8 @@ namespace tom
 		void AsioChannel::CloseSocket()
 		{
 			socket_.cancel();
-			boost::system::error_code err;
-			socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, err);
+			std::error_code err;
+			socket_.shutdown(asio::ip::tcp::socket::shutdown_both, err);
 			socket_.close();
 
 		}
@@ -363,8 +359,8 @@ namespace tom
 			assert(handle == handler_);
 			socket_.cancel();
 			handler_ = 0;
-			boost::system::error_code err;
-			socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, err);
+			std::error_code err;
+			socket_.shutdown(asio::ip::tcp::socket::shutdown_both, err);
 			socket_.close();
 		}
 

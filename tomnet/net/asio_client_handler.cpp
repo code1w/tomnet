@@ -4,7 +4,7 @@
 #include "asio_event_loop.h"
 #include "handler_manager.h"
 
-#include "boost/bind/bind.hpp"
+//#include "boost/bind/bind.hpp"
 
 
 #include <iostream>
@@ -46,8 +46,8 @@ namespace net {
 		remoteip_ = std::string(address);
 		remoteport_ = port;
 
-		boost::system::error_code ec;
-		boost::asio::ip::address_v4 addr(boost::asio::ip::address_v4::from_string(address, ec));
+		std::error_code ec;
+		asio::ip::address_v4 addr(asio::ip::address_v4::from_string(address, ec));
 		if (ec)
 		{
 			return 0;

@@ -6,8 +6,6 @@
 #include "asio_event_loop.h"
 #include "net_define.h"
 
-#include "boost/bind/bind.hpp"
-
 #include <stdio.h>
 
 namespace tom
@@ -25,11 +23,11 @@ namespace tom
 		bool AsioTcpServer::Start(const char* address, uint16_t port)
 		{
 			accept_thread_loop_.Start();
-			boost::system::error_code ec;
-			auto endpoint = boost::asio::ip::tcp::endpoint(boost::asio::ip::address::from_string(address), port);
-			acceptorptr_.reset(new boost::asio::ip::tcp::acceptor(accept_thread_loop_.loop()->io_service()));
+			std::error_code ec;
+			auto endpoint = asio::ip::tcp::endpoint(asio::ip::address::from_string(address), port);
+			acceptorptr_.reset(new asio::ip::tcp::acceptor(accept_thread_loop_.loop()->io_service()));
 			acceptorptr_->open(endpoint.protocol());
-			acceptorptr_->set_option(boost::asio::ip::tcp::acceptor::reuse_address(reuse_addr_));
+			acceptorptr_->set_option(asio::ip::tcp::acceptor::reuse_address(reuse_addr_));
 			acceptorptr_->bind(endpoint, ec);
 			if (ec) 
 			{
@@ -58,33 +56,40 @@ namespace tom
 			{
 				//handler->SetMsgHeaderProtocal(headprotol_);
 				//handler->SetUserData(GetUserdata());
+#if 0
 				acceptorptr_->async_accept(handler->Socket(), 
-					boost::bind(&AsioTcpServer::AsyncAcceptCallback, this, handler, boost::asio::placeholders::error));
+					boost::bind(&AsioTcpServer::AsyncAcceptCallback, this, handler, asio::placeholders::error));
+#endif 
+				acceptorptr_->async_accept(handler->Socket(),
+					[this,handler](const std::error_code& error)
+					{
+						if (!error)
+						{
+							AsyncAcceptCallback(handler);
+						}
+					});
 			}
 
 		}
 
-		void AsioTcpServer::AsyncAcceptCallback(AsioServerHandler* handler, const boost::system::error_code& err)
+		void AsioTcpServer::AsyncAcceptCallback(AsioServerHandler* handler)
 		{
-			if (!err)
-			{
-				uint64_t handle = HandlerManager::instance().AllocateHandlerId();
-				handler->SetHandler(handle);
-				handler->SetMsgHeaderProtocal(headprotol_);
-				handler->SetUserData(GetUserdata());
-				HandlerManager::instance().LinkHandler(handler);
-				handler->OnAccept();
-				max_connect_++;
+
+			auto& s = handler->Socket();
+			uint64_t handle = HandlerManager::instance().AllocateHandlerId();
+			handler->SetHandler(handle);
+			handler->SetMsgHeaderProtocal(headprotol_);
+			handler->SetUserData(GetUserdata());
+			HandlerManager::instance().LinkHandler(handler);
+			handler->OnAccept();
+			max_connect_++;
 #ifdef  TOM_ TOM_NET_DEBUG
-				std::thread::id tid = std::this_thread::get_id();
-				uint32_t hid = handler->GetHandler();
-				printf("AsioTcpServer AsyncAcceptCallback , tid %d , handle %d \n", tid,hid);
+			std::thread::id tid = std::this_thread::get_id();
+			uint32_t hid = handler->GetHandler();
+			printf("AsioTcpServer AsyncAcceptCallback , tid %d , handle %d \n", tid,hid);
 #endif 
-			}
-			//assert(loop_ != nullptr);
 			Accept();
 		}
-
 
 		AsioEventLoop* AsioTcpServer::GetAcceptLoop()
 		{

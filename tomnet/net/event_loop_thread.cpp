@@ -96,7 +96,7 @@ namespace net
     }
 
 
-    boost::asio::io_service* EventLoopThread::io_service() {
+    asio::io_service* EventLoopThread::io_service() {
         return &(loop()->io_service());
     }
 

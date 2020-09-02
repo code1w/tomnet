@@ -2,7 +2,7 @@
 #define  NET_ASIO_SERVER_HANDLER_H
 
 #include <memory>
-#include "boost/asio.hpp"
+#include "asio/asio.hpp"
 #include "tomnet.h"
 #include "net_define.h"
 #include "asio_handler.h"
@@ -33,7 +33,7 @@ class AsioServerHandler : public AsiokHandler,
 
    public:
     void Start();
-    boost::asio::ip::tcp::socket& Socket();
+    asio::ip::tcp::socket& Socket();
 };
 
 }  // namespace net

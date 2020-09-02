@@ -8,7 +8,7 @@
 
 
 
-#include "boost/asio.hpp"
+#include "asio/asio.hpp"
 #include <memory>
 
 namespace tom
@@ -21,7 +21,7 @@ namespace tom
 		{
 		private:
 			uint32_t max_connect_;
-			std::shared_ptr<boost::asio::ip::tcp::acceptor> acceptorptr_; 
+			std::shared_ptr<asio::ip::tcp::acceptor> acceptorptr_; 
 			AsioEventLoop* loop_;
 			EventLoopThread accept_thread_loop_;
 			bool reuse_addr_ = false;
@@ -41,8 +41,8 @@ namespace tom
 			bool Start(const char* address, uint16_t port);
 			void Stop();
 			void Accept();
-			void AsyncAcceptCallback(AsioServerHandler* handler, const boost::system::error_code& ec);
-			void AsyncAcceptCallback(const boost::system::error_code& ec);
+			void AsyncAcceptCallback(AsioServerHandler* handler);
+			void AsyncAcceptCallback(const std::error_code& ec);
 			AsioEventLoop* GetAcceptLoop();
 			void SetReuseAddr(bool value){reuse_addr_ = value; }
 			void SetMsgHeaderProtocal(MsgHeaderProtocal type) { headprotol_ = type;}
