@@ -32,6 +32,6 @@ void client(char const* host, char const* port, int thread_count, size_t totalco
 	{
 		Client * c = new Client;
 		c->handler = i;
-		tom::net::Connect(host, atoi(port), &Q_, 10000, 25000, tom::net::seqidzip,c);
+		tom::net::Connect(host, atoi(port), &Q_, 10000, 25000, tom::net::nametype,c);
 	}
 }

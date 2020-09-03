@@ -60,19 +60,6 @@ namespace tom {
             return packetLen;
         }
 
-        static int encode_zip_header(const google::protobuf::Message& message, tom::Buffer* buf, int body_size, int32_t seq, int16_t msgid, int8_t zip = 0 ) 
-        {
-            tom::net::MessageHeader header;
-            int32_t packetLen = sizeof(header.u.seq_mid_zip.seq_) + sizeof(header.u.seq_mid_zip.msgid_) + sizeof(header.u.seq_mid_zip.zip_) + body_size;
-            buf->ensureWritableBytes(packetLen);
-            assert(packetLen <= MAX_PACKET_SIZE);
-            buf->appendInt32(packetLen);
-            buf->appendInt32(seq); 
-            buf->appendInt16(msgid);
-            buf->appendInt8(zip); 
-            return packetLen;
-        }
-
         static int encode_header(const google::protobuf::Message& message, tom::Buffer* buf, int body_size, tom::net::MsgHeaderProtocal headprotol = tom::net::nametype) 
         {
             int size = 0;
@@ -93,19 +80,6 @@ namespace tom {
                 buf->appendInt32(packetType);
                 buf->appendInt32(nameLen);
                 buf->append(typeName.c_str(), typeName.size());
-                size = packetLen;
-            }
-            break;
-
-            case tom::net::seqidzip:
-            {
-                int32_t packetLen = sizeof(header.u.seq_mid_zip.seq_) + sizeof(header.u.seq_mid_zip.msgid_) + sizeof(header.u.seq_mid_zip.zip_) + body_size;
-                buf->ensureWritableBytes(packetLen);
-                assert(packetLen <= MAX_PACKET_SIZE);
-                buf->appendInt32(packetLen);
-                buf->appendInt32(0); // seq
-                buf->appendInt16(0); // msgid
-                buf->appendInt8(0); // zip
                 size = packetLen;
             }
             break;
@@ -142,16 +116,6 @@ namespace tom {
             int body_size = msgsize(message);
 
             int totalsize = encode_header(message, buf, body_size, headprotol);
-            int bsize = encode_body(message, buf);
-            assert(bsize == body_size);
-            return totalsize;
-        }
-
-
-        static int encodezip(const google::protobuf::Message& message, tom::Buffer* buf, uint32_t seq, uint32_t msgid, int8_t zip = 0)
-        {
-            int body_size = msgsize(message);
-            int totalsize = encode_zip_header(message, buf, body_size, seq, msgid, zip);
             int bsize = encode_body(message, buf);
             assert(bsize == body_size);
             return totalsize;
@@ -214,14 +178,6 @@ namespace tom {
                     strcpy(header->u.type_name.name,name.c_str());
                 }
                 break;
-                case tom::net::seqidzip:
-                {
-                    header->size_ = buf->readInt32();
-                    header->u.seq_mid_zip.seq_ = buf->readInt32();
-                    header->u.seq_mid_zip.msgid_ = buf->readInt16();
-                    header->u.seq_mid_zip.zip_ = buf->readInt8();
-                }
-                break;
                 default:
                 {
 
@@ -245,18 +201,6 @@ namespace tom {
            if(headprotol == tom::net::nametype)
            {
                message.reset(createPbMessage(header->u.type_name.name));
-           }
-           else if(headprotol == tom::net::seqidzip)
-           {
-               if(header->u.seq_mid_zip.zip_)
-               {
-                   Unzip(buf->peek(), buf->readableBytes());
-               }
-               if(gettype)
-               {
-                   auto msgytpe = gettype(header->u.seq_mid_zip.msgid_);
-                   message.reset(createPbMessage(msgytpe));
-               }
            }
 
            if (message && !message->ParseFromArray(buf->peek(), buf->readableBytes()))

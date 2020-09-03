@@ -18,9 +18,6 @@ extern size_t total_count;
 
 extern std::vector<uint32_t> handles_;
 
-
-
-
 void OnAccept(uint32_t handle,void* ud, const tom::BufferPtr& msg) {
 	//std::cout << "accept new connect  " << handle << std::endl;
 	if(total_count)
@@ -67,29 +64,23 @@ void OnError(uint32_t handle, const tom::BufferPtr& msg) {
 
 void OnPersonaInfoList(uint32_t handle, void* ud, const std::shared_ptr<Tom::personal_info_list>& message)
 {
-	//std::cout << "Recv pb msg handler : " << handle << ", msgname: " << message->GetTypeName() << std::endl;
-#if 0
-	int info_size = message->info_size();
-	for (int idx = 0; idx < info_size; idx++)
-	{
-		auto info = message->mutable_info(idx);
-		uint32_t id = info->id();
-		std::string name = info->name();
-		uint32_t age = info->age();
-		uint64_t gender = info->gender();
-	}
-#endif
-	//SendInfoList(handle);
 
 }
 
+void OnReqLogin(uint32_t nethandle, void* ud, const std::shared_ptr<Tom::ReqLogin>& message)
+{
 
+}
 
 
 void RegisterCb()
 {
 	gDispatcher_.registerMessageCallback<Tom::personal_info_list>(
 		std::bind(OnPersonaInfoList, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+
+
+	gDispatcher_.registerMessageCallback<Tom::ReqLogin>(
+		std::bind(OnReqLogin, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 }
 
 

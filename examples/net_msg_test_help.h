@@ -6,12 +6,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <mutex>
+#include <concurrentqueue/concurrentqueue.h>
+
 #include "base/buffer.h"
 #include "net/net_define.h"
+#include "base/codec.h"
 
 #include "tellist.pb.h"
-#include "base/codec.h"
-#include <concurrentqueue/concurrentqueue.h>
+#include "login.pb.h"
 
 struct Client
 {
@@ -40,6 +42,7 @@ struct Server
 
  void RegisterCb();
  void OnPersonaInfoList(uint32_t nethandle, void* ud, const std::shared_ptr<Tom::personal_info_list>& message);
+ void OnReqLogin(uint32_t nethandle, void* ud, const std::shared_ptr<Tom::ReqLogin>& message);
 
  void TestConcurrentqueue();
  void TestEcodeAndDecode();

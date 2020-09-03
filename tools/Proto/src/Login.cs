@@ -9,7 +9,7 @@ using pb = global::Google.Protobuf;
 using pbc = global::Google.Protobuf.Collections;
 using pbr = global::Google.Protobuf.Reflection;
 using scg = global::System.Collections.Generic;
-namespace Msg {
+namespace Tom {
 
   /// <summary>Holder for reflection information generated from login.proto</summary>
   public static partial class LoginReflection {
@@ -24,27 +24,27 @@ namespace Msg {
     static LoginReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "Cgtsb2dpbi5wcm90bxIDbXNnIjQKDlNpZ25VcFJlc3BvbnNlEhEKCWVycm9y",
+            "Cgtsb2dpbi5wcm90bxIDVG9tIjQKDlNpZ25VcFJlc3BvbnNlEhEKCWVycm9y",
             "Q29kZRgBIAEoBRIPCgd2ZXJzaW9uGAIgASgCIigKB1Rvc0NoYXQSDAoEbmFt",
             "ZRgBIAEoCRIPCgdjb250ZW50GAIgASgJIigKB1RvY0NoYXQSDAoEbmFtZRgB",
-            "IAEoCRIPCgdjb250ZW50GAIgASgJIioKBUxvZ2luEg8KB2FjY291bnQYASAB",
-            "KAkSEAoIcGFzc3dhcmQYAiABKAkiMAoOUGxheWVyQmFzZUluZm8SEAoIUGxh",
-            "eWVySUQYASABKA0SDAoETmFtZRgCIAEoCSI/ChBMb2dpblN1Y2Nlc3NmdWxs",
-            "EisKDnBsYXllckJhc2VJbmZvGAEgASgLMhMubXNnLlBsYXllckJhc2VJbmZv",
-            "IpQBCgpMb2dpbkZhaWxkEicKBGNvZGUYASABKA4yGS5tc2cuTG9naW5GYWls",
-            "ZC5FcnJvckNvZGUiXQoJRXJyb3JDb2RlEh0KGUFjY291bnRPclBhc3N3YXJk",
-            "Tm90TWF0Y2gQABIQCgxBY2NJREludmFsaWQQARIPCgtMb2dpblJlcGVhdBAC",
-            "Eg4KCklubmVyRXJyb3IQA2IGcHJvdG8z"));
+            "IAEoCRIPCgdjb250ZW50GAIgASgJIi0KCFJlcUxvZ2luEg8KB2FjY291bnQY",
+            "ASABKAkSEAoIcGFzc3dhcmQYAiABKAkiMAoOUGxheWVyQmFzZUluZm8SEAoI",
+            "UGxheWVySUQYASABKA0SDAoETmFtZRgCIAEoCSI2CgdMb2dpbk9rEisKDnBs",
+            "YXllckJhc2VJbmZvGAEgASgLMhMuVG9tLlBsYXllckJhc2VJbmZvIpQBCgpM",
+            "b2dpbkZhaWxkEicKBGNvZGUYASABKA4yGS5Ub20uTG9naW5GYWlsZC5FcnJv",
+            "ckNvZGUiXQoJRXJyb3JDb2RlEh0KGUFjY291bnRPclBhc3N3YXJkTm90TWF0",
+            "Y2gQABIQCgxBY2NJREludmFsaWQQARIPCgtMb2dpblJlcGVhdBACEg4KCklu",
+            "bmVyRXJyb3IQA2IGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Msg.SignUpResponse), global::Msg.SignUpResponse.Parser, new[]{ "ErrorCode", "Version" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Msg.TosChat), global::Msg.TosChat.Parser, new[]{ "Name", "Content" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Msg.TocChat), global::Msg.TocChat.Parser, new[]{ "Name", "Content" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Msg.Login), global::Msg.Login.Parser, new[]{ "Account", "Passward" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Msg.PlayerBaseInfo), global::Msg.PlayerBaseInfo.Parser, new[]{ "PlayerID", "Name" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Msg.LoginSuccessfull), global::Msg.LoginSuccessfull.Parser, new[]{ "PlayerBaseInfo" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Msg.LoginFaild), global::Msg.LoginFaild.Parser, new[]{ "Code" }, null, new[]{ typeof(global::Msg.LoginFaild.Types.ErrorCode) }, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Tom.SignUpResponse), global::Tom.SignUpResponse.Parser, new[]{ "ErrorCode", "Version" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Tom.TosChat), global::Tom.TosChat.Parser, new[]{ "Name", "Content" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Tom.TocChat), global::Tom.TocChat.Parser, new[]{ "Name", "Content" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Tom.ReqLogin), global::Tom.ReqLogin.Parser, new[]{ "Account", "Passward" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Tom.PlayerBaseInfo), global::Tom.PlayerBaseInfo.Parser, new[]{ "PlayerID", "Name" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Tom.LoginOk), global::Tom.LoginOk.Parser, new[]{ "PlayerBaseInfo" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Tom.LoginFaild), global::Tom.LoginFaild.Parser, new[]{ "Code" }, null, new[]{ typeof(global::Tom.LoginFaild.Types.ErrorCode) }, null, null)
           }));
     }
     #endregion
@@ -59,7 +59,7 @@ namespace Msg {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Msg.LoginReflection.Descriptor.MessageTypes[0]; }
+      get { return global::Tom.LoginReflection.Descriptor.MessageTypes[0]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -216,7 +216,7 @@ namespace Msg {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Msg.LoginReflection.Descriptor.MessageTypes[1]; }
+      get { return global::Tom.LoginReflection.Descriptor.MessageTypes[1]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -373,7 +373,7 @@ namespace Msg {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Msg.LoginReflection.Descriptor.MessageTypes[2]; }
+      get { return global::Tom.LoginReflection.Descriptor.MessageTypes[2]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -522,15 +522,15 @@ namespace Msg {
 
   }
 
-  public sealed partial class Login : pb::IMessage<Login> {
-    private static readonly pb::MessageParser<Login> _parser = new pb::MessageParser<Login>(() => new Login());
+  public sealed partial class ReqLogin : pb::IMessage<ReqLogin> {
+    private static readonly pb::MessageParser<ReqLogin> _parser = new pb::MessageParser<ReqLogin>(() => new ReqLogin());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public static pb::MessageParser<Login> Parser { get { return _parser; } }
+    public static pb::MessageParser<ReqLogin> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Msg.LoginReflection.Descriptor.MessageTypes[3]; }
+      get { return global::Tom.LoginReflection.Descriptor.MessageTypes[3]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -539,22 +539,22 @@ namespace Msg {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public Login() {
+    public ReqLogin() {
       OnConstruction();
     }
 
     partial void OnConstruction();
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public Login(Login other) : this() {
+    public ReqLogin(ReqLogin other) : this() {
       account_ = other.account_;
       passward_ = other.passward_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public Login Clone() {
-      return new Login(this);
+    public ReqLogin Clone() {
+      return new ReqLogin(this);
     }
 
     /// <summary>Field number for the "account" field.</summary>
@@ -581,11 +581,11 @@ namespace Msg {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override bool Equals(object other) {
-      return Equals(other as Login);
+      return Equals(other as ReqLogin);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public bool Equals(Login other) {
+    public bool Equals(ReqLogin other) {
       if (ReferenceEquals(other, null)) {
         return false;
       }
@@ -644,7 +644,7 @@ namespace Msg {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public void MergeFrom(Login other) {
+    public void MergeFrom(ReqLogin other) {
       if (other == null) {
         return;
       }
@@ -687,7 +687,7 @@ namespace Msg {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Msg.LoginReflection.Descriptor.MessageTypes[4]; }
+      get { return global::Tom.LoginReflection.Descriptor.MessageTypes[4]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -836,15 +836,15 @@ namespace Msg {
 
   }
 
-  public sealed partial class LoginSuccessfull : pb::IMessage<LoginSuccessfull> {
-    private static readonly pb::MessageParser<LoginSuccessfull> _parser = new pb::MessageParser<LoginSuccessfull>(() => new LoginSuccessfull());
+  public sealed partial class LoginOk : pb::IMessage<LoginOk> {
+    private static readonly pb::MessageParser<LoginOk> _parser = new pb::MessageParser<LoginOk>(() => new LoginOk());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public static pb::MessageParser<LoginSuccessfull> Parser { get { return _parser; } }
+    public static pb::MessageParser<LoginOk> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Msg.LoginReflection.Descriptor.MessageTypes[5]; }
+      get { return global::Tom.LoginReflection.Descriptor.MessageTypes[5]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -853,28 +853,28 @@ namespace Msg {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public LoginSuccessfull() {
+    public LoginOk() {
       OnConstruction();
     }
 
     partial void OnConstruction();
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public LoginSuccessfull(LoginSuccessfull other) : this() {
+    public LoginOk(LoginOk other) : this() {
       playerBaseInfo_ = other.playerBaseInfo_ != null ? other.playerBaseInfo_.Clone() : null;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public LoginSuccessfull Clone() {
-      return new LoginSuccessfull(this);
+    public LoginOk Clone() {
+      return new LoginOk(this);
     }
 
     /// <summary>Field number for the "playerBaseInfo" field.</summary>
     public const int PlayerBaseInfoFieldNumber = 1;
-    private global::Msg.PlayerBaseInfo playerBaseInfo_;
+    private global::Tom.PlayerBaseInfo playerBaseInfo_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public global::Msg.PlayerBaseInfo PlayerBaseInfo {
+    public global::Tom.PlayerBaseInfo PlayerBaseInfo {
       get { return playerBaseInfo_; }
       set {
         playerBaseInfo_ = value;
@@ -883,11 +883,11 @@ namespace Msg {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override bool Equals(object other) {
-      return Equals(other as LoginSuccessfull);
+      return Equals(other as LoginOk);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public bool Equals(LoginSuccessfull other) {
+    public bool Equals(LoginOk other) {
       if (ReferenceEquals(other, null)) {
         return false;
       }
@@ -937,13 +937,13 @@ namespace Msg {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public void MergeFrom(LoginSuccessfull other) {
+    public void MergeFrom(LoginOk other) {
       if (other == null) {
         return;
       }
       if (other.playerBaseInfo_ != null) {
         if (playerBaseInfo_ == null) {
-          PlayerBaseInfo = new global::Msg.PlayerBaseInfo();
+          PlayerBaseInfo = new global::Tom.PlayerBaseInfo();
         }
         PlayerBaseInfo.MergeFrom(other.PlayerBaseInfo);
       }
@@ -960,7 +960,7 @@ namespace Msg {
             break;
           case 10: {
             if (playerBaseInfo_ == null) {
-              PlayerBaseInfo = new global::Msg.PlayerBaseInfo();
+              PlayerBaseInfo = new global::Tom.PlayerBaseInfo();
             }
             input.ReadMessage(PlayerBaseInfo);
             break;
@@ -979,7 +979,7 @@ namespace Msg {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Msg.LoginReflection.Descriptor.MessageTypes[6]; }
+      get { return global::Tom.LoginReflection.Descriptor.MessageTypes[6]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1007,9 +1007,9 @@ namespace Msg {
 
     /// <summary>Field number for the "code" field.</summary>
     public const int CodeFieldNumber = 1;
-    private global::Msg.LoginFaild.Types.ErrorCode code_ = global::Msg.LoginFaild.Types.ErrorCode.AccountOrPasswardNotMatch;
+    private global::Tom.LoginFaild.Types.ErrorCode code_ = global::Tom.LoginFaild.Types.ErrorCode.AccountOrPasswardNotMatch;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public global::Msg.LoginFaild.Types.ErrorCode Code {
+    public global::Tom.LoginFaild.Types.ErrorCode Code {
       get { return code_; }
       set {
         code_ = value;
@@ -1036,7 +1036,7 @@ namespace Msg {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override int GetHashCode() {
       int hash = 1;
-      if (Code != global::Msg.LoginFaild.Types.ErrorCode.AccountOrPasswardNotMatch) hash ^= Code.GetHashCode();
+      if (Code != global::Tom.LoginFaild.Types.ErrorCode.AccountOrPasswardNotMatch) hash ^= Code.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -1050,7 +1050,7 @@ namespace Msg {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void WriteTo(pb::CodedOutputStream output) {
-      if (Code != global::Msg.LoginFaild.Types.ErrorCode.AccountOrPasswardNotMatch) {
+      if (Code != global::Tom.LoginFaild.Types.ErrorCode.AccountOrPasswardNotMatch) {
         output.WriteRawTag(8);
         output.WriteEnum((int) Code);
       }
@@ -1062,7 +1062,7 @@ namespace Msg {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public int CalculateSize() {
       int size = 0;
-      if (Code != global::Msg.LoginFaild.Types.ErrorCode.AccountOrPasswardNotMatch) {
+      if (Code != global::Tom.LoginFaild.Types.ErrorCode.AccountOrPasswardNotMatch) {
         size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Code);
       }
       if (_unknownFields != null) {
@@ -1076,7 +1076,7 @@ namespace Msg {
       if (other == null) {
         return;
       }
-      if (other.Code != global::Msg.LoginFaild.Types.ErrorCode.AccountOrPasswardNotMatch) {
+      if (other.Code != global::Tom.LoginFaild.Types.ErrorCode.AccountOrPasswardNotMatch) {
         Code = other.Code;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
@@ -1091,7 +1091,7 @@ namespace Msg {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 8: {
-            Code = (global::Msg.LoginFaild.Types.ErrorCode) input.ReadEnum();
+            Code = (global::Tom.LoginFaild.Types.ErrorCode) input.ReadEnum();
             break;
           }
         }

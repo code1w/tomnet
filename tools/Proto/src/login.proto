@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package msg;
+package Tom;
 
 message SignUpResponse
 {
@@ -21,7 +21,7 @@ message TocChat
 	  string content = 2;
 }
 
-message Login
+message ReqLogin
 {
 	string account = 1;
 	string passward =2;
@@ -35,9 +35,8 @@ message PlayerBaseInfo
 
 	}
 
-message LoginSuccessfull
+message LoginOk
 {
-	
 	PlayerBaseInfo playerBaseInfo  = 1;
 }
 

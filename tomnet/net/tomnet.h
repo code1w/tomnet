@@ -71,7 +71,6 @@ enum PacketType {
 enum MsgHeaderProtocal 
 {
     nametype, // | 4字节 (消息长度) | 4字节 (类型) | 4字节 (pb消息名字) | 消息名字 | 消息内容 |
-    seqidzip,   // | 4字节 (消息长度) | 4字节 (消息序号) | 2字节 (消息id) | 1字节 (压缩标志) | 消息内容 |
 };
 
 #pragma pack(push, 1)
@@ -83,12 +82,6 @@ struct MessageHeader {
             int32_t namelen_;
             char name[MAXMSGNAMELEN];
         }type_name;
-
-        struct {
-            int32_t seq_;
-            int16_t msgid_;
-            int8_t zip_;
-        }seq_mid_zip;
     }u;
 };
 
