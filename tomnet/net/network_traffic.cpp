@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <string>
+#include <chrono>
 
 namespace tom
 {
@@ -50,7 +51,7 @@ namespace tom
 
 		}
 
-		void NetworkTraffic::OnTimer(const boost::system::error_code& error)
+		void NetworkTraffic::OnTimer(const std::error_code& error)
 		{
 			Print();
 			Reset();
@@ -59,7 +60,8 @@ namespace tom
 
 		void NetworkTraffic::AddTimer(uint64_t deadline)
 		{
-			timer_->expires_from_now(boost::posix_time::millisec(deadline));
+			
+			timer_->expires_from_now(std::chrono::milliseconds(deadline));
 			timer_->async_wait(std::bind(&NetworkTraffic::OnTimer, this, std::placeholders::_1));
 		}
 

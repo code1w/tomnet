@@ -8,7 +8,7 @@ namespace net{
 	AsioEventLoop::AsioEventLoop():notified_(false), pending_functor_count_(0)
 	{
 		Init();
-		io_work_.reset(new boost::asio::io_service::work(io_service_));
+		io_work_.reset(new asio::io_service::work(io_service_));
 	}
 
 	AsioEventLoop::~AsioEventLoop()

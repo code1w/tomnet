@@ -4,7 +4,7 @@
 #include "tomnet.h"
 #include "asio_channel.h"
 #include "asio_handler.h"
-#include "boost/asio.hpp"
+#include "asio/asio.hpp"
 #include <memory>
 namespace tom {
 class Buffer;
@@ -14,7 +14,7 @@ namespace net {
 		std::enable_shared_from_this<AsioClientHandler>
 	{
 	private:
-		boost::asio::deadline_timer timer_;
+		asio::steady_timer timer_;
 
 		IMessageQueue* msgqueue_ = nullptr;
 		AsioChannelPtr channel_;

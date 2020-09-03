@@ -9,7 +9,7 @@
 #include <memory>
 #include <functional>
 
-#include "boost/asio.hpp"
+#include "asio/asio.hpp"
 #include "server_status.h"
 
 
@@ -35,7 +35,7 @@ namespace net
 		void set_name(const std::string& n);
 		const std::string& name() const;
 		AsioEventLoop* loop();
-		boost::asio::io_service* io_service();
+		asio::io_service* io_service();
 		std::thread::id tid() const;
 		bool IsRunning() const;
 

@@ -4,7 +4,7 @@
 #include "net_define.h"
 #include "base/noncopyable.h"
 #include "base/buffer.h"
-#include "boost/asio.hpp"
+#include "asio/asio.hpp"
 
 #ifdef __GNUC__
 #pragma GCC diagnostic push
@@ -32,7 +32,7 @@ namespace tom
 		{
 		private:
 			AsioEventLoop* loop_ = nullptr;
-			boost::asio::ip::tcp::socket socket_;
+			asio::ip::tcp::socket socket_;
 			std::size_t  block_size_;
 			uint32_t failed_count_ = 0; 
 			MessageHeader headerbuffer_{0,0};
@@ -48,21 +48,21 @@ namespace tom
 			int32_t nsize_ = 0;
 			std::string remoteip_;
 			uint16_t remoteport_;
-			boost::asio::deadline_timer reconnectimer_;
+			asio::steady_timer reconnectimer_;
 
 			moodycamel::ConcurrentQueue<std::shared_ptr<tom::Buffer>> wbufferlist_;
 			std::atomic<bool> sendding_{false};
 			std::atomic<bool> start_{ false };
 		private:
 			uint32_t PostPacket(const std::shared_ptr<tom::Buffer>& packet);
-			void AsyncWriteSomeCallback(const boost::system::error_code& error, const std::shared_ptr<tom::Buffer>& packet, std::size_t bytes_transferred);
+			void AsyncWriteSomeCallback(const std::error_code& error, const std::shared_ptr<tom::Buffer>& packet, std::size_t bytes_transferred);
 			void AsyncSendData(const std::shared_ptr<tom::Buffer>& packet);
-			void AsyncReadError(const boost::system::error_code& error);
+			void AsyncReadError(const std::error_code& error);
 		public:
 			AsioChannel(AsioEventLoop* loop, std::size_t block_size);
 			~AsioChannel();
 
-			boost::asio::ip::tcp::socket& Socket();
+			asio::ip::tcp::socket& Socket();
 			void Connect(const std::string& ip, uint16_t port, bool tryconnect = false);
 			void Start();
 			void ReadPacketLen();
