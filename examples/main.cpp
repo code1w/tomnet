@@ -35,14 +35,10 @@ std::vector<uint32_t> handles_;
 
 void OnRecvPacket(uint32_t handle, void* ud, const std::shared_ptr<tom::Buffer>& packet, tom::net::MsgHeaderProtocal headerprotocal = tom::net::nametype) 
 {
-    auto fn = [](int32_t id) -> std::string {
-        return "bus.CommonMessage";
-    };
-
     std::size_t qsize = Q_->Size();
     {
         auto header = std::make_shared<tom::net::MessageHeader>();
-        auto msg = tom::pb::decode(packet, header, headerprotocal, fn);
+        auto msg = tom::pb::decode(packet, header, headerprotocal);
         gDispatcher_.onMessage(handle, ud, msg);
     }
 
@@ -181,7 +177,7 @@ int main(int argc, char** argv)
         return usage();
     }
 
-    if (!strcmp(argv[1], "c"))
+    if (!strcmp(argv[1], "client"))
     {
         style = "c";
         const char* host = argv[2];
@@ -192,7 +188,7 @@ int main(int argc, char** argv)
         client(host, port, thread_count, total_count, session_count);
 
     }
-    else if (!strcmp(argv[1], "s")) {
+    else if (!strcmp(argv[1], "server")) {
         style = "s";
         const char* host = argv[2];
         const char* port = argv[3];

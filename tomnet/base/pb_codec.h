@@ -195,12 +195,18 @@ namespace tom {
 
        static std::shared_ptr<google::protobuf::Message> decode(const std::shared_ptr<tom::Buffer>& buf, const HeaderPtr& header, tom::net::MsgHeaderProtocal headprotol = tom::net::nametype,const GetPbMsgTypeCb&& gettype = nullptr)
        {
-           //tom::net::MessageHeader msgheader;
            decode_header(buf, header.get(), headprotol);
-           MessagePtr message;
+           MessagePtr message = nullptr;
+
            if(headprotol == tom::net::nametype)
            {
-               message.reset(createPbMessage(header->u.type_name.name));
+               auto rawmsg = createPbMessage(header->u.type_name.name);
+               if(!rawmsg)
+               {
+                   return nullptr;
+               }
+
+               message.reset(rawmsg);
            }
 
            if (message && !message->ParseFromArray(buf->peek(), buf->readableBytes()))
