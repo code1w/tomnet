@@ -60,13 +60,11 @@ namespace tom {
             return packetLen;
         }
 
-        static int encode_header(const google::protobuf::Message& message, tom::Buffer* buf, int body_size, tom::net::MsgHeaderProtocal headprotol = tom::net::nametype) 
+        static int32_t encode_header(const google::protobuf::Message& message, tom::Buffer* buf, int body_size, tom::net::MsgHeaderProtocal headprotol = tom::net::nametype) 
         {
-            int size = 0;
+            int32_t size = 0;
             tom::net::MessageHeader header;
-            switch(headprotol)
-            {
-            case tom::net::nametype:
+            if(headprotol == tom::net::nametype)
             {
                 const std::string& typeName = message.GetTypeName();
                 int32_t nameLen = static_cast<int32_t>(typeName.size());
@@ -81,8 +79,6 @@ namespace tom {
                 buf->appendInt32(nameLen);
                 buf->append(typeName.c_str(), typeName.size());
                 size = packetLen;
-            }
-            break;
             }
 
             return size;

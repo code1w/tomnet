@@ -76,6 +76,7 @@ void OnReqLogin(uint32_t handle, void* ud, const std::shared_ptr<Tom::ReqLogin>&
 	pinfo->set_name("zhang xiao bin");
 	pinfo->set_playerid(51886);
 	tom::SendMsg(handle, rsp);
+	//SendInfoList(handle);
 }
 
 
