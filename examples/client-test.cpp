@@ -14,9 +14,13 @@
 #include "base/pb_message_helper.h"
 #include "net_msg_test_help.h"
 
+namespace net_test {
 
 extern tom::net::IMessageQueue* Q_;
 extern size_t total_count;
+}
+using namespace net_test;
+
 void client(char const* host, char const* port, int thread_count, size_t totalcount, size_t session_count)
 {
 	if (thread_count == 0)

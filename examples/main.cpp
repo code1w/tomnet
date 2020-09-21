@@ -13,6 +13,9 @@
 #include "net_msg_test_help.h"
 
 #include "tellist.pb.h"
+#include "asio/asio.hpp"
+
+
 
 #ifndef WIN32
 #include <sys/time.h>
@@ -24,14 +27,20 @@
 
 #define RLIMIT_NOFILE 1000000
 
+namespace net_test
+{
+
 std::string style = "";
 
-
+asio::io_service io_service_;
 tom::net::IMessageQueue* Q_ = nullptr;
 tom::pb::ProtobufDispatcher gDispatcher_;
 size_t total_count = 1;
 std::vector<uint32_t> handles_;
 
+}
+
+using namespace net_test;
 
 void OnRecvPacket(uint32_t handle, void* ud, const std::shared_ptr<tom::Buffer>& packet, tom::net::MsgHeaderProtocal headerprotocal = tom::net::nametype) 
 {
@@ -95,10 +104,16 @@ int ProcessNetPackect(tom::net::IMessageQueue* msg_queue)
     return nProcessPacketCount;
 }
 
+/// @brief 
+/// 
+/// 
+
+
 void Update()
 {
     while (true)
     {
+        io_service_.run();
         while(Q_ && Q_->Size() > 0)
         {
             ProcessNetPackect(Q_);

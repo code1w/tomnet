@@ -39,6 +39,7 @@ struct Server
  void OnError(uint32_t handle, void* ud, const tom::BufferPtr& msg);
  void OnConnectFail(uint32_t handle, void* ud,const tom::BufferPtr& msg);
  void SendInfoList(uint32_t handle);
+ void SendReqLogin(uint32_t handle);
 
  void RegisterCb();
  void OnPersonaInfoList(uint32_t nethandle, void* ud, const std::shared_ptr<Tom::personal_info_list>& message);

@@ -11,12 +11,20 @@
 #include <arpa/inet.h>  // for ntohl()
 #endif    // _WIN32
 
+#include "asio/asio.hpp"
+
 #include <vector>
+#include <chrono>
+
+namespace net_test {
+
 
 extern tom::pb::ProtobufDispatcher gDispatcher_;
 extern size_t total_count;
-
+extern asio::io_service io_service_;
 extern std::vector<uint32_t> handles_;
+}
+using namespace net_test;
 
 void OnAccept(uint32_t handle,void* ud, const tom::BufferPtr& msg) {
 	//std::cout << "accept new connect  " << handle << std::endl;
@@ -28,13 +36,23 @@ void OnAccept(uint32_t handle,void* ud, const tom::BufferPtr& msg) {
 	}
 	Server* s = (Server*)ud;
 	handles_.push_back(handle);
+	//SendReqLogin(handle);
 
+}
+
+void DelaySend(const std::error_code& error)
+{
+	if (!error)
+	{
+		// Timer expired.
+	}
 }
 
 
 void OnConnected(uint32_t handle, void* ud, const tom::BufferPtr& msg) {
 	Client* c = (Client*)ud;
 	SendInfoList(handle);
+	SendReqLogin(handle);
 }
 
 void OnReConnected(uint32_t handle,void* ud, const tom::BufferPtr& msg) {
@@ -75,7 +93,17 @@ void OnReqLogin(uint32_t handle, void* ud, const std::shared_ptr<Tom::ReqLogin>&
 	Tom::PlayerBaseInfo* pinfo = rsp.mutable_playerbaseinfo();
 	pinfo->set_name("zhang xiao bin");
 	pinfo->set_playerid(51886);
+
+	//asio::steady_timer timer(io_service_);
+	//timer.expires_after(std::chrono::seconds(10));
+	//std::cout << "wait 10 s " << std::endl;
+	//timer.wait();
+
+	{
+
+	std::cout << " send msg " << std::endl;
 	tom::SendMsg(handle, rsp);
+	}
 	//SendInfoList(handle);
 }
 
@@ -90,6 +118,19 @@ void RegisterCb()
 		std::bind(OnReqLogin, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 }
 
+void SendReqLogin(uint32_t handle)
+{
+	while (true)
+	{
+
+	Tom::ReqLogin req;
+	req.set_account("zxb-1");
+	req.set_passward("1234546");
+	tom::SendMsg(handle, req);
+	std::this_thread::sleep_for(std::chrono::milliseconds(1));
+	}
+
+}
 
 void SendInfoList(uint32_t handle)
 {
