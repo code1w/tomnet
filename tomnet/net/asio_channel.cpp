@@ -112,7 +112,8 @@ namespace tom
 			{
 				SetSocketOpt();
 				tid_ = std::this_thread::get_id();
-     			ReadPacketLen();
+     			//ReadPacketLen();
+				AsyncRead();
 				start_ = true;
 
 #ifdef  TOM_ TOM_NET_TRAFFIC
@@ -312,6 +313,7 @@ namespace tom
 
 		void AsioChannel::DoReConnect(const std::string& ip, uint16_t port)
 		{ 
+			recvbuf_.retrieveAll();
 			start_ = false;
 			std::error_code ec;
 			asio::ip::address_v4 addr(asio::ip::address_v4::from_string(ip, ec));
@@ -343,6 +345,63 @@ namespace tom
 				DoReConnect(ip ,port);
 			});
 
+		}
+
+		void AsioChannel::AsyncRead()
+		{
+			socket_.async_read_some(asio::buffer(inputbuf_),
+				[this, self = shared_from_this()](const std::error_code& err, size_t readsize)
+			{
+				if (err)
+				{
+					AsyncReadError(err);
+					return;
+				}
+
+				recvbuf_.append(inputbuf_, readsize);
+				CeneratePacket();
+				AsyncRead();
+			});
+		}
+
+		void AsioChannel::CeneratePacket()
+		{
+			int readable = recvbuf_.readableBytes();
+
+			while (readable > sizeof(int))
+			{
+				int packetlen = recvbuf_.peekInt32();
+				if (readable < packetlen + sizeof(int))
+				{
+					break;
+				}
+
+				if (packetlen > 64 * 1024)
+				{
+					break;
+				}
+
+				packetlen = recvbuf_.readInt32();
+
+				NetContext context;
+				context.handler_ = handler_;
+				context.evetype_ = EVENT_NETMSG;
+				context.headerprotocal_ = nametype;
+				context.ud_ = nullptr;
+
+				auto post = std::make_shared<tom::Buffer>();
+				post->ensureWritableBytes(sizeof(NetContext) + packetlen + sizeof(int));
+				post->append(static_cast<const void*>(&context), sizeof(NetContext));
+				post->appendInt32(packetlen);
+				post->append(recvbuf_.peek(), packetlen);
+				//post->hasWritten(packetlen);
+
+				recvbuf_.retrieve(packetlen);
+
+				readable = recvbuf_.readableBytes();
+
+				PostPacket(post);
+			}
 		}
 
 		void AsioChannel::CloseSocket()

@@ -38,6 +38,8 @@ namespace tom
 			MessageHeader headerbuffer_{0,0};
 			tom::Buffer bodybuffer_;
 			tom::Buffer headbuffer_;
+			tom::Buffer recvbuf_;
+			char inputbuf_[4096];
 			uint32_t handler_ = 0;
 			std::thread::id tid_;
 			ConnectedCallback connectedcb_;
@@ -75,6 +77,9 @@ namespace tom
 			void DelayReConnect(const std::string& ip, uint16_t port);
 			void DoReConnect(const std::string& ip, uint16_t port);
 			void CloseSocket();
+			void AsyncRead();
+			void CeneratePacket();
+
 	
 		public:
 			void SetConnnectedCb(const ConnectedCallback& cb) { connectedcb_ = cb; }

@@ -51,8 +51,7 @@ void DelaySend(const std::error_code& error)
 
 void OnConnected(uint32_t handle, void* ud, const tom::BufferPtr& msg) {
 	Client* c = (Client*)ud;
-	SendInfoList(handle);
-	SendReqLogin(handle);
+	std::cout << " OnConnected remote server handle : " << handle << std::endl;
 }
 
 void OnReConnected(uint32_t handle,void* ud, const tom::BufferPtr& msg) {
