@@ -4,6 +4,9 @@
 namespace tom
 {
 	namespace net {
+
+
+
 		using Message = google::protobuf::Message;
 		class ProtobufCodec : IMsgCodec<Message>
 		{
