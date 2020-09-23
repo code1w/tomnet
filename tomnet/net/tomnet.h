@@ -112,7 +112,7 @@ public:
     bool binary;
 };
 
-template <class T>
+template <typename T>
 class IMsgCodec : public Unknown
 {
 public:
