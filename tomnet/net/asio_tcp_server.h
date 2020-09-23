@@ -42,7 +42,6 @@ namespace tom
 			void Stop();
 			void Accept();
 			void AsyncAcceptCallback(AsioServerHandler* handler);
-			void AsyncAcceptCallback(const std::error_code& ec);
 			AsioEventLoop* GetAcceptLoop();
 			void SetReuseAddr(bool value){reuse_addr_ = value; }
 			void SetMsgHeaderProtocal(MsgHeaderProtocal type) { headprotol_ = type;}

@@ -86,8 +86,8 @@ void OnPersonaInfoList(uint32_t handle, void* ud, const std::shared_ptr<Tom::per
 
 void OnReqLogin(uint32_t handle, void* ud, const std::shared_ptr<Tom::ReqLogin>& message)
 {
-	std::cout << message->account() <<std::endl;
-	std::cout << message->passward() << std::endl;
+	std::cout << message->account() <<" , "<< message->passward()<<std::endl;
+/*
 	Tom::LoginOk rsp;
 	Tom::PlayerBaseInfo* pinfo = rsp.mutable_playerbaseinfo();
 	pinfo->set_name("zhang xiao bin");
@@ -104,6 +104,7 @@ void OnReqLogin(uint32_t handle, void* ud, const std::shared_ptr<Tom::ReqLogin>&
 	tom::SendMsg(handle, rsp);
 	}
 	//SendInfoList(handle);
+*/
 }
 
 

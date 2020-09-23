@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "base/buffer.h"
+#include "base/any.h"
 #include "dll_export.h"
 
 //#include <google/protobuf/message.h>
@@ -94,12 +95,37 @@ struct NetContext {
 
 #pragma pack(pop)
 
-struct NetProtocal {
-    uint32_t (*HeaderSize)() = 0;
-    uint32_t (*PacketLength)(const char* header) = 0;
-    uint32_t (*PacketFilter)(const char* header) = 0;
-    uint32_t (*PacketSystem)(uint8_t event, char* header) = 0;
-    uint32_t (*PacketFinial)(char* header, uint32_t length) = 0;
+
+class IMsgHeader{
+public:
+    int32_t packetlen;
+    int32_t packetop;
+    bool encrypted;
+    bool compressed;
+    bool binary;
+};
+
+
+class IMsgCodec
+{
+public:
+    virtual std::shared_ptr<tom::Buffer> GenerateBinaryMessage(IMsgHeader* , Any&) = 0;
+    virtual std::shared_ptr<Any> GenerateMessage(IMsgHeader* ,std::shared_ptr<tom::Buffer>& ) = 0;
+};
+
+
+class INetWorkProtocal {
+public:
+    IMsgHeader* header = nullptr;
+    IMsgCodec* codec = nullptr;
+public:
+    /*
+    virtual uint32_t HeaderSize() = 0;
+    virtual uint32_t PacketLength(const char* header) = 0;
+    virtual uint32_t PacketFilter(const char* header) = 0;
+    virtual uint32_t PacketSystem(uint8_t event, char* header) = 0;
+    virtual uint32_t PacketFinial(char* header, uint32_t length) = 0;
+    */
 };
 
 class IMessageQueue {

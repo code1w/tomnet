@@ -47,16 +47,11 @@ namespace tom
 				[this, tryconnect, self = shared_from_this()](const std::error_code& error)
 			{
 
-				if(error)
+				if(error && connectedcb_)
 				{
-					if(connectedcb_)
-					{
-						connectedcb_(EVENT_CONNECT_FAIL);
-					}
-					return;
+					connectedcb_(EVENT_CONNECT_FAIL);
 				}
-
-				if(connectedcb_)
+				else if(connectedcb_)
 				{
 					Start();
 					connectedcb_(EVENT_CONNECT_SUCCESS); 
@@ -112,7 +107,6 @@ namespace tom
 			{
 				SetSocketOpt();
 				tid_ = std::this_thread::get_id();
-     			//ReadPacketLen();
 				AsyncRead();
 				start_ = true;
 
@@ -122,84 +116,57 @@ namespace tom
 			}
 		}
 
-		void AsioChannel::ReadPacketLen()
+		void AsioChannel::AsyncRead()
 		{
-			nsize_ = 0;
-			asio::async_read(socket_, asio::buffer(&nsize_, sizeof(int32_t)),
-				[this,self = shared_from_this()](
-					const std::error_code& err, size_t cb){
-
-				if(err)
+			socket_.async_read_some(asio::buffer(inputbuf_),
+				[this, self = shared_from_this()](const std::error_code& err, size_t readsize)
+			{
+				if (err)
 				{
 					AsyncReadError(err);
 					return;
 				}
 
-				int32_t hsize = ntohl(nsize_);
-				if (hsize + sizeof(int32_t) > MAX_PACKET_SIZE)
-				{
-					socket_.cancel();
-					if(disconnectcb_)
-					{
-						disconnectcb_();
-					}
-					Close(handler_);
-					return;
-				}
-				
-				ReadPacketBody(hsize);
+				recvbuf_.append(inputbuf_.data(), readsize);
+				AsyncRead();
+				CeneratePacket();
 			});
 		}
 
-		void AsioChannel::ReadPacketBody(size_t bsize)
+		void AsioChannel::CeneratePacket()
 		{
-			auto post = std::make_shared<tom::Buffer>();
+			int readable = recvbuf_.readableBytes();
 
-#ifdef  TOM_ TOM_NET_TEST
-			post->ensureWritableBytes(bsize + 10);
-			post->appendInt32(bsize);
-#else 
-			NetContext context;
-			context.handler_ = handler_;
-			context.evetype_ = EVENT_NETMSG;
-			context.headerprotocal_ = nametype;
-			context.ud_ = nullptr;
-			post->ensureWritableBytes(sizeof(NetContext) + bsize + sizeof(bsize));
-			post->append(static_cast<const void*>(&context), sizeof(NetContext));
-			post->appendInt32(bsize);
-#endif 
-			asio::async_read(socket_, asio::buffer(post->beginWrite(), bsize),
-				[this,self = shared_from_this(), bsize, post](
-					const std::error_code& err, size_t cb){
-				if (!err)
+			while (readable > sizeof(int))
+			{
+				int packetlen = recvbuf_.peekInt32();
+				if (readable < packetlen + sizeof(int))
 				{
-					assert(cb == bsize);
-					post->hasWritten(bsize);
-#ifdef  TOM_ TOM_NET_TRAFFIC
-					NetworkTraffic::instance().FetchAddRecvPacket();
-					NetworkTraffic::instance().FetchAddRecvByte(bsize);
-#endif 
-
-#ifdef  TOM_ TOM_NET_DEBUG
-					int32_t recv_size = bsize + sizeof(MessageHeader);
-					assert(std::this_thread::get_id() == tid_);
-					printf("Recv Size %d, tid %d , handle %d \n",recv_size, tid_,handler_);
-#endif 
-
-					ReadPacketLen();
-
-#ifdef  TOM_ TOM_NET_TEST
-					SendPacket(post->peek(), post->readableBytes());
-#else
-					PostPacket(post);
-#endif 
+					break;
 				}
-				else 
+
+				if (packetlen > 64 * 1024)
 				{
-					AsyncReadError(err);
+					break;
 				}
-			});
 
+				packetlen = recvbuf_.readInt32();
+
+				NetContext context;
+				context.handler_ = handler_;
+				context.evetype_ = EVENT_NETMSG;
+				context.headerprotocal_ = nametype;
+				context.ud_ = nullptr;
+
+				auto post = std::make_shared<tom::Buffer>();
+				post->ensureWritableBytes(sizeof(NetContext) + packetlen + sizeof(int));
+				post->append(static_cast<const void*>(&context), sizeof(NetContext));
+				post->appendInt32(packetlen);
+				post->append(recvbuf_.peek(), packetlen);
+				recvbuf_.retrieve(packetlen);
+				readable = recvbuf_.readableBytes();
+				PostPacket(post);
+			}
 		}
 
 		uint32_t AsioChannel::PostPacket(const std::shared_ptr<tom::Buffer>& packet)
@@ -347,62 +314,7 @@ namespace tom
 
 		}
 
-		void AsioChannel::AsyncRead()
-		{
-			socket_.async_read_some(asio::buffer(inputbuf_),
-				[this, self = shared_from_this()](const std::error_code& err, size_t readsize)
-			{
-				if (err)
-				{
-					AsyncReadError(err);
-					return;
-				}
 
-				recvbuf_.append(inputbuf_, readsize);
-				CeneratePacket();
-				AsyncRead();
-			});
-		}
-
-		void AsioChannel::CeneratePacket()
-		{
-			int readable = recvbuf_.readableBytes();
-
-			while (readable > sizeof(int))
-			{
-				int packetlen = recvbuf_.peekInt32();
-				if (readable < packetlen + sizeof(int))
-				{
-					break;
-				}
-
-				if (packetlen > 64 * 1024)
-				{
-					break;
-				}
-
-				packetlen = recvbuf_.readInt32();
-
-				NetContext context;
-				context.handler_ = handler_;
-				context.evetype_ = EVENT_NETMSG;
-				context.headerprotocal_ = nametype;
-				context.ud_ = nullptr;
-
-				auto post = std::make_shared<tom::Buffer>();
-				post->ensureWritableBytes(sizeof(NetContext) + packetlen + sizeof(int));
-				post->append(static_cast<const void*>(&context), sizeof(NetContext));
-				post->appendInt32(packetlen);
-				post->append(recvbuf_.peek(), packetlen);
-				//post->hasWritten(packetlen);
-
-				recvbuf_.retrieve(packetlen);
-
-				readable = recvbuf_.readableBytes();
-
-				PostPacket(post);
-			}
-		}
 
 		void AsioChannel::CloseSocket()
 		{

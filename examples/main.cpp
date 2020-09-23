@@ -7,6 +7,7 @@
 
 #include "net/tomnet.h"
 #include "base/buffer.h"
+#include "base/any.h"  
 #include "base/pb_dispatcher.h"
 #include "base/pb_message_helper.h"
 
@@ -109,6 +110,7 @@ int ProcessNetPackect(tom::net::IMessageQueue* msg_queue)
 /// 
 
 
+
 void Update()
 {
     while (true)
@@ -175,9 +177,19 @@ void change_limit() {
 }
 #endif
 
+void TestAny()
+{
+    tom::Buffer* buf(new tom::Buffer());
+    tom::Any any(buf);
+    tom::Buffer* b = tom::any_cast<tom::Buffer*>(any);
+    assert(buf == b);
+    delete buf;
+}
+
 // s 127.0.0.1 8888 4 1
 int main(int argc, char** argv)
 {
+    TestAny();
     if (argc < 2)
     {
         return usage();
