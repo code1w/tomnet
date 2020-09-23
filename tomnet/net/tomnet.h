@@ -95,9 +95,16 @@ struct NetContext {
 
 #pragma pack(pop)
 
-
-class IMsgHeader{
+class Unknown
+{
 public:
+    virtual ~Unknown(){}
+};
+
+class IMsgHeader : public Unknown
+{
+public:
+    virtual ~IMsgHeader() {}
     int32_t packetlen;
     int32_t packetop;
     bool encrypted;
@@ -105,27 +112,22 @@ public:
     bool binary;
 };
 
-
-class IMsgCodec
+template <class T>
+class IMsgCodec : public Unknown
 {
 public:
-    virtual std::shared_ptr<tom::Buffer> GenerateBinaryMessage(IMsgHeader* , Any&) = 0;
-    virtual std::shared_ptr<Any> GenerateMessage(IMsgHeader* ,std::shared_ptr<tom::Buffer>& ) = 0;
+    virtual ~IMsgCodec() {}
+    virtual std::shared_ptr<tom::Buffer> GenerateBinaryMessage(Unknown* , T&) = 0;
+    virtual std::shared_ptr<T> GenerateMessage(Unknown* ,std::shared_ptr<tom::Buffer>& ) = 0;
 };
 
 
-class INetWorkProtocal {
+class INetWorkProtocol {
 public:
-    IMsgHeader* header = nullptr;
-    IMsgCodec* codec = nullptr;
+    Unknown* header = nullptr;
+    Unknown* codec = nullptr;
 public:
-    /*
-    virtual uint32_t HeaderSize() = 0;
-    virtual uint32_t PacketLength(const char* header) = 0;
-    virtual uint32_t PacketFilter(const char* header) = 0;
-    virtual uint32_t PacketSystem(uint8_t event, char* header) = 0;
-    virtual uint32_t PacketFinial(char* header, uint32_t length) = 0;
-    */
+    virtual ~INetWorkProtocol() {}
 };
 
 class IMessageQueue {

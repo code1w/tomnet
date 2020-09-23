@@ -1,14 +1,15 @@
 #pragma once
 #include "tomnet.h"
-
+#include <google/protobuf/message.h>
 namespace tom
 {
 	namespace net {
-		class ProtobufCodec : IMsgCodec
+		using Message = google::protobuf::Message;
+		class ProtobufCodec : IMsgCodec<Message>
 		{
 		public:
-			std::shared_ptr<tom::Buffer> GenerateBinaryMessage(IMsgHeader* , Any& any);
-			std::shared_ptr<tom::Any> GenerateMessage(IMsgHeader*,std::shared_ptr<tom::Buffer>& buffer);
+			std::shared_ptr<tom::Buffer> GenerateBinaryMessage(Unknown* , std::shared_ptr<Message>&);
+			std::shared_ptr<Message> GenerateMessage(Unknown*, std::shared_ptr<tom::Buffer>&);
 		};
 	}
 }

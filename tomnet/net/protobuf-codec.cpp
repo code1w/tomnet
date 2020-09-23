@@ -3,20 +3,18 @@
 #include "default_packet_header.h"
 
 #include <google/protobuf/message.h>
+using namespace google::protobuf;
 namespace tom
 {
 	namespace net {
-		typedef std::shared_ptr<google::protobuf::Message> PbPtr;
-		typedef std::shared_ptr<tom::Buffer> BufPtr;
-		std::shared_ptr<tom::Buffer> ProtobufCodec::GenerateBinaryMessage(IMsgHeader* header,Any& any)
+		std::shared_ptr<tom::Buffer> ProtobufCodec::GenerateBinaryMessage(Unknown* header, std::shared_ptr<Message>& message)
 		{
 			auto defheader = (DefaultPacketHeader*)header;
 
-			BufPtr buf = std::make_shared<tom::Buffer>();
-			PbPtr message = any.Get<PbPtr>();
+			std::shared_ptr<tom::Buffer> buf = std::make_shared<tom::Buffer>();
 
 #if GOOGLE_PROTOBUF_VERSION > 3009002
-			int body_size = google::protobuf::internal::ToIntSize(message->ByteSizeLong());
+			int body_size = internal::ToIntSize(message->ByteSizeLong());
 #else
 			int body_size = message.ByteSize();
 #endif
@@ -27,7 +25,7 @@ namespace tom
 			if (end - start != body_size)
 			{
 #if GOOGLE_PROTOBUF_VERSION > 3009002
-				ByteSizeConsistencyError(body_size, google::protobuf::internal::ToIntSize(message->ByteSizeLong()), static_cast<int>(end - start));
+				ByteSizeConsistencyError(body_size, internal::ToIntSize(message->ByteSizeLong()), static_cast<int>(end - start));
 #else
 				ByteSizeConsistencyError(body_size, message.ByteSize(), static_cast<int>(end - start));
 #endif
@@ -37,7 +35,7 @@ namespace tom
 			return buf;
 		}
 
-		std::shared_ptr<tom::Any> ProtobufCodec::GenerateMessage(IMsgHeader* header, std::shared_ptr<tom::Buffer>& buffer)
+		std::shared_ptr<Message> ProtobufCodec::GenerateMessage(Unknown* header, std::shared_ptr<tom::Buffer>& buffer)
 		{
 			auto defheader = (DefaultPacketHeader*)header;
 			return nullptr;
