@@ -32,7 +32,7 @@ public:
 
 	}
 
-	void MessageHeaderBuffer(const Message& message, std::shared_ptr<tom::Buffer>& buffer)
+	void MessageHeaderToBuffer(const Message& message, std::shared_ptr<tom::Buffer>& buffer)
 	{
 		auto msgsize = tom::base::PbMessageSize(message);
 		const std::string& typeName = message.GetTypeName();
@@ -47,7 +47,22 @@ public:
 
 	}
 
-	void MessageHeaderFromBuffer(std::shared_ptr<tom::Buffer>& buffer)
+	void MessageHeaderToBuffer(const Message& message, tom::Buffer& buffer)
+	{
+		auto msgsize = tom::base::PbMessageSize(message);
+		const std::string& typeName = message.GetTypeName();
+		int32_t nameLen = static_cast<int32_t>(typeName.size());
+		packetlen = sizeof(packetop) + sizeof(msgtypelen) + nameLen + msgsize;
+		buffer.ensureWritableBytes(packetlen);
+		buffer.appendInt32(packetlen);
+		buffer.appendInt32(packetop);
+		buffer.appendInt32(nameLen);
+		buffer.append(typeName.c_str(), typeName.size());
+
+
+	}
+
+	void MessageHeaderFromBuffer(const std::shared_ptr<tom::Buffer>& buffer)
 	{
 		packetlen = buffer->readInt32();
 		packetop = buffer->readInt32();

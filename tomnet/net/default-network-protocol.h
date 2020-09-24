@@ -16,32 +16,31 @@ namespace tom {
 			{
 			}
 
-
-			std::shared_ptr<tom::Buffer> PackNetPacket(const Message& message)
+			 void PackNetPacket(const Message& message, tom::Buffer& buffer)
 			{
 
-				auto buffer = std::make_shared<tom::Buffer>();
+				//auto buffer = std::make_shared<tom::Buffer>();
 				DefaultPacketHeader packetheader;
 
-				packetheader.MessageHeaderBuffer(message, buffer); //
-				if(codec_)
+				packetheader.MessageHeaderToBuffer(message, buffer); //
+				if (codec_)
 				{
 					codec_->GenerateBinaryMessage(buffer, message);
 				}
 
-				if(packetheader.compressed)
+				if (packetheader.compressed)
 				{
-                   // TODO compressed
+					// TODO compressed
+				}
+
+				if (packetheader.encrypted)
+				{
+					// TODO encrypted
 				}
 				
-				if(packetheader.encrypted)
-				{
-                   // TODO encrypted
-				}
-				return buffer;
 			}
 
-			std::shared_ptr<Message> UnPackNetPacket(std::shared_ptr<tom::Buffer>& buffer)
+			std::shared_ptr<Message> UnPackNetPacket(const std::shared_ptr<tom::Buffer>& buffer)
 			{
 				DefaultPacketHeader header;
 				
@@ -60,21 +59,6 @@ namespace tom {
 				auto message = codec_->GenerateMessage(header.msgtype, buffer);
 				return message;
 			}
-
-			std::shared_ptr<Message> UnPackNetPacket(tom::Buffer& buffer)
-			{
-				auto msg = codec_->GenerateMessage(std::string(""), buffer);
-				return nullptr;
-			}
-
-			std::shared_ptr<tom::Buffer> PackNetPacket(std::shared_ptr<Message>& message) 
-			{
-				auto buf = codec_->GenerateBinaryMessage(message);
-				return buf;
-			}
-
-
-
 
 		};
 	}}

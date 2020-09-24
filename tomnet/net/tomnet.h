@@ -116,9 +116,9 @@ public:
     virtual ~IMsgCodec() {}
     virtual std::shared_ptr<tom::Buffer> GenerateBinaryMessage(std::shared_ptr<T>&) = 0;
     virtual std::shared_ptr<tom::Buffer> GenerateBinaryMessage(const T&) = 0;
-    virtual void GenerateBinaryMessage(std::shared_ptr<tom::Buffer>& , const T&) = 0;
-    virtual std::shared_ptr<T> GenerateMessage(std::string& ,std::shared_ptr<tom::Buffer>& ) = 0;
-    virtual std::shared_ptr<T> GenerateMessage(std::string&,tom::Buffer& ) = 0;
+    virtual void GenerateBinaryMessage(tom::Buffer& , const T&) = 0;
+    virtual std::shared_ptr<T> GenerateMessage(std::string& ,const std::shared_ptr<tom::Buffer>& ) = 0;
+    virtual std::shared_ptr<T> GenerateMessage(std::string&,const tom::Buffer& ) = 0;
 };
 
 template <typename T>
@@ -135,10 +135,8 @@ public:
    }
 
     virtual ~INetWorkProtocol() {}
-    virtual std::shared_ptr<tom::Buffer> PackNetPacket(std::shared_ptr<T>&) = 0;
-    virtual std::shared_ptr<tom::Buffer> PackNetPacket(const T&) = 0;
-    virtual std::shared_ptr<T> UnPackNetPacket(std::shared_ptr<tom::Buffer>&) = 0;
-    virtual std::shared_ptr<T> UnPackNetPacket(tom::Buffer&) = 0;
+    virtual void  PackNetPacket(const T&, tom::Buffer&) = 0;
+    virtual std::shared_ptr<T> UnPackNetPacket(const std::shared_ptr<tom::Buffer>&) = 0;
 };
 
 class IMessageQueue {

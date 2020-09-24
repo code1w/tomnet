@@ -209,14 +209,19 @@ namespace tom
 			packet->ensureWritableBytes(size);
 			packet->append(data, size);
  
-			if (sendding_.load())
+			auto fn = [this, packet]()
 			{
-				wbufferlist_.enqueue(packet);
-			}
-			else
-			{
-				AsyncSendData(packet);
-			}
+				if (sendding_.load())
+				{
+					wbufferlist_.enqueue(packet);
+				}
+				else
+				{
+					AsyncSendData(packet);
+				}
+			};
+
+			loop_->RunInIoService(std::move(fn));
 
 			return 0;
 		}

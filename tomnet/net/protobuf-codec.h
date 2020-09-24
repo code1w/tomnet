@@ -36,7 +36,9 @@ namespace tom
 				return buf;
 			}
 
-			std::shared_ptr<Message> GenerateMessage(std::string& msgtype , std::shared_ptr<tom::Buffer>& buffer)
+
+
+			std::shared_ptr<Message> GenerateMessage(std::string& msgtype , const std::shared_ptr<tom::Buffer>& buffer)
 			{
 				if (msgtype == "")
 				{
@@ -82,22 +84,22 @@ namespace tom
 				return buf;
 			}
 
-			void GenerateBinaryMessage(std::shared_ptr<tom::Buffer>& buf, const Message& message)
+			void GenerateBinaryMessage(tom::Buffer& buffer, const Message& message)
 			{
 
 				int body_size = internal::ToIntSize(message.ByteSizeLong());
-				buf->ensureWritableBytes(body_size);
-				uint8_t* start = reinterpret_cast<uint8_t*>(buf->beginWrite());
+				buffer.ensureWritableBytes(body_size);
+				uint8_t* start = reinterpret_cast<uint8_t*>(buffer.beginWrite());
 				uint8_t* end = message.SerializeWithCachedSizesToArray(start);
 				if (end - start != body_size)
 				{
 					ByteSizeConsistencyError(body_size, internal::ToIntSize(message.ByteSizeLong()), static_cast<int>(end - start));
 				}
-				buf->hasWritten(body_size);
+				buffer.hasWritten(body_size);
 			}
 
 
-			std::shared_ptr<Message> GenerateMessage(std::string& msgtype, tom::Buffer& buffer)
+			std::shared_ptr<Message> GenerateMessage(std::string& msgtype, const tom::Buffer& buffer)
 			{
 				
 				if (msgtype == "")
