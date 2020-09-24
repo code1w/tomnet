@@ -5,6 +5,7 @@ namespace tom
 {
 namespace net
 {
+	
 	int32_t(*InitNetwork)(uint32_t workthreads) = 0;
 	uint64_t(*StartNetService)(const char* address, uint16_t port, IMessageQueue** msg_queue_ptr, uint32_t ping_invent, uint32_t timeout, uint16_t acceptor_count, MsgHeaderProtocal, void* ) = 0;
 	int32_t(*CloseNetService)(uint64_t server_h) = 0;
@@ -14,6 +15,7 @@ namespace net
 	int32_t(*CloseLink)(uint32_t handle) = 0;
 	int32_t(*SetUserData)(uint32_t handle, void* ud) = 0;
 	MsgHeaderProtocal(*GetLinkMsgHeaderProtocal)(uint32_t handle) = 0;
+	
 
 
 #define SETUP_NET_DRIVER( PIX, FNAME ) 	FNAME = tom::net::PIX##FNAME 

@@ -7,15 +7,6 @@
 #include "base/any.h"
 #include "dll_export.h"
 
-//#include <google/protobuf/message.h>
-
-#ifdef  TOM_NET_EXPORTS
-#define  TOM_NET_API __declspec(dllexport)
-#else
-#define  TOM_NET_API __declspec(dllimport)
-#endif
-
-
 #define MAX_PACKET_SIZE (1024 * 1024)  
 #define INVALID_NETWORK_HANDLE (~0)
 #define MAXFREENETPACKET 1024
@@ -95,16 +86,13 @@ struct NetContext {
 
 #pragma pack(pop)
 
-class Unknown
-{
-public:
-    virtual ~Unknown(){}
-};
-
-class IMsgHeader : public Unknown
+class IMsgHeader
 {
 public:
     virtual ~IMsgHeader() {}
+    virtual void ToBinary(tom::Buffer& buffer) = 0;
+    virtual void FromBinary(tom::Buffer& buffer) = 0;
+public:
     int32_t packetlen;
     int32_t packetop;
     bool encrypted;
@@ -112,22 +100,42 @@ public:
     bool binary;
 };
 
+class Unknown {
+public:
+    Unknown(){}
+    virtual ~Unknown(){}
+};
+
 template <typename T>
-class IMsgCodec : public Unknown
+class IMsgCodec
 {
 public:
     virtual ~IMsgCodec() {}
-    virtual std::shared_ptr<tom::Buffer> GenerateBinaryMessage(Unknown* , T&) = 0;
-    virtual std::shared_ptr<T> GenerateMessage(Unknown* ,std::shared_ptr<tom::Buffer>& ) = 0;
+    virtual std::shared_ptr<tom::Buffer> GenerateBinaryMessage(std::shared_ptr<T>&) = 0;
+    virtual std::shared_ptr<tom::Buffer> GenerateBinaryMessage(const T&) = 0;
+    virtual void GenerateBinaryMessage(std::shared_ptr<tom::Buffer>& , const T&) = 0;
+    virtual std::shared_ptr<T> GenerateMessage(std::string& ,std::shared_ptr<tom::Buffer>& ) = 0;
+    virtual std::shared_ptr<T> GenerateMessage(std::string&,tom::Buffer& ) = 0;
 };
 
+template <typename T>
+class INetWorkProtocol : public Unknown
+{
+public:
+    IMsgHeader* header_ = nullptr;
+    IMsgCodec<T>* codec_ = nullptr;
+public:
+    INetWorkProtocol(IMsgHeader* header, IMsgCodec<T>* codec)
+        :header_(header)
+        ,codec_(codec)
+    {
+   }
 
-class INetWorkProtocol {
-public:
-    Unknown* header = nullptr;
-    Unknown* codec = nullptr;
-public:
     virtual ~INetWorkProtocol() {}
+    virtual std::shared_ptr<tom::Buffer> PackNetPacket(std::shared_ptr<T>&) = 0;
+    virtual std::shared_ptr<tom::Buffer> PackNetPacket(const T&) = 0;
+    virtual std::shared_ptr<T> UnPackNetPacket(std::shared_ptr<tom::Buffer>&) = 0;
+    virtual std::shared_ptr<T> UnPackNetPacket(tom::Buffer&) = 0;
 };
 
 class IMessageQueue {
@@ -138,17 +146,18 @@ class IMessageQueue {
     virtual std::size_t Size() = 0;
 };
 
- TOM_TOM_NET_DLL_DECL int32_t (*InitNetwork)(uint32_t threads);
- TOM_TOM_NET_DLL_C_DECL uint64_t (*StartNetService)(const char* address, uint16_t port, IMessageQueue** q, uint32_t , uint32_t , uint16_t, MsgHeaderProtocal, void*);
- TOM_TOM_NET_DLL_C_DECL int32_t (*CloseNetService)(uint64_t server_h);
- TOM_TOM_NET_DLL_C_DECL int32_t (*Connect)(const char* ip, uint16_t port,IMessageQueue** q,uint32_t , uint32_t , MsgHeaderProtocal, void*);
- TOM_TOM_NET_DLL_C_DECL int32_t (*SendPacket)(uint32_t handle, const char* data,uint16_t size);
- TOM_TOM_NET_DLL_C_DECL int32_t (*SendBuffer)(uint32_t handle, const tom::Buffer& b1,const tom::Buffer& b2);
- TOM_TOM_NET_DLL_C_DECL int32_t (*CloseLink)(uint32_t handle);
- TOM_TOM_NET_DLL_C_DECL int32_t (*SetUserData)(uint32_t handle, void* ud);
- TOM_TOM_NET_DLL_C_DECL MsgHeaderProtocal (*GetLinkMsgHeaderProtocal)(uint32_t handle);
- TOM_TOM_NET_DLL_C_DECL bool CreateNetwork(NetDriver);
- TOM_TOM_NET_DLL_C_DECL void DestroyNetwork();
+TOM_TOM_NET_DLL_DECL int32_t (*InitNetwork)(uint32_t threads);
+TOM_TOM_NET_DLL_DECL uint64_t (*StartNetService)(const char* address, uint16_t port, IMessageQueue** q, uint32_t , uint32_t , uint16_t, MsgHeaderProtocal, void*);
+TOM_TOM_NET_DLL_DECL int32_t (*CloseNetService)(uint64_t server_h);
+TOM_TOM_NET_DLL_DECL int32_t (*Connect)(const char* ip, uint16_t port,IMessageQueue** q,uint32_t , uint32_t , MsgHeaderProtocal, void*);
+TOM_TOM_NET_DLL_DECL int32_t (*SendPacket)(uint32_t handle, const char* data,uint16_t size);
+TOM_TOM_NET_DLL_DECL int32_t (*SendBuffer)(uint32_t handle, const tom::Buffer& b1,const tom::Buffer& b2);
+TOM_TOM_NET_DLL_DECL int32_t (*CloseLink)(uint32_t handle);
+TOM_TOM_NET_DLL_DECL int32_t (*SetUserData)(uint32_t handle, void* ud);
+TOM_TOM_NET_DLL_DECL MsgHeaderProtocal (*GetLinkMsgHeaderProtocal)(uint32_t handle);
+
+TOM_TOM_NET_DLL_DECL bool CreateNetwork(NetDriver);
+TOM_TOM_NET_DLL_DECL void DestroyNetwork();
 
 }  // namespace net
 }  // namespace tom

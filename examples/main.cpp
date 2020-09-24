@@ -16,7 +16,9 @@
 #include "tellist.pb.h"
 #include "asio/asio.hpp"
 
-
+#include "net/protobuf-codec.h"
+#include "net/default-network-protocol.h"
+#include "net/default_packet_header.h"
 
 #ifndef WIN32
 #include <sys/time.h>
@@ -186,10 +188,27 @@ void TestAny()
     delete buf;
 }
 
+void TestProtocol()
+{
+
+    tom::net::ProtobufCodec* codec = new tom::net::ProtobufCodec();
+    tom::net::DefaultPacketHeader* header = new tom::net::DefaultPacketHeader();
+    tom::net::INetWorkProtocol<google::protobuf::Message>* protocol  = new tom::net::DefaultNetWorkProtocol(header, codec);
+	Tom::ReqLogin req;
+	req.set_account("zxb-1");
+	req.set_passward("1234546");
+
+    auto binary = protocol->PackNetPacket(req);
+    auto msg = protocol->UnPackNetPacket(binary);
+
+    TestAny();
+
+}
+
 // s 127.0.0.1 8888 4 1
 int main(int argc, char** argv)
 {
-    TestAny();
+    TestProtocol();
     if (argc < 2)
     {
         return usage();

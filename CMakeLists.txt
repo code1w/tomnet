@@ -19,29 +19,7 @@ option(TOMNET_BUILD_EXAMPLES "Build Tomnet examples" ON)
 endif()
 
 if(WIN32)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W3 /O2 /bigobj")
-
-  # was causing conflics with gtest build
-  string(REPLACE "/RTC1" "" CMAKE_CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
-
-  if("${MSVC_RUNTIME_LIBRARY_CONFIG}" STREQUAL "")
-    set(MSVC_RUNTIME_LIBRARY_CONFIG "/MT")
-  endif()
-
-  foreach(flag_var CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE)
-    if("${MSVC_RUNTIME_LIBRARY_CONFIG}" STREQUAL "/MT")
-      string(REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
-    elseif("${MSVC_RUNTIME_LIBRARY_CONFIG}" STREQUAL "/MD")
-      string(REPLACE "/MT" "/MD" ${flag_var} "${${flag_var}}")
-    else()
-      string(REPLACE "/MD" "${MSVC_RUNTIME_LIBRARY_CONFIG}" ${flag_var} "${${flag_var}}")
-      string(REPLACE "/MT" "${MSVC_RUNTIME_LIBRARY_CONFIG}" ${flag_var} "${${flag_var}}")
-    endif()
-  endforeach()
-
-  add_definitions(-D_UNICODE)
-  add_definitions(-DUNICODE)
-  add_definitions(-DWIN32_LEAN_AND_MEAN)
+  add_definitions(-DTOM_TOM_NET_DLL_EXPORT)
 else()
   set(CMAKE_CXX_FLAGS 
   ${CMAKE_CXX_FLAGS} 
