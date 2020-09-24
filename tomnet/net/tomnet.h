@@ -158,8 +158,8 @@ TOM_TOM_NET_DLL_C_DECL int32_t (*SendBuffer)(uint32_t handle, const tom::Buffer&
 TOM_TOM_NET_DLL_C_DECL int32_t (*CloseLink)(uint32_t handle);
 TOM_TOM_NET_DLL_C_DECL int32_t (*SetUserData)(uint32_t handle, void* ud);
 TOM_TOM_NET_DLL_C_DECL MsgHeaderProtocal (*GetLinkMsgHeaderProtocal)(uint32_t handle);
-TOM_TOM_NET_DLL_DECL bool CreateNetwork(NetDriver);
-TOM_TOM_NET_DLL_DECL void DestroyNetwork();
+TOM_TOM_NET_DLL_C_DECL bool CreateNetwork(NetDriver);
+TOM_TOM_NET_DLL_C_DECL void DestroyNetwork();
 
 }  // namespace net
 }  // namespace tom
