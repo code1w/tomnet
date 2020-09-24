@@ -149,7 +149,7 @@ class IMessageQueue {
     virtual std::size_t Size() = 0;
 };
 
-TOM_TOM_NET_DLL_DECL int32_t (*InitNetwork)(uint32_t threads);
+TOM_TOM_NET_DLL_C_DECL int32_t (*InitNetwork)(uint32_t threads);
 TOM_TOM_NET_DLL_C_DECL uint64_t (*StartNetService)(const char* address, uint16_t port, IMessageQueue** q, uint32_t , uint32_t , uint16_t, MsgHeaderProtocal, void*);
 TOM_TOM_NET_DLL_C_DECL int32_t (*CloseNetService)(uint64_t server_h);
 TOM_TOM_NET_DLL_C_DECL int32_t (*Connect)(const char* ip, uint16_t port,IMessageQueue** q,uint32_t , uint32_t , MsgHeaderProtocal, void*);

@@ -2,7 +2,7 @@
 #define  NET_DLL_EXPORT_H
 
 #ifdef _WIN32
-    #ifdef TOM_TOM_NET_DLL_EXPORT_O
+    #ifdef TOM_TOM_NET_DLL_EXPORT
         #define TOM_TOM_NET_CLASS_API __declspec(dllexport)
     #else
         #define TOM_TOM_NET_CLASS_API __declspec(dllimport)
