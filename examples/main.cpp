@@ -29,7 +29,8 @@
 #include <thread>
 
 #define RLIMIT_NOFILE 1000000
-
+#pragma comment (lib, "E:/zxb/work/3rd/tomnet/bin/debug/lib/tomnet.lib")
+#pragma comment (lib, "E:/zxb/work/3rd/tomnet/bin/debug/lib/tomnet_base.lib")
 namespace net_test
 {
 

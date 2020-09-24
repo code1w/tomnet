@@ -10,12 +10,13 @@
 #include "event_loop_thread_pool.h"
 #include "network_traffic.h"
 #include "asio_handler.h"
+#include "dll_export.h"
 
 namespace tom
 {
 namespace net
 {
-	static  int32_t Asio_InitNetwork(uint32_t pool_size)
+	static int32_t Asio_InitNetwork(uint32_t pool_size)
 	{
 		HandlerManager::instance().Initialize(5000);
 		EventLoopThreadPool::instance().Initialize(pool_size);
