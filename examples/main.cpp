@@ -208,7 +208,7 @@ void TestTypeId()
 
 void TestProtocol()
 {
-
+       
     INetWorkProtocol<google::protobuf::Message>* protocol  = 
         new DefaultNetWorkProtocol(new DefaultPacketHeader(), new ProtobufCodec());
 	Tom::ReqLogin req;
