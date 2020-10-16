@@ -5,18 +5,22 @@
 #include <google/protobuf/message.h>
 #include "protobuf-codec.h"
 
-using namespace google::protobuf;
 namespace tom {
 	namespace net{
-		TOM_TOM_NET_DLL_DECL class DefaultNetWorkProtocol : public INetWorkProtocol<Message>
+		TOM_TOM_NET_DLL_DECL class DefaultNetWorkProtocol : public INetWorkProtocol<google::protobuf::Message>
 		{
 		public:
-			DefaultNetWorkProtocol(IMsgHeader* header, ProtobufCodec* codec)
-				:INetWorkProtocol<Message>(header, (IMsgCodec<Message>*)codec)
+			DefaultNetWorkProtocol(IMsgHeader* header, IMsgCodec<google::protobuf::Message>* codec)
+				:INetWorkProtocol<google::protobuf::Message>(header, codec)
 			{
 			}
 
-			 void PackNetPacket(const Message& message, tom::Buffer& buffer)
+			void PackNetPacket(const google::protobuf::Message& message, std::shared_ptr<tom::Buffer>& buffer)
+			{
+
+			}
+
+			void PackNetPacket(const google::protobuf::Message& message, tom::Buffer& buffer)
 			{
 
 				//auto buffer = std::make_shared<tom::Buffer>();
@@ -37,7 +41,11 @@ namespace tom {
 				{
 					// TODO encrypted
 				}
-				
+			}
+
+			std::shared_ptr<Message> UnPackNetPacket(const tom::Buffer& buffer)
+			{
+				return nullptr;
 			}
 
 			std::shared_ptr<Message> UnPackNetPacket(const std::shared_ptr<tom::Buffer>& buffer)
@@ -54,8 +62,6 @@ namespace tom {
 				{
 
 				}
-
-
 				auto message = codec_->GenerateMessage(header.msgtype, buffer);
 				return message;
 			}

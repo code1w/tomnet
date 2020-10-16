@@ -1,6 +1,6 @@
 #pragma once
 #include "tomnet.h"
-#include "default_packet_header.h"
+#include "default-packet-header.h"
 #include "base/google-inl.h"
 
 #include <google/protobuf/message.h>
@@ -16,7 +16,7 @@ namespace tom
 	namespace net {
 		using Message = google::protobuf::Message;
 
-		class ProtobufCodec : IMsgCodec<Message>
+		class ProtobufCodec : public IMsgCodec<Message>
 		{
 		public:
 			std::shared_ptr<tom::Buffer> GenerateBinaryMessage(std::shared_ptr<Message>& message)
@@ -35,8 +35,6 @@ namespace tom
 
 				return buf;
 			}
-
-
 
 			std::shared_ptr<Message> GenerateMessage(std::string& msgtype , const std::shared_ptr<tom::Buffer>& buffer)
 			{

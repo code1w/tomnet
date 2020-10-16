@@ -18,7 +18,7 @@
 
 #include "net/protobuf-codec.h"
 #include "net/default-network-protocol.h"
-#include "net/default_packet_header.h"
+#include "net/default-packet-header.h"
 
 #ifndef WIN32
 #include <sys/time.h>
@@ -27,6 +27,9 @@
 
 #include <functional>
 #include <thread>
+#include "login.pb.h"
+
+using namespace tom::net;
 
 #define RLIMIT_NOFILE 1000000
 namespace net_test
@@ -187,18 +190,34 @@ void TestAny()
     delete buf;
 }
 
+void TestTypeId()
+{
+	Tom::ReqLogin req;
+	req.set_account("zxb-1");
+	req.set_passward("1234546");
+	auto tname = typeid(Tom::ReqLogin).raw_name();
+    tname = typeid(Tom::ReqLogin).name();
+    size_t hcode = typeid(Tom::ReqLogin).hash_code();
+    hcode = typeid(Tom::ReqLogin).hash_code();
+
+    auto ptr = std::make_shared<Tom::ReqLogin>();
+    tname = typeid(ptr.get()).name();
+    tname = typeid(*ptr).name();
+}
+
+
 void TestProtocol()
 {
 
-    tom::net::ProtobufCodec* codec = new tom::net::ProtobufCodec();
-    tom::net::DefaultPacketHeader* header = new tom::net::DefaultPacketHeader();
-    tom::net::INetWorkProtocol<google::protobuf::Message>* protocol  = new tom::net::DefaultNetWorkProtocol(header, codec);
+    INetWorkProtocol<google::protobuf::Message>* protocol  = 
+        new DefaultNetWorkProtocol(new DefaultPacketHeader(), new ProtobufCodec());
 	Tom::ReqLogin req;
 	req.set_account("zxb-1");
 	req.set_passward("1234546");
 
     tom::Buffer buffer;
     protocol->PackNetPacket(req, buffer);
+
     std::shared_ptr<tom::Buffer> binary = std::make_shared<tom::Buffer>();
     binary->append(buffer.peek(), buffer.readableBytes());
     auto msg = protocol->UnPackNetPacket(binary);
@@ -211,6 +230,7 @@ void TestProtocol()
 int main(int argc, char** argv)
 {
     TestProtocol();
+    TestTypeId();
     if (argc < 2)
     {
         return usage();

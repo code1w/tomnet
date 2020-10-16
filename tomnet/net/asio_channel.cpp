@@ -75,8 +75,11 @@ namespace tom
 				{
 					disconnectcb_();
 				}
-				
-				DoReConnect(remoteip_, remoteport_);
+
+				if(reconnectedcb_)
+				{
+					DoReConnect(remoteip_, remoteport_);
+				}
 			}
 			break;
 			case asio::error::eof:
@@ -129,11 +132,11 @@ namespace tom
 
 				recvbuf_.append(inputbuf_.data(), readsize);
 				AsyncRead();
-				CeneratePacket();
+				TryCeneratePacket();
 			});
 		}
 
-		void AsioChannel::CeneratePacket()
+		void AsioChannel::TryCeneratePacket()
 		{
 			int readable = recvbuf_.readableBytes();
 
@@ -319,15 +322,12 @@ namespace tom
 
 		}
 
-
-
 		void AsioChannel::CloseSocket()
 		{
 			socket_.cancel();
 			std::error_code err;
 			socket_.shutdown(asio::ip::tcp::socket::shutdown_both, err);
 			socket_.close();
-
 		}
 
 		void AsioChannel::Close(uint32_t handle)

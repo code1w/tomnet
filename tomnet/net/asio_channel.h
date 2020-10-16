@@ -40,7 +40,6 @@ namespace tom
 			tom::Buffer bodybuffer_;
 			tom::Buffer headbuffer_;
 			tom::Buffer recvbuf_;
-			//char inputbuf_[4096];
 			std::array<char, 4096> inputbuf_;
 			uint32_t handler_ = 0;
 			std::thread::id tid_;
@@ -78,7 +77,7 @@ namespace tom
 			void DoReConnect(const std::string& ip, uint16_t port);
 			void CloseSocket();
 			void AsyncRead();
-			void CeneratePacket();
+			void TryCeneratePacket();
 
 	
 		public:

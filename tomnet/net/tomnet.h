@@ -86,9 +86,6 @@ struct NetContext {
 
 #pragma pack(pop)
 
-
-
-
 class IMsgHeader
 {
 public:
@@ -110,7 +107,7 @@ public:
 };
 
 template <typename T>
-class IMsgCodec
+class IMsgCodec : public Unknown
 {
 public:
     virtual ~IMsgCodec() {}
@@ -136,6 +133,8 @@ public:
 
     virtual ~INetWorkProtocol() {}
     virtual void  PackNetPacket(const T&, tom::Buffer&) = 0;
+    virtual void  PackNetPacket(const T&, std::shared_ptr<tom::Buffer>&) = 0;
+    virtual std::shared_ptr<T> UnPackNetPacket(const tom::Buffer&) = 0;
     virtual std::shared_ptr<T> UnPackNetPacket(const std::shared_ptr<tom::Buffer>&) = 0;
 };
 

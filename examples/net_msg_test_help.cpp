@@ -57,7 +57,7 @@ void OnConnected(uint32_t handle, void* ud, const tom::BufferPtr& msg) {
 void OnReConnected(uint32_t handle,void* ud, const tom::BufferPtr& msg) {
 	//std::cout << " connected remote server handle : " << handle << std::endl;
 	//tom::net::CloseLink(handle);
-	SendInfoList(handle);
+	//SendInfoList(handle);
 	//handles_.push_back(handle);
 }
 
@@ -126,6 +126,7 @@ void SendReqLogin(uint32_t handle)
 	Tom::ReqLogin req;
 	req.set_account("zxb-1");
 	req.set_passward("1234546");
+	auto tname = typeid(Tom::ReqLogin).name();
 	tom::SendMsg(handle, req);
 	std::this_thread::sleep_for(std::chrono::milliseconds(1));
 	}
