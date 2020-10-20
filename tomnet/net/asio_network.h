@@ -80,7 +80,7 @@ namespace net
 		{
 			handler->AsyncConnect(address, port);
 		}
-		return 0;
+		return hid;
 	}
 
 	static int32_t Asio_SendPacket(uint32_t handleid, const char* data, uint16_t size)

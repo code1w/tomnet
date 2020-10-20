@@ -19,6 +19,7 @@
 #include "net/protobuf-codec.h"
 #include "net/default-network-protocol.h"
 #include "net/default-packet-header.h"
+#include "net/protobuf-networking.h"
 
 #ifndef WIN32
 #include <sys/time.h>
@@ -267,6 +268,8 @@ int main(int argc, char** argv)
     else {
         return usage();
     }
+
+    INetWorking<google::protobuf::Message> pbnet;
     RegisterCb();
     Update();
 
