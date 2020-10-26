@@ -20,6 +20,7 @@
 #include <mutex>
 #include <atomic>
 #include <queue>
+#include <array>
 
 namespace tom
 {
@@ -38,6 +39,8 @@ namespace tom
 			MessageHeader headerbuffer_{0,0};
 			tom::Buffer bodybuffer_;
 			tom::Buffer headbuffer_;
+			tom::Buffer recvbuf_;
+			std::array<char, 4096> inputbuf_;
 			uint32_t handler_ = 0;
 			std::thread::id tid_;
 			ConnectedCallback connectedcb_;
@@ -65,8 +68,6 @@ namespace tom
 			asio::ip::tcp::socket& Socket();
 			void Connect(const std::string& ip, uint16_t port, bool tryconnect = false);
 			void Start();
-			void ReadPacketLen();
-			void ReadPacketBody(size_t size);
 			int32_t SendPacket(const char* data, uint16_t len);
 			bool IsConnect() {return handler_ == 0;	}
 			void SetHandler(uint32_t handler) { handler_ = handler; }
@@ -75,6 +76,9 @@ namespace tom
 			void DelayReConnect(const std::string& ip, uint16_t port);
 			void DoReConnect(const std::string& ip, uint16_t port);
 			void CloseSocket();
+			void AsyncRead();
+			void TryCeneratePacket();
+
 	
 		public:
 			void SetConnnectedCb(const ConnectedCallback& cb) { connectedcb_ = cb; }

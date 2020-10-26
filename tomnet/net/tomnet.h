@@ -4,16 +4,8 @@
 #include <memory>
 
 #include "base/buffer.h"
+#include "base/any.h"
 #include "dll_export.h"
-
-//#include <google/protobuf/message.h>
-
-#ifdef  TOM_NET_EXPORTS
-#define  TOM_NET_API __declspec(dllexport)
-#else
-#define  TOM_NET_API __declspec(dllimport)
-#endif
-
 
 #define MAX_PACKET_SIZE (1024 * 1024)  
 #define INVALID_NETWORK_HANDLE (~0)
@@ -94,12 +86,56 @@ struct NetContext {
 
 #pragma pack(pop)
 
-struct NetProtocal {
-    uint32_t (*HeaderSize)() = 0;
-    uint32_t (*PacketLength)(const char* header) = 0;
-    uint32_t (*PacketFilter)(const char* header) = 0;
-    uint32_t (*PacketSystem)(uint8_t event, char* header) = 0;
-    uint32_t (*PacketFinial)(char* header, uint32_t length) = 0;
+class IMsgHeader
+{
+public:
+    virtual ~IMsgHeader() {}
+    virtual void ToBinary(tom::Buffer& buffer) = 0;
+    virtual void FromBinary(tom::Buffer& buffer) = 0;
+public:
+    int32_t packetlen;
+    int32_t packetop;
+    bool encrypted;
+    bool compressed;
+    bool binary;
+};
+
+class Unknown {
+public:
+    Unknown(){}
+    virtual ~Unknown(){}
+};
+
+template <typename T>
+class IMsgCodec : public Unknown
+{
+public:
+    virtual ~IMsgCodec() {}
+    virtual std::shared_ptr<tom::Buffer> GenerateBinaryMessage(std::shared_ptr<T>&) = 0;
+    virtual std::shared_ptr<tom::Buffer> GenerateBinaryMessage(const T&) = 0;
+    virtual void GenerateBinaryMessage(tom::Buffer& , const T&) = 0;
+    virtual std::shared_ptr<T> GenerateMessage(std::string& ,const std::shared_ptr<tom::Buffer>& ) = 0;
+    virtual std::shared_ptr<T> GenerateMessage(std::string&,const tom::Buffer& ) = 0;
+};
+
+template <typename T>
+class INetWorkProtocol : public Unknown
+{
+public:
+    IMsgHeader* header_ = nullptr;
+    IMsgCodec<T>* codec_ = nullptr;
+public:
+    INetWorkProtocol(IMsgHeader* header, IMsgCodec<T>* codec)
+        :header_(header)
+        ,codec_(codec)
+    {
+   }
+
+    virtual ~INetWorkProtocol() {}
+    virtual void  PackNetPacket(const T&, tom::Buffer&) = 0;
+    virtual void  PackNetPacket(const T&, std::shared_ptr<tom::Buffer>&) = 0;
+    virtual std::shared_ptr<T> UnPackNetPacket(const tom::Buffer&) = 0;
+    virtual std::shared_ptr<T> UnPackNetPacket(const std::shared_ptr<tom::Buffer>&) = 0;
 };
 
 class IMessageQueue {

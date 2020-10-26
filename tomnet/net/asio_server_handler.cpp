@@ -21,7 +21,7 @@ namespace net {
 
 	AsioServerHandler::~AsioServerHandler()
 	{
-#ifdef  TOM_ TOM_NET_TRAFFIC
+#ifdef  TOM_NET_TRAFFIC
 			printf("~AsioServerHandler()");
 #endif
 		channel_.reset();
@@ -46,7 +46,7 @@ namespace net {
 
 	int32_t AsioServerHandler::OnAccept()
 	{
-#ifdef  TOM_ TOM_NET_DEBUG
+#ifdef  TOM_NET_DEBUG
 		std::thread::id tid = std::this_thread::get_id();
 		//printf("AsioServerHandler OnAccept , tid %d \n", tid);
 #endif
@@ -68,7 +68,7 @@ namespace net {
 				msgqueue_->PushMessage(packet);
 			}
 
-#ifdef  TOM_ TOM_NET_DEBUG
+#ifdef  TOM_NET_DEBUG
 			std::thread::id tid = std::this_thread::get_id();
 			//printf("AsioServerHandler Channel Start , tid %d \n", tid);
 #endif

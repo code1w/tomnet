@@ -26,7 +26,7 @@ namespace net{
 	{
 		status_.store(kStarting);
 		tid_ = std::this_thread::get_id();
-#ifdef  TOM_ TOM_NET_DEBUG
+#ifdef  TOM_NET_DEBUG
 		printf("AsioEventLoop Run , tid %d \n", tid_);
 #endif
 		status_.store(kRunning);

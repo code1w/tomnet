@@ -15,8 +15,7 @@ namespace net
 	int32_t(*SetUserData)(uint32_t handle, void* ud) = 0;
 	MsgHeaderProtocal(*GetLinkMsgHeaderProtocal)(uint32_t handle) = 0;
 
-
-#define SETUP_NET_DRIVER( PIX, FNAME ) 	FNAME = tom::net::PIX##FNAME 
+#define SETUP_NET_DRIVER( PIX, FNAME ) 	FNAME = tom::net::PIX##FNAME
 
 
 	bool CreateNetwork(NetDriver type)

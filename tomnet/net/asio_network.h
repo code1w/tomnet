@@ -10,12 +10,13 @@
 #include "event_loop_thread_pool.h"
 #include "network_traffic.h"
 #include "asio_handler.h"
+#include "dll_export.h"
 
 namespace tom
 {
 namespace net
 {
-	static  int32_t Asio_InitNetwork(uint32_t pool_size)
+	static int32_t Asio_InitNetwork(uint32_t pool_size)
 	{
 		HandlerManager::instance().Initialize(5000);
 		EventLoopThreadPool::instance().Initialize(pool_size);
@@ -47,7 +48,7 @@ namespace net
 			return 0;
 		}
 
-#ifdef  TOM_ TOM_NET_TRAFFIC
+#ifdef  TOM_NET_TRAFFIC
 		NetworkTraffic::trafmsgq_ = *queue;
 		NetworkTraffic::instance().CreateTimer(&tcpserver->GetAcceptLoop()->io_service());
 #endif 
@@ -79,7 +80,7 @@ namespace net
 		{
 			handler->AsyncConnect(address, port);
 		}
-		return 0;
+		return hid;
 	}
 
 	static int32_t Asio_SendPacket(uint32_t handleid, const char* data, uint16_t size)

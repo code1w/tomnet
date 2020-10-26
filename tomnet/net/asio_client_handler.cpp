@@ -34,7 +34,7 @@ namespace net {
 
 	AsioClientHandler::~AsioClientHandler() 
 	{
-#ifdef  TOM_ TOM_NET_TRAFFIC
+#ifdef  TOM_NET_TRAFFIC
 		printf("~AsioClientHandler()");
 #endif
 		channel_.reset();

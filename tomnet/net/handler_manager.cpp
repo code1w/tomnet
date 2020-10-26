@@ -45,10 +45,10 @@ namespace tom
 
 		void  HandlerManager::LinkDown(uint64_t handler)
 		{
-#ifdef  TOM_ TOM_NET_TEST
+#ifdef  TOM_NET_TEST
 			printf("LinkDown handler %d \n", handler);
 #endif
-#ifdef  TOM_ TOM_NET_TRAFFIC
+#ifdef  TOM_NET_TRAFFIC
 			NetworkTraffic::instance().FetchSubLinks();
 #endif 
 			std::lock_guard<std::mutex> l(mutex_);

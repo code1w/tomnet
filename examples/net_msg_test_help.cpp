@@ -51,14 +51,13 @@ void DelaySend(const std::error_code& error)
 
 void OnConnected(uint32_t handle, void* ud, const tom::BufferPtr& msg) {
 	Client* c = (Client*)ud;
-	SendInfoList(handle);
-	SendReqLogin(handle);
+	std::cout << " OnConnected remote server handle : " << handle << std::endl;
 }
 
 void OnReConnected(uint32_t handle,void* ud, const tom::BufferPtr& msg) {
 	//std::cout << " connected remote server handle : " << handle << std::endl;
 	//tom::net::CloseLink(handle);
-	SendInfoList(handle);
+	//SendInfoList(handle);
 	//handles_.push_back(handle);
 }
 
@@ -87,8 +86,8 @@ void OnPersonaInfoList(uint32_t handle, void* ud, const std::shared_ptr<Tom::per
 
 void OnReqLogin(uint32_t handle, void* ud, const std::shared_ptr<Tom::ReqLogin>& message)
 {
-	std::cout << message->account() <<std::endl;
-	std::cout << message->passward() << std::endl;
+	std::cout << message->account() <<" , "<< message->passward()<<std::endl;
+/*
 	Tom::LoginOk rsp;
 	Tom::PlayerBaseInfo* pinfo = rsp.mutable_playerbaseinfo();
 	pinfo->set_name("zhang xiao bin");
@@ -105,6 +104,7 @@ void OnReqLogin(uint32_t handle, void* ud, const std::shared_ptr<Tom::ReqLogin>&
 	tom::SendMsg(handle, rsp);
 	}
 	//SendInfoList(handle);
+*/
 }
 
 
@@ -126,6 +126,7 @@ void SendReqLogin(uint32_t handle)
 	Tom::ReqLogin req;
 	req.set_account("zxb-1");
 	req.set_passward("1234546");
+	auto tname = typeid(Tom::ReqLogin).name();
 	tom::SendMsg(handle, req);
 	std::this_thread::sleep_for(std::chrono::milliseconds(1));
 	}

@@ -162,6 +162,7 @@ class Buffer : public noncopyable
     hasWritten(len);
   }
 
+
   void append(const void* /*restrict*/ data, size_t len)
   {
     append(static_cast<const char*>(data), len);

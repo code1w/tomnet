@@ -7,6 +7,7 @@
 
 #include "net/tomnet.h"
 #include "base/buffer.h"
+#include "base/any.h"  
 #include "base/pb_dispatcher.h"
 #include "base/pb_message_helper.h"
 
@@ -15,7 +16,10 @@
 #include "tellist.pb.h"
 #include "asio/asio.hpp"
 
-
+#include "net/protobuf-codec.h"
+#include "net/default-network-protocol.h"
+#include "net/default-packet-header.h"
+#include "net/protobuf-networking.h"
 
 #ifndef WIN32
 #include <sys/time.h>
@@ -24,9 +28,11 @@
 
 #include <functional>
 #include <thread>
+#include "login.pb.h"
+
+using namespace tom::net;
 
 #define RLIMIT_NOFILE 1000000
-
 namespace net_test
 {
 
@@ -109,6 +115,7 @@ int ProcessNetPackect(tom::net::IMessageQueue* msg_queue)
 /// 
 
 
+
 void Update()
 {
     while (true)
@@ -175,9 +182,75 @@ void change_limit() {
 }
 #endif
 
+void TestAny()
+{
+    tom::Buffer* buf(new tom::Buffer());
+    tom::Any any(buf);
+    tom::Buffer* b = tom::any_cast<tom::Buffer*>(any);
+    assert(buf == b);
+    delete buf;
+}
+
+void TestTypeId()
+{
+	Tom::ReqLogin req;
+	req.set_account("zxb-1");
+	req.set_passward("1234546");
+	auto tname = typeid(Tom::ReqLogin).raw_name();
+    tname = typeid(Tom::ReqLogin).name();
+    size_t hcode = typeid(Tom::ReqLogin).hash_code();
+    hcode = typeid(Tom::ReqLogin).hash_code();
+
+    auto ptr = std::make_shared<Tom::ReqLogin>();
+    tname = typeid(ptr.get()).name();
+    tname = typeid(*ptr).name();
+}
+
+
+void TestProtocol()
+{
+       
+    {
+    INetWorkProtocol<google::protobuf::Message>* protocol  = 
+        new DefaultNetWorkProtocol(new DefaultPacketHeader(), new ProtobufCodec());
+
+    Tom::ReqLogin req;
+	req.set_account("zxb-1");
+	req.set_passward("1234546");
+
+    tom::Buffer buffer;
+    protocol->PackNetPacket(req, buffer);
+
+    std::shared_ptr<tom::Buffer> binary = std::make_shared<tom::Buffer>();
+    binary->append(buffer.peek(), buffer.readableBytes());
+    auto msg = protocol->UnPackNetPacket(binary);
+
+    }
+	{
+        DefaultNetWorkProtocol protocol(new DefaultPacketHeader(), new ProtobufCodec());
+
+		Tom::ReqLogin req;
+		req.set_account("zxb-1");
+		req.set_passward("1234546");
+
+		tom::Buffer buffer;
+		protocol.PackNetPacket(req, buffer);
+
+		std::shared_ptr<tom::Buffer> binary = std::make_shared<tom::Buffer>();
+		binary->append(buffer.peek(), buffer.readableBytes());
+		auto msg = protocol.UnPackNetPacket(binary);
+
+	}
+
+    TestAny();
+
+}
+
 // s 127.0.0.1 8888 4 1
 int main(int argc, char** argv)
 {
+    TestProtocol();
+    TestTypeId();
     if (argc < 2)
     {
         return usage();
@@ -214,6 +287,8 @@ int main(int argc, char** argv)
     else {
         return usage();
     }
+
+
     RegisterCb();
     Update();
 
