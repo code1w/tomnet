@@ -5,9 +5,20 @@ file(GLOB_RECURSE SRC_LIST *.cpp *.c *.cc *.cxx)
 set(ALL_FILES ${HEADER_LIST} ${SRC_LIST})
 source_group_by_dir("${ALL_FILES}")
 add_executable(${projectName} ${ALL_FILES})
+
+
+if(NOT WIN32)
+target_link_libraries(
+	${projectName}
+	protobuf
+    tomnet
+)
+else()
 target_link_libraries(
 	${projectName}
 	libprotobuf
     tomnet
 )
+
+endif()
 

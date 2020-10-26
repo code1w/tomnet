@@ -7,7 +7,7 @@
 
 namespace tom {
 	namespace net{
-		TOM_TOM_NET_DLL_DECL class DefaultNetWorkProtocol : public INetWorkProtocol<google::protobuf::Message>
+		TOM_TOM_NET_DLL_C_DECL class DefaultNetWorkProtocol : public INetWorkProtocol<google::protobuf::Message>
 		{
 		public:
 			DefaultNetWorkProtocol(IMsgHeader* header, IMsgCodec<google::protobuf::Message>* codec)

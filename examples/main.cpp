@@ -196,8 +196,7 @@ void TestTypeId()
 	Tom::ReqLogin req;
 	req.set_account("zxb-1");
 	req.set_passward("1234546");
-	auto tname = typeid(Tom::ReqLogin).raw_name();
-    tname = typeid(Tom::ReqLogin).name();
+    auto tname = typeid(Tom::ReqLogin).name();
     size_t hcode = typeid(Tom::ReqLogin).hash_code();
     hcode = typeid(Tom::ReqLogin).hash_code();
 
@@ -271,7 +270,7 @@ int main(int argc, char** argv)
         const char* host = argv[2];
         const char* port = argv[3];
         int thread_count = atoi(argv[4]);
-        uint32_t total_count = atoi(argv[5]); // Ò»¸ö°ü³¤¶È K
+        uint32_t total_count = atoi(argv[5]); // Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ K
         size_t session_count = atoi(argv[6]);
         client(host, port, thread_count, total_count, session_count);
 
@@ -281,7 +280,7 @@ int main(int argc, char** argv)
         const char* host = argv[2];
         const char* port = argv[3];
         int thread_count = atoi(argv[4]);
-        uint32_t total_count = atoi(argv[5]); // °ü³¤ K
+        uint32_t total_count = atoi(argv[5]); // ï¿½ï¿½ï¿½ï¿½ K
         server(host, port, thread_count,total_count);
     }
     else {

@@ -8,7 +8,7 @@
         #define TOM_TOM_NET_CLASS_API __declspec(dllimport)
     #endif 
 #else
-    #define TOM_TOM_NET_CLASS_API
+    #define TOM_TOM_NET_CLASS_API __attribute__((visibility("default")))
 #endif
 
 #ifdef __cplusplus

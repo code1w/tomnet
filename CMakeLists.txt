@@ -10,7 +10,7 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 include(${PROJECT_SOURCE_DIR}/cmake/build_config.cmake)
-include(${PROJECT_SOURCE_DIR}/cmake/tomvcpkg.cmake)
+#include(${PROJECT_SOURCE_DIR}/cmake/tomvcpkg.cmake)
 include(${PROJECT_SOURCE_DIR}/cmake/vs_dir_proj.cmake)
 
 
@@ -22,6 +22,13 @@ include_directories(${PROJECT_SOURCE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/3rd/)
 include_directories(${PROJECT_SOURCE_DIR}/3rd/asio/)
 include_directories(${PROJECT_SOURCE_DIR}/tomnet/)
+
+
+if(NOT WIN32)
+link_directories(${PROJECT_SOURCE_DIR}/3rd/libs/x64-linux/)
+else()
+link_directories(${PROJECT_SOURCE_DIR}/3rd/libs/x64-windows/)
+endif()
 
 
 if(TOMNET_BUILD_EXAMPLES)

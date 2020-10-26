@@ -10,7 +10,7 @@ using namespace google::protobuf;
 namespace tom {
 namespace net {
 
-TOM_TOM_NET_DLL_DECL class  DefaultPacketHeader : public IMsgHeader
+TOM_TOM_NET_DLL_C_DECL class  DefaultPacketHeader : public IMsgHeader
 {
 public:
 
