@@ -20,6 +20,7 @@ endif()
 
 include_directories(${PROJECT_SOURCE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/3rd/)
+include_directories(${PROJECT_SOURCE_DIR}/3rd/asio/)
 include_directories(${PROJECT_SOURCE_DIR}/tomnet/)
 
 

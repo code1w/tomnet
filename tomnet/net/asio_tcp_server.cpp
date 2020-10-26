@@ -83,7 +83,7 @@ namespace tom
 			HandlerManager::instance().LinkHandler(handler);
 			handler->OnAccept();
 			max_connect_++;
-#ifdef  TOM_ TOM_NET_DEBUG
+#ifdef  TOM_NET_DEBUG
 			std::thread::id tid = std::this_thread::get_id();
 			uint32_t hid = handler->GetHandler();
 			printf("AsioTcpServer AsyncAcceptCallback , tid %d , handle %d \n", tid,hid);

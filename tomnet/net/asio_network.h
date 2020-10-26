@@ -48,7 +48,7 @@ namespace net
 			return 0;
 		}
 
-#ifdef  TOM_ TOM_NET_TRAFFIC
+#ifdef  TOM_NET_TRAFFIC
 		NetworkTraffic::trafmsgq_ = *queue;
 		NetworkTraffic::instance().CreateTimer(&tcpserver->GetAcceptLoop()->io_service());
 #endif 

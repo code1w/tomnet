@@ -114,7 +114,7 @@ namespace tom
 				AsyncRead();
 				start_ = true;
 
-#ifdef  TOM_ TOM_NET_TRAFFIC
+#ifdef  TOM_NET_TRAFFIC
 				NetworkTraffic::instance().FetchAddLinks();
 #endif 
 			}
@@ -182,7 +182,7 @@ namespace tom
 			{
 				if (messagecb_)
 				{
-#ifdef  TOM_ TOM_NET_TRAFFIC
+#ifdef  TOM_NET_TRAFFIC
 					NetworkTraffic::instance().FetchAddPostMsg();
 #endif 
 					messagecb_(packet);
@@ -243,7 +243,7 @@ namespace tom
 				return;
 			}
 
-#ifdef  TOM_ TOM_NET_TRAFFIC
+#ifdef  TOM_NET_TRAFFIC
 				NetworkTraffic::instance().FetchAddSendByte(writen);
 #endif 
 			if (writen < packet->readableBytes())
@@ -253,7 +253,7 @@ namespace tom
 			}
 			else
 			{
-#ifdef  TOM_ TOM_NET_TRAFFIC
+#ifdef  TOM_NET_TRAFFIC
 				NetworkTraffic::instance().FetchAddSendPacket();
 #endif 
 				if (wbufferlist_.size_approx() != 0)
@@ -270,7 +270,7 @@ namespace tom
 					sendding_.store(false);
 				}
 			}
-#ifdef  TOM_ TOM_NET_DEBUG
+#ifdef  TOM_NET_DEBUG
 			assert(std::this_thread::get_id()== tid_);
 			printf("Send size %d, tid %d \n",writen, tid_);
 #endif
@@ -281,7 +281,7 @@ namespace tom
 		{
 			sendding_.store(true);
 			socket_.async_write_some(asio::buffer(packet->peek(), packet->readableBytes()),
-				[this, packet](const const std::error_code& err, std::size_t writen)
+				[this, packet](const std::error_code& err, std::size_t writen)
 				{
 					AsyncWriteSomeCallback(err,packet,writen);
 				});
