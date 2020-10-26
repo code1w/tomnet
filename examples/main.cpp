@@ -210,9 +210,11 @@ void TestTypeId()
 void TestProtocol()
 {
        
+    {
     INetWorkProtocol<google::protobuf::Message>* protocol  = 
         new DefaultNetWorkProtocol(new DefaultPacketHeader(), new ProtobufCodec());
-	Tom::ReqLogin req;
+
+    Tom::ReqLogin req;
 	req.set_account("zxb-1");
 	req.set_passward("1234546");
 
@@ -222,6 +224,23 @@ void TestProtocol()
     std::shared_ptr<tom::Buffer> binary = std::make_shared<tom::Buffer>();
     binary->append(buffer.peek(), buffer.readableBytes());
     auto msg = protocol->UnPackNetPacket(binary);
+
+    }
+	{
+        DefaultNetWorkProtocol protocol(new DefaultPacketHeader(), new ProtobufCodec());
+
+		Tom::ReqLogin req;
+		req.set_account("zxb-1");
+		req.set_passward("1234546");
+
+		tom::Buffer buffer;
+		protocol.PackNetPacket(req, buffer);
+
+		std::shared_ptr<tom::Buffer> binary = std::make_shared<tom::Buffer>();
+		binary->append(buffer.peek(), buffer.readableBytes());
+		auto msg = protocol.UnPackNetPacket(binary);
+
+	}
 
     TestAny();
 
@@ -269,7 +288,7 @@ int main(int argc, char** argv)
         return usage();
     }
 
-    INetWorking<google::protobuf::Message> pbnet;
+
     RegisterCb();
     Update();
 

@@ -21,6 +21,7 @@ namespace tom
 			,reconnectimer_(loop->io_service())
 
 		{
+			SetSocketOpt();
 		}
 
 		AsioChannel::~AsioChannel()
@@ -69,6 +70,10 @@ namespace tom
 			switch(err.value())
 			{
 			case asio::error::connection_reset:
+			case asio::error::eof:
+			case asio::error::operation_aborted:
+			case asio::error::bad_descriptor:
+			case asio::error::connection_aborted:
 			{
 				CloseSocket();
 				if(disconnectcb_)
@@ -82,10 +87,6 @@ namespace tom
 				}
 			}
 			break;
-			case asio::error::eof:
-			case asio::error::operation_aborted:
-			case asio::error::bad_descriptor:
-			case asio::error::connection_aborted:
 			default:
 			break;
 			}
@@ -108,7 +109,7 @@ namespace tom
 		{
 			if (!start_)
 			{
-				SetSocketOpt();
+				//SetSocketOpt();
 				tid_ = std::this_thread::get_id();
 				AsyncRead();
 				start_ = true;
