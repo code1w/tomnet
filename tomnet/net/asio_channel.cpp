@@ -101,6 +101,7 @@ namespace tom
 			socket_.set_option(sendbuf);
 			asio::socket_base::reuse_address reuse(true);
 			socket_.set_option(reuse);
+			socket_.non_blocking(true);
 		}
 
 
