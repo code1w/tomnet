@@ -120,12 +120,13 @@ void Update()
 {
     while (true)
     {
-        io_service_.run();
-        while(Q_ && Q_->Size() > 0)
+        //io_service_.run();
+        while(Q_)
         {
             ProcessNetPackect(Q_);
         }
-
+        std::this_thread::sleep_for(std::chrono::milliseconds(2));
+#if 0
         if(style == "client")
         {
             for (auto handle : handles_)
@@ -139,7 +140,7 @@ void Update()
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(5));
         }
-
+#endif 
 
     }
 }

@@ -60,6 +60,7 @@ void OnReConnected(uint32_t handle,void* ud, const tom::BufferPtr& msg) {
 	//tom::net::CloseLink(handle);
 	//SendInfoList(handle);
 	//handles_.push_back(handle);
+	SendReqLogin(handle);
 }
 
 
@@ -121,14 +122,17 @@ void RegisterCb()
 
 void SendReqLogin(uint32_t handle)
 {
+	int32_t index = 1;
 	while (true)
 	{
-
+    char pasw[128];
+	sprintf(pasw, "passward.%u", index);
 	Tom::ReqLogin req;
 	req.set_account("zxb-1");
-	req.set_passward("1234546");
+	req.set_passward(pasw);
 	auto tname = typeid(Tom::ReqLogin).name();
 	tom::SendMsg(handle, req);
+	index++;
 	std::this_thread::sleep_for(std::chrono::milliseconds(1));
 	}
 

@@ -61,6 +61,7 @@ namespace tom
 			void AsyncWriteSomeCallback(const std::error_code& error, const std::shared_ptr<tom::Buffer>& packet, std::size_t bytes_transferred);
 			void AsyncSendData(const std::shared_ptr<tom::Buffer>& packet);
 			void AsyncReadError(const std::error_code& error);
+			void ResetBuffer();
 		public:
 			AsioChannel(AsioEventLoop* loop, std::size_t block_size);
 			~AsioChannel();

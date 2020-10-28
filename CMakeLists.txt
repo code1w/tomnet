@@ -5,9 +5,6 @@ include(${CMAKE_ROOT}/Modules/ExternalProject.cmake)
 project(tomnet CXX)
 
 enable_testing()
-if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE "Release")
-endif()
 
 include(${PROJECT_SOURCE_DIR}/cmake/build_config.cmake)
 #include(${PROJECT_SOURCE_DIR}/cmake/tomvcpkg.cmake)
@@ -38,4 +35,4 @@ endif()
 add_subdirectory(tomnet/net)
 add_subdirectory(tomnet/base)
 
-
+message(cxx_flags =  "  ${CMAKE_CXX_FLAGS}")
