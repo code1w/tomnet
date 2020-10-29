@@ -6,6 +6,7 @@
 //TODO : 安装解码器
 namespace tom {
 
+#if 0
 template< class message_type >
 int32_t SendMsg(uint32_t handle, const message_type &msg) {
   
@@ -14,6 +15,17 @@ int32_t SendMsg(uint32_t handle, const message_type &msg) {
   tom::pb::encode(msg, &buf, hprotocal);
   int ret = tom::net::SendPacket(handle, buf.peek(), buf.readableBytes()); 
   return ret;
+}
+#endif 
+
+static int32_t SendMsg(uint32_t handle, const google::protobuf::Message& msg) 
+{
+
+	auto hprotocal = tom::net::GetLinkMsgHeaderProtocal(handle);
+	tom::Buffer buf;
+	tom::pb::encode(msg, &buf, hprotocal);
+	int ret = tom::net::SendPacket(handle, buf.peek(), buf.readableBytes());
+	return ret;
 }
 
 template< class message_type >
