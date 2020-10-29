@@ -167,7 +167,7 @@ namespace tom
 				context.headerprotocal_ = nametype;
 				context.ud_ = nullptr;
 
-				std::shared_ptr<tom::Buffer>& post = FethFreePackage();
+				std::shared_ptr<tom::Buffer> post = FethFreePackage();
 				if(!post)
 				{
 					post = std::make_shared<tom::Buffer>();
