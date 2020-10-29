@@ -36,7 +36,7 @@ namespace net
 		void PushMessage(const std::shared_ptr<tom::Buffer>&, bool front = false);
 	private:
 		std::atomic<int32_t> qsize_{0};
-         moodycamel::ConcurrentQueue<std::shared_ptr<tom::Buffer>>* q_;
+        moodycamel::ConcurrentQueue<std::shared_ptr<tom::Buffer>>* q_;
 	};
 }
 }

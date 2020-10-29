@@ -152,5 +152,10 @@ namespace net {
 		HandlerManager::instance().LinkDown(handler_);
 	}
 
+	void AsioClientHandler::FreePackage(const std::shared_ptr<tom::Buffer>& package)
+	{
+		channel_->FreePackage(package);
+	}
+
 }
 }

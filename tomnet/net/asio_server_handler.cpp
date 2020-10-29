@@ -129,6 +129,11 @@ namespace net {
 		channel_->Close(handle);
 		HandlerManager::instance().LinkDown(handler_);
 	}
+	
+	void AsioServerHandler::FreePackage(const std::shared_ptr<tom::Buffer>& package)
+	{
+		channel_->FreePackage(package);
+	}
 
 }
 }

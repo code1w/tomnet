@@ -167,7 +167,11 @@ namespace tom
 				context.headerprotocal_ = nametype;
 				context.ud_ = nullptr;
 
-				auto post = std::make_shared<tom::Buffer>();
+				std::shared_ptr<tom::Buffer>& post = FethFreePackage();
+				if(!post)
+				{
+					post = std::make_shared<tom::Buffer>();
+				}
 				post->ensureWritableBytes(sizeof(NetContext) + packetlen + sizeof(int));
 				post->append(static_cast<const void*>(&context), sizeof(NetContext));
 				post->appendInt32(packetlen);
@@ -346,7 +350,29 @@ namespace tom
 			socket_.close();
 		}
 
-	
+		void AsioChannel::FreePackage(const std::shared_ptr<tom::Buffer>& package)
+		{
+			package->retrieveAll();
+			if (!freepacket_.enqueue(package))
+			{
+				// error
+			}
+			else {
+				freeqsize_.fetch_add(1);
+			}
+		}
+
+		std::shared_ptr<tom::Buffer> AsioChannel::FethFreePackage()
+		{
+
+			std::shared_ptr<tom::Buffer> empty;
+			if (freeqsize_.load() > 0)
+			{
+				freepacket_.try_dequeue(empty);
+				freeqsize_.fetch_sub(1);
+			}
+			return empty;
+		}
 }
 
 }

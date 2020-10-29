@@ -155,6 +155,7 @@ class IMessageQueue {
  TOM_TOM_NET_DLL_C_DECL int32_t (*CloseLink)(uint32_t handle);
  TOM_TOM_NET_DLL_C_DECL int32_t (*SetUserData)(uint32_t handle, void* ud);
  TOM_TOM_NET_DLL_C_DECL MsgHeaderProtocal (*GetLinkMsgHeaderProtocal)(uint32_t handle);
+ TOM_TOM_NET_DLL_C_DECL void (*FreeNetPackage)(uint32_t handle, const std::shared_ptr<tom::Buffer>& package);
  TOM_TOM_NET_DLL_C_DECL bool CreateNetwork(NetDriver);
  TOM_TOM_NET_DLL_C_DECL void DestroyNetwork();
 

@@ -112,6 +112,7 @@ int ProcessNetPackect(tom::net::IMessageQueue* msg_queue)
         }
 
         nProcessPacketCount++;
+        tom::net::FreeNetPackage(context->handler_, packet);
     }
     return nProcessPacketCount;
 }

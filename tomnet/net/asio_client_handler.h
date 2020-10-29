@@ -38,6 +38,7 @@ namespace net {
 		 void  CloseLink(uint32_t handle);
 		 void  SetHandler(uint32_t handler);
 		uint64_t AsyncConnect(const char* addr, uint16_t port);
+		 void FreePackage(const std::shared_ptr<tom::Buffer>&);
 
 	};
 

@@ -163,6 +163,16 @@ namespace net
 	}
 
 
+	static void Asio_FreeNetPackage(uint32_t handle, const std::shared_ptr<tom::Buffer>& package)
+	{
+		auto handler = HandlerManager::instance().FectHandler(handle);
+		if (handler)
+		{
+			handler->FreePackage(package);
+		}
+	}
+
+
 
 }
 }

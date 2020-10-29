@@ -54,14 +54,17 @@ namespace tom
 			asio::steady_timer reconnectimer_;
 
 			moodycamel::ConcurrentQueue<std::shared_ptr<tom::Buffer>> wbufferlist_;
+			moodycamel::ConcurrentQueue<std::shared_ptr<tom::Buffer>> freepacket_;
 			std::atomic<bool> sendding_{false};
 			std::atomic<bool> start_{ false };
+			std::atomic<int32_t> freeqsize_{0};
 		private:
 			uint32_t PostPacket(const std::shared_ptr<tom::Buffer>& packet);
 			void AsyncWriteSomeCallback(const std::error_code& error, const std::shared_ptr<tom::Buffer>& packet, std::size_t bytes_transferred);
 			void AsyncSendData(const std::shared_ptr<tom::Buffer>& packet);
 			void AsyncReadError(const std::error_code& error);
 			void ResetBuffer();
+			std::shared_ptr<tom::Buffer> FethFreePackage();
 		public:
 			AsioChannel(AsioEventLoop* loop, std::size_t block_size);
 			~AsioChannel();
@@ -79,6 +82,8 @@ namespace tom
 			void CloseSocket();
 			void AsyncRead();
 			void TryCeneratePacket();
+
+			void FreePackage(const std::shared_ptr<tom::Buffer>& package);
 
 	
 		public:

@@ -30,6 +30,7 @@ class AsioServerHandler : public AsiokHandler,
     int32_t OnConnected(uint32_t);
     int32_t SendPacket(const char* data, uint16_t size);
     void CloseLink(uint32_t handle);
+    void FreePackage(const std::shared_ptr<tom::Buffer>&);
 
    public:
     void Start();
