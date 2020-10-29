@@ -159,6 +159,7 @@ namespace net
 		{
 			return handler->GetMsgHeaderProtocal();
 		}
+		return nametype;
 	}
 
 

@@ -28,7 +28,12 @@ public:
     void* GetUserdata() const { return ud_; }
     void SetUserData(void* ud) { ud_ = ud; }
     void SetMsgHeaderProtocal(MsgHeaderProtocal type) { headproto_ = type;}
-    MsgHeaderProtocal GetMsgHeaderProtocal(){return headproto_;}
+    MsgHeaderProtocal GetMsgHeaderProtocal()
+    {
+        MsgHeaderProtocal ptype;
+        ptype = this->headproto_;
+        return ptype;
+    }
 };
 }}
 #endif //  TOM_NET_ASIO_HANDLER_H
