@@ -82,7 +82,6 @@ namespace tom
 
 				if(reconnectedcb_)
 				{
-					std::cout << "call doreconnetc " << std::endl;
 					DoReConnect(remoteip_, remoteport_);
 				}
 			}
@@ -295,7 +294,6 @@ namespace tom
 
 		void AsioChannel::DoReConnect(const std::string& ip, uint16_t port)
 		{ 
-			printf("DoReconnect");
 			recvbuf_.retrieveAll();
 			start_ = false;
 			std::error_code ec;
@@ -306,7 +304,6 @@ namespace tom
 				{
 					reconnectimer_.cancel();
 					Start();
-					printf("Reconnect sucess");
 					if(reconnectedcb_)
 					{
 						reconnectedcb_(EVENT_RECONNECTED); 

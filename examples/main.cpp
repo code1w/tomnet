@@ -83,19 +83,25 @@ int ProcessNetPackect(tom::net::IMessageQueue* msg_queue)
             OnConnected(context->handler_, context->ud_ ,packet);
         }
         break;
+
         case EVENT_RECONNECTED:
         {
             OnReConnected(context->handler_,context->ud_, packet);
         }
-
         break;
+
         case EVENT_CLOSE:
+        {
             OnClose(context->handler_, context->ud_,packet);
-            break;
+        }
+        break;
+
+
         case EVENT_CONNECT_FAIL:
+        {
             OnConnectFail(context->handler_,context->ud_, packet);
-        case EVENT_ERROR:
-            break;
+        }
+        break;
         case EVENT_NETMSG:
         {
             OnRecvPacket(context->handler_, context->ud_, packet, context->headerprotocal_);
@@ -121,10 +127,13 @@ void Update()
     while (true)
     {
         //io_service_.run();
-        while(Q_)
+        auto size = Q_->Size();
+        while(Q_ && size > 0)
         {
             ProcessNetPackect(Q_);
+            size = Q_->Size();
         }
+
         std::this_thread::sleep_for(std::chrono::milliseconds(2));
 #if 0
         if(style == "client")

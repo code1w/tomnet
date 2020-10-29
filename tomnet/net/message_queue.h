@@ -17,6 +17,7 @@
 #include <mutex>
 #include <list>
 #include <queue>
+#include <atomic>
 
 namespace tom
 {
@@ -29,10 +30,12 @@ namespace net
 		~MessageQueue();
 
 		bool IsEmpty() { return q_->size_approx() == 0; }
-        std::size_t Size() { return q_->size_approx(); }
+        //std::size_t Size() { return q_->size_approx(); }
+		std::size_t Size() { return qsize_.load();}
 		std::shared_ptr<tom::Buffer> PopMessage();
 		void PushMessage(const std::shared_ptr<tom::Buffer>&, bool front = false);
 	private:
+		std::atomic<int32_t> qsize_{0};
          moodycamel::ConcurrentQueue<std::shared_ptr<tom::Buffer>>* q_;
 	};
 }

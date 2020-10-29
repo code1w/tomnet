@@ -20,6 +20,7 @@ namespace tom {
 		{
 			std::shared_ptr<tom::Buffer> packet;
             q_->try_dequeue(packet);
+			qsize_.fetch_sub(1);
             return packet;
 		}
 		
@@ -30,6 +31,7 @@ namespace tom {
 			{
 				printf("PushMessage Error \n");
 			}
+			qsize_.fetch_add(1);
 		}
 	}
 }

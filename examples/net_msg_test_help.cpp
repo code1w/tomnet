@@ -27,7 +27,7 @@ extern std::vector<uint32_t> handles_;
 using namespace net_test;
 
 void OnAccept(uint32_t handle,void* ud, const tom::BufferPtr& msg) {
-	//std::cout << "accept new connect  " << handle << std::endl;
+	std::cout << "Recv new connect :" << handle << std::endl;
 	if(total_count)
 	{
 
@@ -51,7 +51,7 @@ void DelaySend(const std::error_code& error)
 
 void OnConnected(uint32_t handle, void* ud, const tom::BufferPtr& msg) {
 	Client* c = (Client*)ud;
-	std::cout << " OnConnected remote server handle : " << handle << std::endl;
+	std::cout << " Connect  server handle : " << handle << std::endl;
 	SendReqLogin(handle);
 }
 
@@ -60,7 +60,8 @@ void OnReConnected(uint32_t handle,void* ud, const tom::BufferPtr& msg) {
 	//tom::net::CloseLink(handle);
 	//SendInfoList(handle);
 	//handles_.push_back(handle);
-	SendReqLogin(handle);
+	std::cout << " ReConnect  server handle : " << handle << std::endl;
+	//SendReqLogin(handle);
 }
 
 
@@ -74,6 +75,7 @@ void OnClose(uint32_t handle,void* ud, const tom::BufferPtr& msg)
 {
 	//tom::net::CloseLink(handle);
 	//std::cout << "net close handle " << handle << std::endl;
+	std::cout << " Connect close handle : " << handle << std::endl;
 }
 
 void OnError(uint32_t handle, const tom::BufferPtr& msg) {
@@ -88,7 +90,8 @@ void OnPersonaInfoList(uint32_t handle, void* ud, const std::shared_ptr<Tom::per
 
 void OnReqLogin(uint32_t handle, void* ud, const std::shared_ptr<Tom::ReqLogin>& message)
 {
-	std::cout << message->account() <<" , "<< message->passward()<<std::endl;
+	std::cout <<"handle : "<< handle << ", "<< message->account() <<" , "<< message->passward()<<std::endl;
+	SendReqLogin(handle);
 /*
 	Tom::LoginOk rsp;
 	Tom::PlayerBaseInfo* pinfo = rsp.mutable_playerbaseinfo();
@@ -122,18 +125,18 @@ void RegisterCb()
 
 void SendReqLogin(uint32_t handle)
 {
-	int32_t index = 1;
-	while (true)
+	static int32_t index = 1;
+	//while (true)
 	{
     char pasw[128];
-	sprintf(pasw, "passward.%u", index);
+	sprintf(pasw, "passward.%u", handle*100);
 	Tom::ReqLogin req;
 	req.set_account("zxb-1");
 	req.set_passward(pasw);
 	auto tname = typeid(Tom::ReqLogin).name();
 	tom::SendMsg(handle, req);
 	index++;
-	std::this_thread::sleep_for(std::chrono::milliseconds(1));
+	std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	}
 
 }
