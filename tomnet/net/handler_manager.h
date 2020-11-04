@@ -3,7 +3,7 @@
 
 #include "tomnet.h"
 #include "base/noncopyable.h"
-
+#include "base/tomnet_malloc.h"
 
 #include <unordered_map>
 #include <queue>

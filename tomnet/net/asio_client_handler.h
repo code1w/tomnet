@@ -5,6 +5,7 @@
 #include "asio_channel.h"
 #include "asio_handler.h"
 #include "asio/asio.hpp"
+#include "base/tomnet_malloc.h"
 #include <memory>
 namespace tom {
 class Buffer;

@@ -20,12 +20,19 @@ include_directories(${PROJECT_SOURCE_DIR}/3rd/)
 include_directories(${PROJECT_SOURCE_DIR}/3rd/asio/)
 include_directories(${PROJECT_SOURCE_DIR}/tomnet/)
 
+if(NOT WIN32)
+include_directories(${PROJECT_SOURCE_DIR}/3rd/jemalloc/include/)
+endif()
+
+
 
 if(NOT WIN32)
 link_directories(${PROJECT_SOURCE_DIR}/3rd/libs/x64-linux/)
+link_directories(${PROJECT_SOURCE_DIR}/3rd/jemalloc/lib/)
 else()
 link_directories(${PROJECT_SOURCE_DIR}/3rd/libs/x64-windows/)
 endif()
+
 
 
 if(TOMNET_BUILD_EXAMPLES)

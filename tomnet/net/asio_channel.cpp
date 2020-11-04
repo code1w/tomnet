@@ -34,6 +34,14 @@ namespace tom
 				}
 			}
 
+			while (freepacket_.try_dequeue(next))
+			{
+				if(next)
+				{
+					next.reset();
+				}
+			}
+
 		}
 
 		void AsioChannel::Connect(const std::string& ip, uint16_t port, bool tryconnect)
@@ -352,6 +360,7 @@ namespace tom
 
 		void AsioChannel::FreePackage(const std::shared_ptr<tom::Buffer>& package)
 		{
+			return ;
 			package->retrieveAll();
 			if (!freepacket_.enqueue(package))
 			{

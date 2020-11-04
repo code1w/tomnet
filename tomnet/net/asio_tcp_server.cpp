@@ -54,12 +54,6 @@ namespace tom
 			auto handler = new AsioServerHandler(loop, msgqueue_);
 			if (handler)
 			{
-				//handler->SetMsgHeaderProtocal(headprotol_);
-				//handler->SetUserData(GetUserdata());
-#if 0
-				acceptorptr_->async_accept(handler->Socket(), 
-					boost::bind(&AsioTcpServer::AsyncAcceptCallback, this, handler, asio::placeholders::error));
-#endif 
 				acceptorptr_->async_accept(handler->Socket(),
 					[this,handler](const std::error_code& error)
 					{

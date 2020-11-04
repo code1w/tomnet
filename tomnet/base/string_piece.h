@@ -45,7 +45,7 @@
 #include "string"
 #include "cstring"
 #include <iosfwd>    // for ostream forward-declaration
-
+#include "base/tomnet_malloc.h"
 namespace tom
 {
 

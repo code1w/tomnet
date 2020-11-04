@@ -10,6 +10,7 @@
 #include <stack>
 #include <thread>
 #include "net/tomnet.h"
+#include "net/network_traffic.h"
 #include "base/buffer.h"
 #include "base/pb_message_helper.h"
 #include "net_msg_test_help.h"
@@ -19,6 +20,7 @@ namespace net_test
 
 extern tom::net::IMessageQueue* Q_;
 extern size_t total_count;
+extern asio::io_service io_service_;
 }
 using namespace net_test;
 
@@ -40,6 +42,10 @@ void server(char const* host, char const* port, int thread_count, size_t totalco
 	if (!tom::net::StartNetService(host, atoi(port), &Q_, 10000, 25000, 100, tom::net::nametype, s))
 	{
 		std::cout<< "start net fail port " << atoi(port)<< std::endl;
+	}
+	else{
+		tom::net::NetworkTraffic::trafmsgq_ = Q_;
+		tom::net::NetworkTraffic::instance().CreateTimer(&io_service_);
 	}
 
 }

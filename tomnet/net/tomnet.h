@@ -6,7 +6,7 @@
 #include "base/buffer.h"
 #include "base/any.h"
 #include "dll_export.h"
-
+#include "base/tomnet_malloc.h"
 #define MAX_PACKET_SIZE (1024 * 1024)  
 #define INVALID_NETWORK_HANDLE (~0)
 #define MAXFREENETPACKET 1024

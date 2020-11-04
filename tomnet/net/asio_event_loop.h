@@ -13,6 +13,7 @@
 #endif // __GNUC__
 #include "base/noncopyable.h"
 #include "asio/asio.hpp"
+#include "base/tomnet_malloc.h"
 
 #include <functional>
 #include <mutex>

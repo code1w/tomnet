@@ -2,7 +2,8 @@
 #define  NET_MESSAGE_QUEUE
 
 #include "tomnet.h"
-
+#include "base/tomnet_malloc.h"
+#include "net/dll_export.h"
 #ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wshadow"
@@ -23,7 +24,7 @@ namespace tom
 {
 namespace net 
 {
-	class MessageQueue : public IMessageQueue
+	TOM_TOM_NET_DLL_C_DECL class MessageQueue : public IMessageQueue
 	{
 	public:
 		MessageQueue();

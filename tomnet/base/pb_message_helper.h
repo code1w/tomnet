@@ -2,6 +2,7 @@
 #define BASE_PB_MESSAGE_HELPER_H
 
 #include "codec.h"
+#include "base/tomnet_malloc.h"
 
 //TODO : 安装解码器
 namespace tom {

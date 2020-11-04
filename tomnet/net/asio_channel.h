@@ -5,6 +5,7 @@
 #include "base/noncopyable.h"
 #include "base/buffer.h"
 #include "asio/asio.hpp"
+#include "base/tomnet_malloc.h"
 
 #ifdef __GNUC__
 #pragma GCC diagnostic push

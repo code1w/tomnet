@@ -11,6 +11,7 @@
 #include "network_traffic.h"
 #include "asio_handler.h"
 #include "dll_export.h"
+#include "base/tomnet_malloc.h"
 
 namespace tom
 {

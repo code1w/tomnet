@@ -2,6 +2,7 @@
 
 #include "base/pb_message_helper.h"
 #include "base/pb_dispatcher.h"
+#include "net/network_traffic.h"
 
 #include <functional>
 #ifdef WIN32
@@ -23,21 +24,14 @@ extern tom::pb::ProtobufDispatcher gDispatcher_;
 extern size_t total_count;
 extern asio::io_service io_service_;
 extern std::vector<uint32_t> handles_;
+
+char * teststr = "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890";
+
 }
 using namespace net_test;
 
 void OnAccept(uint32_t handle,void* ud, const tom::BufferPtr& msg) {
-	std::cout << "Recv new connect :" << handle << std::endl;
-	if(total_count)
-	{
-
-		//SendInfoList(handle);
-		total_count--;
-	}
-	Server* s = (Server*)ud;
-	handles_.push_back(handle);
-	//SendReqLogin(handle);
-
+	tom::net::NetworkTraffic::instance().FetchAddLinks();
 }
 
 void DelaySend(const std::error_code& error)
@@ -51,7 +45,7 @@ void DelaySend(const std::error_code& error)
 
 void OnConnected(uint32_t handle, void* ud, const tom::BufferPtr& msg) {
 	Client* c = (Client*)ud;
-	std::cout << " Connect  server handle : " << handle << std::endl;
+	tom::net::NetworkTraffic::instance().FetchAddLinks();
 	SendReqLogin(handle);
 }
 
@@ -75,7 +69,7 @@ void OnClose(uint32_t handle,void* ud, const tom::BufferPtr& msg)
 {
 	//tom::net::CloseLink(handle);
 	//std::cout << "net close handle " << handle << std::endl;
-	std::cout << " Connect close handle : " << handle << std::endl;
+	tom::net::NetworkTraffic::instance().FetchSubLinks();
 }
 
 void OnError(uint32_t handle, const tom::BufferPtr& msg) {
@@ -90,26 +84,8 @@ void OnPersonaInfoList(uint32_t handle, void* ud, const std::shared_ptr<Tom::per
 
 void OnReqLogin(uint32_t handle, void* ud, const std::shared_ptr<Tom::ReqLogin>& message)
 {
-	std::cout <<"handle : "<< handle << ", "<< message->account() <<" , "<< message->passward()<<std::endl;
 	SendReqLogin(handle);
-/*
-	Tom::LoginOk rsp;
-	Tom::PlayerBaseInfo* pinfo = rsp.mutable_playerbaseinfo();
-	pinfo->set_name("zhang xiao bin");
-	pinfo->set_playerid(51886);
-
-	//asio::steady_timer timer(io_service_);
-	//timer.expires_after(std::chrono::seconds(10));
-	//std::cout << "wait 10 s " << std::endl;
-	//timer.wait();
-
-	{
-
-	std::cout << " send msg " << std::endl;
-	tom::SendMsg(handle, rsp);
-	}
-	//SendInfoList(handle);
-*/
+	tom::net::NetworkTraffic::instance().FetchAddRecvByte(message->ByteSizeLong());
 }
 
 
@@ -126,19 +102,16 @@ void RegisterCb()
 void SendReqLogin(uint32_t handle)
 {
 	static int32_t index = 1;
-	//while (true)
-	{
     char pasw[128];
 	sprintf(pasw, "passward.%u", handle*100);
 	Tom::ReqLogin req;
-	req.set_account("zxb-1");
+	req.set_account(teststr);
 	req.set_passward(pasw);
 	auto tname = typeid(Tom::ReqLogin).name();
 	tom::SendMsg(handle, req);
 	index++;
-	std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	}
-
+	tom::net::NetworkTraffic::instance().FetchAddSendByte(req.ByteSizeLong());
+	tom::net::NetworkTraffic::instance().FetchAddSendPacket();
 }
 
 void SendInfoList(uint32_t handle)

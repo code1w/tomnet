@@ -31,7 +31,7 @@ namespace tom
 		{
 			if (recv_packets_.load() == 0)
 			{
-				return;
+				//return;
 			}
 			double avgrecv_packet_size = static_cast<double>(recv_bytes_.load()) / static_cast<double>(recv_packets_.load());
 			double recv_throughput = static_cast<double>(recv_bytes_.load()) / (1024*1024);
@@ -49,6 +49,12 @@ namespace tom
 			printf("System Time  %s \n", tmp);
 			printf("=======================================\n");
 
+		}
+
+		void NetworkTraffic::Report()
+		{
+			Print();
+			Reset();
 		}
 
 		void NetworkTraffic::OnTimer(const std::error_code& error)

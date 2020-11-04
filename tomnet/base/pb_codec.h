@@ -5,7 +5,7 @@
 
 #include "base/buffer.h"
 #include "base/google-inl.h"
-
+#include "base/tomnet_malloc.h"
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/message.h>
 

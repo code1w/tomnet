@@ -6,6 +6,7 @@
 #include "tomnet.h"
 #include "net_define.h"
 #include "asio_handler.h"
+#include "base/tomnet_malloc.h"
 namespace tom {
 class Buffer;
 namespace net {

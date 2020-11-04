@@ -3,9 +3,9 @@
 #include "base/buffer.h"
 #include "base/misc.h"
 #include "dll_export.h"
+#include "base/tomnet_malloc.h"
 #include <google/protobuf/message.h>
 #include <cstring>
-
 using namespace google::protobuf;
 namespace tom {
 namespace net {
