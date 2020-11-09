@@ -11,7 +11,7 @@
 #include "base/buffer.h"
 #include "net/net_define.h"
 #include "base/codec.h"
-
+#include "base/tomnet_malloc.h"
 #include "tellist.pb.h"
 #include "login.pb.h"
 

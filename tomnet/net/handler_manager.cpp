@@ -34,6 +34,7 @@ namespace tom
 
 		void  HandlerManager::LinkDown(AsiokHandler* handler)
 		{
+
 			std::lock_guard<std::mutex> l(mutex_);
 			auto it = handlers_.find(handler->GetHandler());
 			if (it != handlers_.end())
@@ -41,16 +42,11 @@ namespace tom
 				delete it->second;
 				handlers_.erase(it);
 			}
+
 		}
 
 		void  HandlerManager::LinkDown(uint64_t handler)
 		{
-#ifdef  TOM_NET_TEST
-			printf("LinkDown handler %d \n", handler);
-#endif
-#ifdef  TOM_NET_TRAFFIC
-			NetworkTraffic::instance().FetchSubLinks();
-#endif 
 			std::lock_guard<std::mutex> l(mutex_);
 			auto it = handlers_.find(handler);
 			if (it != handlers_.end())
@@ -58,6 +54,7 @@ namespace tom
 				delete it->second;
 				handlers_.erase(it);
 			}
+
 		}
 
 		AsiokHandler* HandlerManager::FectHandler(uint64_t handler)
@@ -71,8 +68,5 @@ namespace tom
 			}
 			return phander;
 		}
-		
-
-
 	}
 }

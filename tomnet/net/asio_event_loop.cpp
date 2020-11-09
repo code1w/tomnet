@@ -126,4 +126,31 @@ namespace net{
 		return pending_functors_->size_approx() == 0;
 	}
 
+	void AsioEventLoop::AddHandler(uint64_t hid, AsiokHandler* handler)
+	{
+		auto it = handlers_.find(hid);
+		if(it == handlers_.end())
+		{
+			handlers_.emplace(hid, handler);
+		}
+	}
+	
+	AsiokHandler* AsioEventLoop::FetchAsioHandler(uint64_t hid)
+	{
+		auto it = handlers_.find(hid);
+		if(it != handlers_.end())
+		{
+			return it->second;
+		}
+		return NULL;
+	}
+
+	void AsioEventLoop::RemoveHandler(uint64_t hid)
+	{
+		auto it = handlers_.find(hid);
+		if(it != handlers_.end())
+		{
+			handlers_.erase(it);
+		}
+	}
 }}

@@ -2,12 +2,12 @@
 #define  INETWORKING_H
 
 #include "tomnet.h"
-
+#include "base/tomnet_malloc.h"
 namespace tom
 {
 namespace net
 {
-	// T 2进制消息类型
+	// T 2锟斤拷锟斤拷锟斤拷息锟斤拷锟斤拷
 	template<typename T> 
 	class INetWorking
 	{
@@ -22,7 +22,7 @@ namespace net
 		virtual void Update() = 0;
 		virtual int32_t ProcessNetPackect() = 0;
 		
-		// 创建一个连出去的网络连接 
+		// 锟斤拷锟斤拷一锟斤拷锟斤拷锟斤拷去锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷 
 		virtual int32_t CreateClient() = 0;
 		virtual int32_t CreateServer() = 0;
 

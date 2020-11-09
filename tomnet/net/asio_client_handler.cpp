@@ -37,7 +37,7 @@ namespace net {
 #ifdef  TOM_NET_TRAFFIC
 		printf("~AsioClientHandler()");
 #endif
-		channel_.reset();
+		//channel_.reset();
 	}
 
 
@@ -143,6 +143,12 @@ namespace net {
 	int32_t AsioClientHandler::SendPacket(const char* data, uint16_t size)
 	{
 		int32_t ret = channel_->SendPacket(data, size);
+		return ret;
+	}
+	
+	int32_t AsioClientHandler::SendPacket(const std::shared_ptr<tom::Buffer>& pPacket, uint16_t size)
+	{
+		int32_t ret = channel_->SendPacket(pPacket, size);
 		return ret;
 	}
 

@@ -13,6 +13,7 @@ namespace net
 	int32_t(*SendBuffer)(uint32_t handle, const tom::Buffer&,const tom::Buffer&) = 0;
 	int32_t(*CloseLink)(uint32_t handle) = 0;
 	int32_t(*SetUserData)(uint32_t handle, void* ud) = 0;
+	int32_t(*LinkReady)(uint32_t handle, void* ud) = 0;
 	MsgHeaderProtocal(*GetLinkMsgHeaderProtocal)(uint32_t handle) = 0;
 	void(*FreeNetPackage)(uint32_t handle, const std::shared_ptr<tom::Buffer>& package) = 0;
 
@@ -34,6 +35,7 @@ namespace net
 			SETUP_NET_DRIVER(Asio_, SendBuffer);
 			SETUP_NET_DRIVER(Asio_, GetLinkMsgHeaderProtocal);
 			SETUP_NET_DRIVER(Asio_, FreeNetPackage);
+			SETUP_NET_DRIVER(Asio_, LinkReady);
 
 		}
 		return true;

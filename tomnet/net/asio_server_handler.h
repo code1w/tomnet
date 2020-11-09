@@ -6,6 +6,7 @@
 #include "tomnet.h"
 #include "net_define.h"
 #include "asio_handler.h"
+#include "base/tomnet_malloc.h"
 namespace tom {
 class Buffer;
 namespace net {
@@ -29,8 +30,10 @@ class AsioServerHandler : public AsiokHandler,
     int32_t OnError(int32_t error);
     int32_t OnConnected(uint32_t);
     int32_t SendPacket(const char* data, uint16_t size);
+    int32_t SendPacket(const std::shared_ptr<tom::Buffer>& pPacket, uint16_t size);
     void CloseLink(uint32_t handle);
     void FreePackage(const std::shared_ptr<tom::Buffer>&);
+     int32_t LinkReady();
 
    public:
     void Start();

@@ -11,7 +11,7 @@
 #include "event_loop_thread.h"
 #include "server_status.h"
 #include "base/noncopyable.h"
-
+#include "base/tomnet_malloc.h"
 namespace tom
 {
 namespace net

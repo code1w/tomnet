@@ -35,7 +35,7 @@ include_directories(${PROJECT_SOURCE_DIR}/deps/include)
 include_directories(${PROJECT_SOURCE_DIR}/deps/include/${BUILD_OS})
 include_directories(${PROJECT_SOURCE_DIR}/modules)
 include_directories(${PROJECT_SOURCE_DIR}/src)
-include_directories(${PROJECT_SOURCE_DIR}/src/gamesh/include)
+include_directories(${PROJECT_SOURCE_DIR}/src/tom/include)
 include_directories(${VCPKG_INSTALL}/include)
 link_directories(${PROJECT_SOURCE_DIR}/deps/lib_${BUILD_OS}/${BUILD_TYPE_SUFFIX})
 

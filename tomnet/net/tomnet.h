@@ -6,7 +6,7 @@
 #include "base/buffer.h"
 #include "base/any.h"
 #include "dll_export.h"
-
+#include "base/tomnet_malloc.h"
 #define MAX_PACKET_SIZE (1024 * 1024)  
 #define INVALID_NETWORK_HANDLE (~0)
 #define MAXFREENETPACKET 1024
@@ -154,6 +154,7 @@ class IMessageQueue {
  TOM_TOM_NET_DLL_C_DECL int32_t (*SendBuffer)(uint32_t handle, const tom::Buffer& b1,const tom::Buffer& b2);
  TOM_TOM_NET_DLL_C_DECL int32_t (*CloseLink)(uint32_t handle);
  TOM_TOM_NET_DLL_C_DECL int32_t (*SetUserData)(uint32_t handle, void* ud);
+ TOM_TOM_NET_DLL_C_DECL int32_t (*LinkReady)(uint32_t handle, void* ud);
  TOM_TOM_NET_DLL_C_DECL MsgHeaderProtocal (*GetLinkMsgHeaderProtocal)(uint32_t handle);
  TOM_TOM_NET_DLL_C_DECL void (*FreeNetPackage)(uint32_t handle, const std::shared_ptr<tom::Buffer>& package);
  TOM_TOM_NET_DLL_C_DECL bool CreateNetwork(NetDriver);

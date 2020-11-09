@@ -4,7 +4,7 @@
 #include "base/misc.h"
 #include <google/protobuf/message.h>
 #include "protobuf-codec.h"
-
+#include "base/tomnet_malloc.h"
 namespace tom {
 	namespace net{
 		TOM_TOM_NET_DLL_C_DECL class DefaultNetWorkProtocol : public INetWorkProtocol<google::protobuf::Message>

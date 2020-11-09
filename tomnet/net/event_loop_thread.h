@@ -11,7 +11,7 @@
 
 #include "asio/asio.hpp"
 #include "server_status.h"
-
+#include "base/tomnet_malloc.h"
 
 namespace tom
 {

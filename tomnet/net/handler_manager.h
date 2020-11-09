@@ -3,14 +3,14 @@
 
 #include "tomnet.h"
 #include "base/noncopyable.h"
-
+#include "base/tomnet_malloc.h"
+#include "base/base_common.h"
 
 #include <unordered_map>
 #include <queue>
 #include <mutex>
 #include <atomic>
 #include <stdio.h>
-
 
 #define MAX_HANDLE_COUNT 50000
 namespace tom
@@ -41,7 +41,7 @@ namespace tom
 			static HandlerManager* value_;
 
 		private:
-			std::unordered_map<uint64_t, AsiokHandler* > handlers_;
+			std::unordered_map<uint64_t, AsiokHandler*> handlers_;
 			std::mutex mutex_;
 			uint32_t maxcount_ = MAX_HANDLE_COUNT;
 			std::atomic<uint64_t> handlerid_{1};

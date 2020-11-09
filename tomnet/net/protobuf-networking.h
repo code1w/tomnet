@@ -3,7 +3,7 @@
 
 #include "inetworking.h"
 #include <google/protobuf/message.h>
-
+#include "base/tomnet_malloc.h"
 namespace tom
 {
 namespace net

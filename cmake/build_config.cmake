@@ -2,7 +2,7 @@ if(NOT WIN32)
     set(BUILD_OS linux)
 
     if("${CMAKE_BUILD_TYPE}" STREQUAL "")
-        set(CMAKE_BUILD_TYPE debug)
+        set(CMAKE_BUILD_TYPE release)
     endif()
 
    message("${CMAKE_BUILD_TYPE}")

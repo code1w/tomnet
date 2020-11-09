@@ -10,8 +10,10 @@
 #include "base/any.h"  
 #include "base/pb_dispatcher.h"
 #include "base/pb_message_helper.h"
-
+#include "base/tomnet_malloc.h"
 #include "net_msg_test_help.h"
+#include "net/network_traffic.h"
+#include "net/message_queue.h"
 
 #include "tellist.pb.h"
 #include "asio/asio.hpp"
@@ -43,8 +45,11 @@ tom::net::IMessageQueue* Q_ = nullptr;
 tom::pb::ProtobufDispatcher gDispatcher_;
 size_t total_count = 1;
 std::vector<uint32_t> handles_;
+asio::steady_timer* timer_ = nullptr;
+tom::net::IMessageQueue* LocalQ_ = nullptr;
 
 }
+
 
 using namespace net_test;
 
@@ -61,12 +66,12 @@ void OnRecvPacket(uint32_t handle, void* ud, const std::shared_ptr<tom::Buffer>&
 
 int ProcessNetPackect(tom::net::IMessageQueue* msg_queue)
 {
-    
     int nProcessPacketCount = 0;
     auto packet = msg_queue->PopMessage();
 
     if (packet)
     {
+        //tom::net::NetworkTraffic::instance().FetchAddRecvPacket();
       tom::net::NetContext* context =
           (tom::net::NetContext*)packet->peek();
       packet->retrieve(sizeof(tom::net::NetContext));
@@ -121,26 +126,69 @@ int ProcessNetPackect(tom::net::IMessageQueue* msg_queue)
 /// 
 /// 
 
+void ProcessNet()
+{
+    auto size = Q_->Size();
+    while(Q_ && size > 0)
+    {
+        ProcessNetPackect(Q_);
+        size = Q_->Size();
+    }
+
+}
+inline uint64_t timenow()
+{
+    uint64_t _t;
+#ifdef __linux__
+                struct timeval t;
+                gettimeofday(&t, nullptr);
+                _t = ((uint64_t)t.tv_sec) * 1000 + t.tv_usec/1000;
+#elif WIN32
+                FILETIME ft;
+                SYSTEMTIME st;
+                GetSystemTime(&st);
+                SystemTimeToFileTime(&st, &ft);
+                _t = ((uint64_t)ft.dwHighDateTime) << 32 | ft.dwLowDateTime;
+                //const uint64_t offset = 116444736000000000;
+                _t -= (uint64)116444736000000000;
+                _t /= 10000;
+#endif
+    return _t;
+}
+
+uint64_t timebase = 0; 
+uint64_t frame_delay = 1000;
+uint64_t frameslap = 0;
+uint64_t current()
+{
+    return timenow() - timebase;
+}
 
 
 void Update()
 {
+
+    auto start = timenow();
+    
     while (true)
     {
-        //io_service_.run();
-        auto size = Q_->Size();
-        while(Q_ && size > 0)
+        while(current() >= frameslap)
         {
-            ProcessNetPackect(Q_);
-            size = Q_->Size();
-        }
+            frameslap += frame_delay;
+            tom::net::NetworkTraffic::instance().Report();
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(2));
+        }
+        ProcessNet();
+        auto fn = [](){
+
+        };
+        //io_service_.post(std::move(fn));
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
 #if 0
         if(style == "client")
         {
             for (auto handle : handles_)
-            {
+            
                 //SendInfoList(handle);
             }
             std::this_thread::sleep_for(std::chrono::milliseconds(20));
@@ -257,7 +305,26 @@ void TestProtocol()
 
 }
 
+void OnTimer()
+{
+    ProcessNet();
+}
+
+void Timer()
+{
+    if(timer_ == nullptr)
+    {
+        timer_ = new asio::steady_timer(io_service_);
+    }
+    timer_->expires_from_now(std::chrono::milliseconds(20));
+    timer_->async_wait(std::bind(OnTimer));
+}
+
+
 // s 127.0.0.1 8888 4 1
+
+
+
 int main(int argc, char** argv)
 {
     TestProtocol();
@@ -301,6 +368,11 @@ int main(int argc, char** argv)
 
 
     RegisterCb();
+    LocalQ_ = new tom::net::MessageQueue();
+
+    //Timer();
+    timebase =  timenow();
+    frameslap = current() + frame_delay;
     Update();
 
     return 0;

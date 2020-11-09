@@ -21,10 +21,8 @@ namespace net {
 
 	AsioServerHandler::~AsioServerHandler()
 	{
-#ifdef  TOM_NET_TRAFFIC
-			printf("~AsioServerHandler()");
-#endif
-		channel_.reset();
+		printf("~AsioServerHandler()");
+		//channel_.reset();
 	}
 
 	int32_t AsioServerHandler::OnDisConnected()
@@ -46,37 +44,18 @@ namespace net {
 
 	int32_t AsioServerHandler::OnAccept()
 	{
-#ifdef  TOM_NET_DEBUG
-		std::thread::id tid = std::this_thread::get_id();
-		//printf("AsioServerHandler OnAccept , tid %d \n", tid);
-#endif
 		handler_ = GetHandler();
 
-		auto fn = [this]() {
-
-			channel_->SetHandler(handler_);
-			channel_->Start();
-			NetContext context;
-			context.handler_ = handler_;
-			context.evetype_ = EVENT_ACCEPT;
-			context.ud_ = GetUserdata();
-
-			auto packet = std::make_shared<tom::Buffer>();
-			packet->append(static_cast<const void*>(&context), sizeof(NetContext));
-			if (msgqueue_)
-			{
-				msgqueue_->PushMessage(packet);
-			}
-
-#ifdef  TOM_NET_DEBUG
-			std::thread::id tid = std::this_thread::get_id();
-			//printf("AsioServerHandler Channel Start , tid %d \n", tid);
-#endif
-		};
-
-		assert(loop_ !=nullptr);
-		loop_->RunInIoService(std::move(fn));
-
+		NetContext context;
+		context.handler_ = handler_;
+		context.evetype_ = EVENT_ACCEPT;
+		context.ud_ = nullptr;
+		auto packet = std::make_shared<tom::Buffer>();
+		packet->append(static_cast<const void*>(&context), sizeof(NetContext));
+		if (msgqueue_)
+		{
+			msgqueue_->PushMessage(packet);
+		}
 		return 0;
 	}
 
@@ -124,6 +103,12 @@ namespace net {
 		return ret;
 	}
 
+	int32_t AsioServerHandler::SendPacket(const std::shared_ptr<tom::Buffer>& pPacket, uint16_t size)
+	{
+		int32_t ret = channel_->SendPacket(pPacket, size);
+		return ret;
+	}
+
 	void AsioServerHandler::CloseLink(uint32_t handle)
 	{
 		channel_->Close(handle);
@@ -133,6 +118,18 @@ namespace net {
 	void AsioServerHandler::FreePackage(const std::shared_ptr<tom::Buffer>& package)
 	{
 		channel_->FreePackage(package);
+	}
+
+	int32_t AsioServerHandler::LinkReady()
+	{
+		auto fn = [this]() {
+			channel_->SetHandler(handler_);
+			channel_->Start();
+		};
+		
+		assert(loop_ != nullptr);
+		loop_->RunInIoService(std::move(fn));
+		return 0;
 	}
 
 }

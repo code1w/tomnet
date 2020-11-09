@@ -4,6 +4,8 @@
 #include "tomnet.h"
 #include "base/noncopyable.h"
 #include "asio/asio.hpp"
+#include "base/tomnet_malloc.h"
+#include "dll_export.h"
 
 #include <unordered_map>
 #include <queue>
@@ -16,7 +18,7 @@ namespace tom
 	namespace net
 	{
 
-		class NetworkTraffic : public noncopyable
+		TOM_TOM_NET_DLL_C_DECL class NetworkTraffic : public noncopyable
 		{
 		public:
 			NetworkTraffic();
@@ -54,6 +56,7 @@ namespace tom
 		public:
 			void OnTimer(const std::error_code& error);
 			void AddTimer(uint64_t);
+			void Report();
 			void Print();
 			void Reset();
 
@@ -92,7 +95,7 @@ namespace tom
 				post_msg_.fetch_add(1);
 			}
 
-			void CreateTimer(asio::io_service* io)
+			void CreateTimer(asio::io_service* io,uint64_t timeout = 1000)
 			{
 				std::call_once(NetworkTraffic::timer_once_falag_, [&](){
 					io_service_ = io;

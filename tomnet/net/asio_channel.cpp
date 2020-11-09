@@ -25,8 +25,17 @@ namespace tom
 
 		AsioChannel::~AsioChannel()
 		{
+			printf("~AsioChannel()");
 			std::shared_ptr<tom::Buffer> next;
 			while (wbufferlist_.try_dequeue(next))
+			{
+				if(next)
+				{
+					next.reset();
+				}
+			}
+
+			while (freepacket_.try_dequeue(next))
 			{
 				if(next)
 				{
@@ -74,6 +83,7 @@ namespace tom
 			case asio::error::bad_descriptor:
 			case asio::error::connection_aborted:
 			{
+				recycle_.store(true);
 				CloseSocket();
 				if(disconnectcb_)
 				{
@@ -128,17 +138,17 @@ namespace tom
 		void AsioChannel::AsyncRead()
 		{
 			socket_.async_read_some(asio::buffer(inputbuf_),
-				[this, self = shared_from_this()](const std::error_code& err, size_t readsize)
+				[self = shared_from_this()](const std::error_code& err, size_t readsize)
 			{
 				if (err)
 				{
-					AsyncReadError(err);
+					self->AsyncReadError(err);
 					return;
 				}
 
-				recvbuf_.append(inputbuf_.data(), readsize);
-				AsyncRead();
-				TryCeneratePacket();
+				self->recvbuf_.append(self->inputbuf_.data(), readsize);
+				self->AsyncRead();
+				self->TryCeneratePacket();
 			});
 		}
 
@@ -239,6 +249,35 @@ namespace tom
 			return 0;
 		}
 
+		int32_t AsioChannel::SendPacket(const std::shared_ptr<tom::Buffer>& packet, uint16_t size)
+		{
+			if (size > MAX_PACKET_SIZE)
+			{
+				if (errorcb_)
+				{
+					errorcb_( TOM_NET_ERROR_PACKET_INVALID);
+				}
+				return -1;
+			}
+ 
+			
+			auto fn = [this, packet]()
+			{
+				if (sendding_.load())
+				{
+					wbufferlist_.enqueue(packet);
+				}
+				else
+				{
+					AsyncSendData(packet);
+				}
+			};
+
+			loop_->RunInIoService(std::move(fn));
+
+			return 0;
+		}
+
 
 		void  AsioChannel::AsyncWriteSomeCallback(const std::error_code& error, const std::shared_ptr<tom::Buffer>& packet, std::size_t writen)
 		{
@@ -246,15 +285,12 @@ namespace tom
 			{
 				if (errorcb_)
 				{
-					errorcb_(error.value());
+					//errorcb_(error.value());
 				}
 
 				return;
 			}
 
-#ifdef  TOM_NET_TRAFFIC
-				NetworkTraffic::instance().FetchAddSendByte(writen);
-#endif 
 			if (writen < packet->readableBytes())
 			{
 				packet->retrieve(writen);
@@ -262,9 +298,6 @@ namespace tom
 			}
 			else
 			{
-#ifdef  TOM_NET_TRAFFIC
-				NetworkTraffic::instance().FetchAddSendPacket();
-#endif 
 				if (wbufferlist_.size_approx() != 0)
 				{
 					std::shared_ptr<tom::Buffer> next;
@@ -279,20 +312,15 @@ namespace tom
 					sendding_.store(false);
 				}
 			}
-#ifdef  TOM_NET_DEBUG
-			assert(std::this_thread::get_id()== tid_);
-			printf("Send size %d, tid %d \n",writen, tid_);
-#endif
-
 		}
 
 		void AsioChannel::AsyncSendData(const std::shared_ptr<tom::Buffer>& packet)
 		{
 			sendding_.store(true);
 			socket_.async_write_some(asio::buffer(packet->peek(), packet->readableBytes()),
-				[this, packet](const std::error_code& err, std::size_t writen)
+				[self = shared_from_this(), packet](const std::error_code& err, std::size_t writen)
 				{
-					AsyncWriteSomeCallback(err,packet,writen);
+					self->AsyncWriteSomeCallback(err,packet,writen);
 				});
 		}
 
@@ -302,20 +330,21 @@ namespace tom
 			start_ = false;
 			std::error_code ec;
 			asio::ip::address_v4 addr(asio::ip::address_v4::from_string(ip, ec));
+
 			socket_.async_connect(asio::ip::tcp::endpoint(addr, port),
-				[this, self = shared_from_this(), ip, port](const std::error_code& error){
+				[self = shared_from_this(), ip, port](const std::error_code& error){
 				if (!error)
 				{
-					reconnectimer_.cancel();
-					Start();
-					if(reconnectedcb_)
+					self->reconnectimer_.cancel();
+					self->Start();
+					if(self->reconnectedcb_)
 					{
-						reconnectedcb_(EVENT_RECONNECTED); 
+						self->reconnectedcb_(EVENT_RECONNECTED); 
 					}
 				}
 				else {
 
-					DelayReConnect(ip , port);
+					self->DelayReConnect(ip , port);
 				}
 
 			});
@@ -352,6 +381,7 @@ namespace tom
 
 		void AsioChannel::FreePackage(const std::shared_ptr<tom::Buffer>& package)
 		{
+			return ;
 			package->retrieveAll();
 			if (!freepacket_.enqueue(package))
 			{

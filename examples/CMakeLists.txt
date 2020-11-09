@@ -11,7 +11,8 @@ if(NOT WIN32)
 target_link_libraries(
 	${projectName}
 	protobuf
-    tomnet
+	tomnet
+	jemalloc
 )
 else()
 target_link_libraries(

@@ -5,7 +5,7 @@
 #include "asio_channel.h"
 #include "net_define.h"
 #include "event_loop_thread.h"
-
+#include "base/tomnet_malloc.h"
 
 
 #include "asio/asio.hpp"

@@ -8,6 +8,7 @@
 #include <functional>
 #include "base/noncopyable.h"
 #include "base/codec.h"
+#include "base/tomnet_malloc.h"
 
 namespace tom
 {

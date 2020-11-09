@@ -13,10 +13,13 @@
 #endif // __GNUC__
 #include "base/noncopyable.h"
 #include "asio/asio.hpp"
+#include "base/tomnet_malloc.h"
+#include "asio_handler.h"
 
 #include <functional>
 #include <mutex>
 #include <atomic>
+#include <unordered_map>
 
 namespace tom
 {
@@ -34,6 +37,7 @@ namespace net
 		std::atomic<bool> notified_;
 		moodycamel::ConcurrentQueue<Functor>* pending_functors_;
 		std::atomic<int> pending_functor_count_;
+		std::unordered_map<uint64_t, AsiokHandler*> handlers_;
 
 	public:
 		AsioEventLoop();
@@ -48,6 +52,10 @@ namespace net
 
 		void RunInIoService(const Functor& handler);
 		void RunInIoService(Functor&& handler);
+
+		void AddHandler(uint64_t, AsiokHandler*);
+		AsiokHandler* FetchAsioHandler(uint64_t);
+		void RemoveHandler(uint64_t);
 
 	private:
 		void Init();

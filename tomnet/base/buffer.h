@@ -3,7 +3,8 @@
 #ifndef BASE_BUFFER_H
 #define BASE_BUFFER_H
 #include "base/noncopyable.h"
-#include "string_piece.h"
+#include "base/string_piece.h"
+#include "base/tomnet_malloc.h"
 
 #include <algorithm>
 #include <vector>
