@@ -27,6 +27,13 @@ message ReqLogin
 	string passward =2;
 }
 
+message TestEcho
+{
+	string index = 1;
+	string msg =2;
+	int64 time = 3;
+}
+
 
 message PlayerBaseInfo
 	{

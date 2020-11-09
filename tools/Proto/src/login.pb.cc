@@ -32,6 +32,10 @@ class ReqLoginDefaultTypeInternal {
  public:
   ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<ReqLogin> _instance;
 } _ReqLogin_default_instance_;
+class TestEchoDefaultTypeInternal {
+ public:
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<TestEcho> _instance;
+} _TestEcho_default_instance_;
 class PlayerBaseInfoDefaultTypeInternal {
  public:
   ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<PlayerBaseInfo> _instance;
@@ -116,6 +120,20 @@ static void InitDefaultsscc_info_SignUpResponse_login_2eproto() {
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_SignUpResponse_login_2eproto =
     {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_SignUpResponse_login_2eproto}, {}};
 
+static void InitDefaultsscc_info_TestEcho_login_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::Tom::_TestEcho_default_instance_;
+    new (ptr) ::Tom::TestEcho();
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::Tom::TestEcho::InitAsDefaultInstance();
+}
+
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_TestEcho_login_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_TestEcho_login_2eproto}, {}};
+
 static void InitDefaultsscc_info_TocChat_login_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
@@ -144,7 +162,7 @@ static void InitDefaultsscc_info_TosChat_login_2eproto() {
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_TosChat_login_2eproto =
     {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_TosChat_login_2eproto}, {}};
 
-static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_login_2eproto[7];
+static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_login_2eproto[8];
 static const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* file_level_enum_descriptors_login_2eproto[1];
 static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_login_2eproto = nullptr;
 
@@ -178,6 +196,14 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_login_2eproto::offsets[] PROTO
   PROTOBUF_FIELD_OFFSET(::Tom::ReqLogin, account_),
   PROTOBUF_FIELD_OFFSET(::Tom::ReqLogin, passward_),
   ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::Tom::TestEcho, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::Tom::TestEcho, index_),
+  PROTOBUF_FIELD_OFFSET(::Tom::TestEcho, msg_),
+  PROTOBUF_FIELD_OFFSET(::Tom::TestEcho, time_),
+  ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::Tom::PlayerBaseInfo, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
@@ -202,9 +228,10 @@ static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOB
   { 7, -1, sizeof(::Tom::TosChat)},
   { 14, -1, sizeof(::Tom::TocChat)},
   { 21, -1, sizeof(::Tom::ReqLogin)},
-  { 28, -1, sizeof(::Tom::PlayerBaseInfo)},
-  { 35, -1, sizeof(::Tom::LoginOk)},
-  { 41, -1, sizeof(::Tom::LoginFaild)},
+  { 28, -1, sizeof(::Tom::TestEcho)},
+  { 36, -1, sizeof(::Tom::PlayerBaseInfo)},
+  { 43, -1, sizeof(::Tom::LoginOk)},
+  { 49, -1, sizeof(::Tom::LoginFaild)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
@@ -212,6 +239,7 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::Tom::_TosChat_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::Tom::_TocChat_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::Tom::_ReqLogin_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::Tom::_TestEcho_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::Tom::_PlayerBaseInfo_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::Tom::_LoginOk_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::Tom::_LoginFaild_default_instance_),
@@ -223,31 +251,34 @@ const char descriptor_table_protodef_login_2eproto[] PROTOBUF_SECTION_VARIABLE(p
   "hat\022\014\n\004name\030\001 \001(\t\022\017\n\007content\030\002 \001(\t\"(\n\007To"
   "cChat\022\014\n\004name\030\001 \001(\t\022\017\n\007content\030\002 \001(\t\"-\n\010"
   "ReqLogin\022\017\n\007account\030\001 \001(\t\022\020\n\010passward\030\002 "
-  "\001(\t\"0\n\016PlayerBaseInfo\022\020\n\010PlayerID\030\001 \001(\r\022"
-  "\014\n\004Name\030\002 \001(\t\"6\n\007LoginOk\022+\n\016playerBaseIn"
-  "fo\030\001 \001(\0132\023.Tom.PlayerBaseInfo\"\224\001\n\nLoginF"
-  "aild\022\'\n\004code\030\001 \001(\0162\031.Tom.LoginFaild.Erro"
-  "rCode\"]\n\tErrorCode\022\035\n\031AccountOrPasswardN"
-  "otMatch\020\000\022\020\n\014AccIDInvalid\020\001\022\017\n\013LoginRepe"
-  "at\020\002\022\016\n\nInnerError\020\003b\006proto3"
+  "\001(\t\"4\n\010TestEcho\022\r\n\005index\030\001 \001(\t\022\013\n\003msg\030\002 "
+  "\001(\t\022\014\n\004time\030\003 \001(\003\"0\n\016PlayerBaseInfo\022\020\n\010P"
+  "layerID\030\001 \001(\r\022\014\n\004Name\030\002 \001(\t\"6\n\007LoginOk\022+"
+  "\n\016playerBaseInfo\030\001 \001(\0132\023.Tom.PlayerBaseI"
+  "nfo\"\224\001\n\nLoginFaild\022\'\n\004code\030\001 \001(\0162\031.Tom.L"
+  "oginFaild.ErrorCode\"]\n\tErrorCode\022\035\n\031Acco"
+  "untOrPasswardNotMatch\020\000\022\020\n\014AccIDInvalid\020"
+  "\001\022\017\n\013LoginRepeat\020\002\022\016\n\nInnerError\020\003b\006prot"
+  "o3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_login_2eproto_deps[1] = {
 };
-static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_login_2eproto_sccs[7] = {
+static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_login_2eproto_sccs[8] = {
   &scc_info_LoginFaild_login_2eproto.base,
   &scc_info_LoginOk_login_2eproto.base,
   &scc_info_PlayerBaseInfo_login_2eproto.base,
   &scc_info_ReqLogin_login_2eproto.base,
   &scc_info_SignUpResponse_login_2eproto.base,
+  &scc_info_TestEcho_login_2eproto.base,
   &scc_info_TocChat_login_2eproto.base,
   &scc_info_TosChat_login_2eproto.base,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_login_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_login_2eproto = {
-  false, false, descriptor_table_protodef_login_2eproto, "login.proto", 468,
-  &descriptor_table_login_2eproto_once, descriptor_table_login_2eproto_sccs, descriptor_table_login_2eproto_deps, 7, 0,
+  false, false, descriptor_table_protodef_login_2eproto, "login.proto", 522,
+  &descriptor_table_login_2eproto_once, descriptor_table_login_2eproto_sccs, descriptor_table_login_2eproto_deps, 8, 0,
   schemas, file_default_instances, TableStruct_login_2eproto::offsets,
-  file_level_metadata_login_2eproto, 7, file_level_enum_descriptors_login_2eproto, file_level_service_descriptors_login_2eproto,
+  file_level_metadata_login_2eproto, 8, file_level_enum_descriptors_login_2eproto, file_level_service_descriptors_login_2eproto,
 };
 
 // Force running AddDescriptors() at dynamic initialization time.
@@ -1251,6 +1282,280 @@ void ReqLogin::InternalSwap(ReqLogin* other) {
 
 // ===================================================================
 
+void TestEcho::InitAsDefaultInstance() {
+}
+class TestEcho::_Internal {
+ public:
+};
+
+TestEcho::TestEcho(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:Tom.TestEcho)
+}
+TestEcho::TestEcho(const TestEcho& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  index_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (!from._internal_index().empty()) {
+    index_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_index(),
+      GetArena());
+  }
+  msg_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (!from._internal_msg().empty()) {
+    msg_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_msg(),
+      GetArena());
+  }
+  time_ = from.time_;
+  // @@protoc_insertion_point(copy_constructor:Tom.TestEcho)
+}
+
+void TestEcho::SharedCtor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_TestEcho_login_2eproto.base);
+  index_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  msg_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  time_ = PROTOBUF_LONGLONG(0);
+}
+
+TestEcho::~TestEcho() {
+  // @@protoc_insertion_point(destructor:Tom.TestEcho)
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+void TestEcho::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
+  index_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  msg_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+
+void TestEcho::ArenaDtor(void* object) {
+  TestEcho* _this = reinterpret_cast< TestEcho* >(object);
+  (void)_this;
+}
+void TestEcho::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void TestEcho::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const TestEcho& TestEcho::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_TestEcho_login_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void TestEcho::Clear() {
+// @@protoc_insertion_point(message_clear_start:Tom.TestEcho)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  index_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  msg_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  time_ = PROTOBUF_LONGLONG(0);
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* TestEcho::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
+    switch (tag >> 3) {
+      // string index = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+          auto str = _internal_mutable_index();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "Tom.TestEcho.index"));
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // string msg = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
+          auto str = _internal_mutable_msg();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "Tom.TestEcho.msg"));
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // int64 time = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 24)) {
+          time_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* TestEcho::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:Tom.TestEcho)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string index = 1;
+  if (this->index().size() > 0) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_index().data(), static_cast<int>(this->_internal_index().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "Tom.TestEcho.index");
+    target = stream->WriteStringMaybeAliased(
+        1, this->_internal_index(), target);
+  }
+
+  // string msg = 2;
+  if (this->msg().size() > 0) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_msg().data(), static_cast<int>(this->_internal_msg().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "Tom.TestEcho.msg");
+    target = stream->WriteStringMaybeAliased(
+        2, this->_internal_msg(), target);
+  }
+
+  // int64 time = 3;
+  if (this->time() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt64ToArray(3, this->_internal_time(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:Tom.TestEcho)
+  return target;
+}
+
+size_t TestEcho::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:Tom.TestEcho)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // string index = 1;
+  if (this->index().size() > 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_index());
+  }
+
+  // string msg = 2;
+  if (this->msg().size() > 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_msg());
+  }
+
+  // int64 time = 3;
+  if (this->time() != 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int64Size(
+        this->_internal_time());
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void TestEcho::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:Tom.TestEcho)
+  GOOGLE_DCHECK_NE(&from, this);
+  const TestEcho* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<TestEcho>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:Tom.TestEcho)
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:Tom.TestEcho)
+    MergeFrom(*source);
+  }
+}
+
+void TestEcho::MergeFrom(const TestEcho& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:Tom.TestEcho)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from.index().size() > 0) {
+    _internal_set_index(from._internal_index());
+  }
+  if (from.msg().size() > 0) {
+    _internal_set_msg(from._internal_msg());
+  }
+  if (from.time() != 0) {
+    _internal_set_time(from._internal_time());
+  }
+}
+
+void TestEcho::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:Tom.TestEcho)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void TestEcho::CopyFrom(const TestEcho& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:Tom.TestEcho)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool TestEcho::IsInitialized() const {
+  return true;
+}
+
+void TestEcho::InternalSwap(TestEcho* other) {
+  using std::swap;
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
+  index_.Swap(&other->index_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  msg_.Swap(&other->msg_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  swap(time_, other->time_);
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata TestEcho::GetMetadata() const {
+  return GetMetadataStatic();
+}
+
+
+// ===================================================================
+
 void PlayerBaseInfo::InitAsDefaultInstance() {
 }
 class PlayerBaseInfo::_Internal {
@@ -1912,6 +2217,9 @@ template<> PROTOBUF_NOINLINE ::Tom::TocChat* Arena::CreateMaybeMessage< ::Tom::T
 }
 template<> PROTOBUF_NOINLINE ::Tom::ReqLogin* Arena::CreateMaybeMessage< ::Tom::ReqLogin >(Arena* arena) {
   return Arena::CreateMessageInternal< ::Tom::ReqLogin >(arena);
+}
+template<> PROTOBUF_NOINLINE ::Tom::TestEcho* Arena::CreateMaybeMessage< ::Tom::TestEcho >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::Tom::TestEcho >(arena);
 }
 template<> PROTOBUF_NOINLINE ::Tom::PlayerBaseInfo* Arena::CreateMaybeMessage< ::Tom::PlayerBaseInfo >(Arena* arena) {
   return Arena::CreateMessageInternal< ::Tom::PlayerBaseInfo >(arena);
