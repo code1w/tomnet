@@ -71,35 +71,66 @@ namespace net
 			*queue = new MessageQueue();
 		}
 
-		uint32_t hid = HandlerManager::instance().AllocateHandlerId();
-		auto loop = EventLoopThreadPool::instance().GetNextLoopWithHash(hid);
-		AsioClientHandler* handler = new AsioClientHandler(loop, *queue, hid);
-		handler->SetMsgHeaderProtocal(headprotol);
-		handler->SetUserData(ud);
-		HandlerManager::instance().LinkHandler(handler);
-		if (handler)
+		uint32_t handle = HandlerManager::instance().AllocateHandlerId();
+		auto loop = EventLoopThreadPool::instance().GetNextLoopWithHash(handle);
+		AsioClientHandler* handler = new AsioClientHandler(loop, *queue, handle);
+		if(!handler)
 		{
-			handler->AsyncConnect(address, port);
+			return -1;
 		}
-		return hid;
+
+		// handler->SetMsgHeaderProtocal(headprotol);
+		// handler->SetUserData(ud);
+
+		//HandlerManager::instance().LinkHandler(handler);
+		//handler->AsyncConnect(address, port);
+		std::string ip(address);
+		auto fn = [handle, handler,headprotol,ud, ip, port, loop](){
+			loop->AddHandler(handle,handler);
+			handler->SetMsgHeaderProtocal(headprotol);
+			handler->SetUserData(ud);
+			handler->AsyncConnect(ip.c_str(), port);
+		};
+		loop->RunInIoService(std::move(fn));
+		return handle;
 	}
 
-	static int32_t Asio_SendPacket(uint32_t handleid, const char* data, uint16_t size)
+	static int32_t Asio_SendPacket(uint32_t handle, const char* data, uint16_t size)
 	{
 		if(size > MAX_PACKET_SIZE)
 		{
 			return -1;
 		}
 
-		auto handler = HandlerManager::instance().FectHandler(handleid);
+		auto loop = EventLoopThreadPool::instance().GetNextLoopWithHash(handle);
+		if(!loop)
+		{
+			return -1;
+		}
+		
+		auto packet = std::make_shared<tom::Buffer>();
+		packet->ensureWritableBytes(size);
+		packet->append(data, size);
+		
+
+		auto fn = [handle, packet,size, loop](){
+			auto handler = loop->FetchAsioHandler(handle);
+			if(handler)
+			{
+				handler->SendPacket(packet ,size);
+			}
+		};
+		loop->RunInIoService(std::move(fn));
+
+#if 0
+		auto handler = HandlerManager::instance().FectHandler(handle);
 		if(handler)
 		{
-			bool ret = handler->SendPacket(data ,size);
+			bool ret = handler->SendPacket(packet ,size);
 			return ret;
-		} 
-
-		std::cout << "FectHandler Error " << handleid << std::endl;
-		return -1;
+		}
+#endif  
+		return 0;
 
 	}
 
@@ -171,6 +202,27 @@ namespace net
 		{
 			handler->FreePackage(package);
 		}
+	}
+
+	static int32_t Asio_LinkReady(uint32_t handle,void* ud)
+	{
+		auto loop = EventLoopThreadPool::instance().GetNextLoopWithHash(handle);
+		if(!loop)
+		{
+			return -1;
+		}
+
+		auto fn = [handle, loop, ud](){
+			auto handler = loop->FetchAsioHandler(handle);
+			if(handler)
+			{
+				handler->SetUserData(ud);
+				handler->LinkReady();
+			}
+		};
+		loop->RunInIoService(std::move(fn));
+
+		return 0;
 	}
 
 

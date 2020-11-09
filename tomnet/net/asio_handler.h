@@ -21,7 +21,9 @@ public:
     virtual int32_t OnError(int32_t error) = 0;
     virtual int32_t OnConnected(uint32_t) = 0;
     virtual int32_t SendPacket(const char* data, uint16_t size) = 0;
+    virtual int32_t SendPacket(const std::shared_ptr<tom::Buffer>& pPacket, uint16_t size) = 0;
     virtual void CloseLink(uint32_t) = 0;
+    virtual int32_t LinkReady(){return 0;};
     virtual void FreePackage(const std::shared_ptr<tom::Buffer>&) = 0;
     void SetHandler(uint64_t handle) { handler_ = handle; }
     uint64_t GetHandler() { return handler_; }

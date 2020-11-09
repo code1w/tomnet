@@ -59,6 +59,7 @@ namespace tom
 			std::atomic<bool> sendding_{false};
 			std::atomic<bool> start_{ false };
 			std::atomic<int32_t> freeqsize_{0};
+			std::atomic<bool> recycle_{false};
 		private:
 			uint32_t PostPacket(const std::shared_ptr<tom::Buffer>& packet);
 			void AsyncWriteSomeCallback(const std::error_code& error, const std::shared_ptr<tom::Buffer>& packet, std::size_t bytes_transferred);
@@ -74,6 +75,7 @@ namespace tom
 			void Connect(const std::string& ip, uint16_t port, bool tryconnect = false);
 			void Start();
 			int32_t SendPacket(const char* data, uint16_t len);
+			int32_t SendPacket(const std::shared_ptr<tom::Buffer>& pPacket, uint16_t size);
 			bool IsConnect() {return handler_ == 0;	}
 			void SetHandler(uint32_t handler) { handler_ = handler; }
 			void Close(uint32_t handle);

@@ -36,6 +36,8 @@ namespace net {
 		 int32_t OnDisConnected();
 		 int32_t OnReConnected(uint32_t);
 		 int32_t SendPacket(const char* data, uint16_t size);
+	     int32_t SendPacket(const std::shared_ptr<tom::Buffer>& pPacket, uint16_t size);
+
 		 void  CloseLink(uint32_t handle);
 		 void  SetHandler(uint32_t handler);
 		uint64_t AsyncConnect(const char* addr, uint16_t port);

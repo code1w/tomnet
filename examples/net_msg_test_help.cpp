@@ -32,6 +32,7 @@ using namespace net_test;
 
 void OnAccept(uint32_t handle,void* ud, const tom::BufferPtr& msg) {
 	tom::net::NetworkTraffic::instance().FetchAddLinks();
+	tom::net::LinkReady(handle, NULL);
 }
 
 void DelaySend(const std::error_code& error)
@@ -58,8 +59,6 @@ void OnReConnected(uint32_t handle,void* ud, const tom::BufferPtr& msg) {
 	//SendReqLogin(handle);
 }
 
-
-
 void OnConnectFail(uint32_t handle, void* ud, const tom::BufferPtr& msg) {
 	//std::cout << " connected remote server handle : " << handle << std::endl;
 	//tom::net::CloseLink(handle);
@@ -84,6 +83,7 @@ void OnPersonaInfoList(uint32_t handle, void* ud, const std::shared_ptr<Tom::per
 
 void OnReqLogin(uint32_t handle, void* ud, const std::shared_ptr<Tom::ReqLogin>& message)
 {
+	//std::cout << "OnReqLogin ," << handle << ", "<<message->account() << ", " << message->passward() << std::endl;
 	SendReqLogin(handle);
 	tom::net::NetworkTraffic::instance().FetchAddRecvByte(message->ByteSizeLong());
 }

@@ -71,7 +71,7 @@ int ProcessNetPackect(tom::net::IMessageQueue* msg_queue)
 
     if (packet)
     {
-        tom::net::NetworkTraffic::instance().FetchAddRecvPacket();
+        //tom::net::NetworkTraffic::instance().FetchAddRecvPacket();
       tom::net::NetContext* context =
           (tom::net::NetContext*)packet->peek();
       packet->retrieve(sizeof(tom::net::NetContext));
@@ -128,7 +128,6 @@ int ProcessNetPackect(tom::net::IMessageQueue* msg_queue)
 
 void ProcessNet()
 {
-
     auto size = Q_->Size();
     while(Q_ && size > 0)
     {
@@ -160,7 +159,7 @@ inline uint64_t timenow()
 uint64_t timebase = 0; 
 uint64_t frame_delay = 1000;
 uint64_t frameslap = 0;
-uint64_t  Current()
+uint64_t current()
 {
     return timenow() - timebase;
 }
@@ -173,13 +172,17 @@ void Update()
     
     while (true)
     {
-        while(Current() >= frameslap)
+        while(current() >= frameslap)
         {
             frameslap += frame_delay;
             tom::net::NetworkTraffic::instance().Report();
 
         }
         ProcessNet();
+        auto fn = [](){
+
+        };
+        //io_service_.post(std::move(fn));
         std::this_thread::sleep_for(std::chrono::milliseconds(20));
 #if 0
         if(style == "client")
@@ -368,7 +371,7 @@ int main(int argc, char** argv)
 
     //Timer();
     timebase =  timenow();
-    frameslap = Current() + frame_delay;
+    frameslap = current() + frame_delay;
     Update();
 
     return 0;

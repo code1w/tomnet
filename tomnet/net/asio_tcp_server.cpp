@@ -50,10 +50,24 @@ namespace tom
 
 		void AsioTcpServer::Accept()
 		{
-			auto loop = EventLoopThreadPool::instance().GetNextLoop();
+			uint64_t handle = HandlerManager::instance().AllocateHandlerId();
+			auto loop = EventLoopThreadPool::instance().GetNextLoopWithHash(handle);
+			if(!loop)
+			{
+				return;
+			}
+
 			auto handler = new AsioServerHandler(loop, msgqueue_);
+			auto fn = [handle, handler, loop](){
+				loop->AddHandler(handle,handler);
+			};
+			loop->RunInIoService(std::move(fn));
+
 			if (handler)
 			{
+				handler->SetHandler(handle);
+				handler->SetMsgHeaderProtocal(headprotol_);
+				handler->SetUserData(GetUserdata());
 				acceptorptr_->async_accept(handler->Socket(),
 					[this,handler](const std::error_code& error)
 					{
@@ -68,20 +82,14 @@ namespace tom
 
 		void AsioTcpServer::AsyncAcceptCallback(AsioServerHandler* handler)
 		{
+			//uint64_t handle = HandlerManager::instance().AllocateHandlerId();
+			//handler->SetHandler(handle);
+			//handler->SetMsgHeaderProtocal(headprotol_);
+			//handler->SetUserData(GetUserdata());
 
-			auto& s = handler->Socket();
-			uint64_t handle = HandlerManager::instance().AllocateHandlerId();
-			handler->SetHandler(handle);
-			handler->SetMsgHeaderProtocal(headprotol_);
-			handler->SetUserData(GetUserdata());
-			HandlerManager::instance().LinkHandler(handler);
+			//HandlerManager::instance().LinkHandler(handler);
 			handler->OnAccept();
 			max_connect_++;
-#ifdef  TOM_NET_DEBUG
-			std::thread::id tid = std::this_thread::get_id();
-			uint32_t hid = handler->GetHandler();
-			printf("AsioTcpServer AsyncAcceptCallback , tid %d , handle %d \n", tid,hid);
-#endif 
 			Accept();
 		}
 

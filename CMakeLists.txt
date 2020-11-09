@@ -22,6 +22,7 @@ include_directories(${PROJECT_SOURCE_DIR}/tomnet/)
 
 if(NOT WIN32)
 include_directories(${PROJECT_SOURCE_DIR}/3rd/jemalloc/include/)
+include_directories(${PROJECT_SOURCE_DIR}/3rd/tbb/)
 endif()
 
 

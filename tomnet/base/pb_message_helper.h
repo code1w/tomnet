@@ -22,9 +22,9 @@ int32_t SendMsg(uint32_t handle, const message_type &msg) {
 static int32_t SendMsg(uint32_t handle, const google::protobuf::Message& msg) 
 {
 
-	auto hprotocal = tom::net::GetLinkMsgHeaderProtocal(handle);
+	//auto hprotocal = tom::net::GetLinkMsgHeaderProtocal(handle);
 	tom::Buffer buf;
-	tom::pb::encode(msg, &buf, hprotocal);
+	tom::pb::encode(msg, &buf);
 	int ret = tom::net::SendPacket(handle, buf.peek(), buf.readableBytes());
 	return ret;
 }
