@@ -92,24 +92,6 @@ void OnReqLogin(uint32_t handle, void* ud, const std::shared_ptr<Tom::ReqLogin>&
 {
 	std::cout <<"handle : "<< handle << ", "<< message->account() <<" , "<< message->passward()<<std::endl;
 	SendReqLogin(handle);
-/*
-	Tom::LoginOk rsp;
-	Tom::PlayerBaseInfo* pinfo = rsp.mutable_playerbaseinfo();
-	pinfo->set_name("zhang xiao bin");
-	pinfo->set_playerid(51886);
-
-	//asio::steady_timer timer(io_service_);
-	//timer.expires_after(std::chrono::seconds(10));
-	//std::cout << "wait 10 s " << std::endl;
-	//timer.wait();
-
-	{
-
-	std::cout << " send msg " << std::endl;
-	tom::SendMsg(handle, rsp);
-	}
-	//SendInfoList(handle);
-*/
 }
 
 
@@ -126,8 +108,6 @@ void RegisterCb()
 void SendReqLogin(uint32_t handle)
 {
 	static int32_t index = 1;
-	//while (true)
-	{
     char pasw[128];
 	sprintf(pasw, "passward.%u", handle*100);
 	Tom::ReqLogin req;
@@ -136,8 +116,6 @@ void SendReqLogin(uint32_t handle)
 	auto tname = typeid(Tom::ReqLogin).name();
 	tom::SendMsg(handle, req);
 	index++;
-	std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	}
 
 }
 
