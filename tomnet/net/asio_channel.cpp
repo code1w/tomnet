@@ -42,7 +42,6 @@ namespace tom
 					next.reset();
 				}
 			}
-
 		}
 
 		void AsioChannel::Connect(const std::string& ip, uint16_t port, bool tryconnect)
@@ -53,17 +52,17 @@ namespace tom
 			std::error_code ec;
 			asio::ip::address_v4 addr(asio::ip::address_v4::from_string(ip, ec));
 			socket_.async_connect(asio::ip::tcp::endpoint(addr, port),
-				[this, tryconnect, self = shared_from_this()](const std::error_code& error)
+				[tryconnect, self = shared_from_this()](const std::error_code& error)
 			{
 
-				if(error && connectedcb_)
+				if(error && self->connectedcb_)
 				{
-					connectedcb_(EVENT_CONNECT_FAIL);
+					self->connectedcb_(EVENT_CONNECT_FAIL);
 				}
-				else if(connectedcb_)
+				else if(self->connectedcb_)
 				{
-					Start();
-					connectedcb_(EVENT_CONNECT_SUCCESS); 
+					self->Start();
+					self->connectedcb_(EVENT_CONNECT_SUCCESS); 
 				}
 			});
 		}
@@ -232,15 +231,16 @@ namespace tom
 			packet->ensureWritableBytes(size);
 			packet->append(data, size);
  
-			auto fn = [this, packet]()
+
+			auto fn = [self = shared_from_this(), packet]()
 			{
-				if (sendding_.load())
+				if (self->sendding_.load())
 				{
-					wbufferlist_.enqueue(packet);
+					self->wbufferlist_.enqueue(packet);
 				}
 				else
 				{
-					AsyncSendData(packet);
+					self->AsyncSendData(packet);
 				}
 			};
 
@@ -261,15 +261,15 @@ namespace tom
 			}
  
 			
-			auto fn = [this, packet]()
+			auto fn = [self = shared_from_this(), packet]()
 			{
-				if (sendding_.load())
+				if (self->sendding_.load())
 				{
-					wbufferlist_.enqueue(packet);
+					self->wbufferlist_.enqueue(packet);
 				}
 				else
 				{
-					AsyncSendData(packet);
+					self->AsyncSendData(packet);
 				}
 			};
 
@@ -354,9 +354,9 @@ namespace tom
 		{
 			reconnectimer_.expires_from_now(std::chrono::milliseconds(RECONNECTTIME));
 			reconnectimer_.async_wait(
-				[this, self = shared_from_this(), ip, port](const std::error_code& error)
+				[self = shared_from_this(), ip, port](const std::error_code& error)
 			{
-				DoReConnect(ip ,port);
+				self->DoReConnect(ip ,port);
 			});
 
 		}

@@ -24,49 +24,5 @@ namespace tom
 		{
 			return handlers_.size();
 		}
-
-		bool HandlerManager::LinkHandler(AsiokHandler* phandler)
-		{
-			std::lock_guard<std::mutex> l(mutex_);
-			handlers_[phandler->GetHandler()] = phandler;
-			return true;
-		}
-
-		void  HandlerManager::LinkDown(AsiokHandler* handler)
-		{
-
-			std::lock_guard<std::mutex> l(mutex_);
-			auto it = handlers_.find(handler->GetHandler());
-			if (it != handlers_.end())
-			{
-				delete it->second;
-				handlers_.erase(it);
-			}
-
-		}
-
-		void  HandlerManager::LinkDown(uint64_t handler)
-		{
-			std::lock_guard<std::mutex> l(mutex_);
-			auto it = handlers_.find(handler);
-			if (it != handlers_.end())
-			{
-				delete it->second;
-				handlers_.erase(it);
-			}
-
-		}
-
-		AsiokHandler* HandlerManager::FectHandler(uint64_t handler)
-		{
-			std::lock_guard<std::mutex> l(mutex_);
-			AsiokHandler* phander = nullptr;
-			auto kv = handlers_.find(handler);
-			if(kv != handlers_.end())
-			{
-				phander = kv->second;
-			}
-			return phander;
-		}
 	}
 }

@@ -155,7 +155,7 @@ namespace net {
 	void AsioClientHandler::CloseLink(uint32_t handle)
 	{
 		channel_->Close(handle);
-		HandlerManager::instance().LinkDown(handler_);
+		//HandlerManager::instance().LinkDown(handler_);
 	}
 
 	void AsioClientHandler::FreePackage(const std::shared_ptr<tom::Buffer>& package)

@@ -52,10 +52,6 @@ namespace tom
 			uint64_t AllocateHandlerId();
 			void Initialize(uint32_t maxcount = MAX_HANDLE_COUNT);
 			std::size_t HandlerCount();
-			bool LinkHandler(AsiokHandler* phandler);
-			void  LinkDown(AsiokHandler* handler);
-			void  LinkDown(uint64_t handler);
-			AsiokHandler* FectHandler(uint64_t handler);
 		};
 	}
 }

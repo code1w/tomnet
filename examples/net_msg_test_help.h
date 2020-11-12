@@ -8,6 +8,11 @@
 #include <mutex>
 #include <concurrentqueue/concurrentqueue.h>
 
+#ifndef WIN32
+#include <sys/time.h>
+#include <sys/resource.h>
+#endif
+
 #include "base/buffer.h"
 #include "net/net_define.h"
 #include "base/codec.h"
@@ -40,10 +45,14 @@ struct Server
  void OnConnectFail(uint32_t handle, void* ud,const tom::BufferPtr& msg);
  void SendInfoList(uint32_t handle);
  void SendReqLogin(uint32_t handle);
+ void SendTestEcho(uint32_t handle , const std::shared_ptr<Tom::TestEcho>& message = NULL);
 
  void RegisterCb();
  void OnPersonaInfoList(uint32_t nethandle, void* ud, const std::shared_ptr<Tom::personal_info_list>& message);
  void OnReqLogin(uint32_t nethandle, void* ud, const std::shared_ptr<Tom::ReqLogin>& message);
+ void OnTestEcho(uint32_t nethandle, void* ud, const std::shared_ptr<Tom::TestEcho>& message);
 
  void TestConcurrentqueue();
  void TestEcodeAndDecode();
+
+uint64_t timenow();

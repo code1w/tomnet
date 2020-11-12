@@ -136,25 +136,7 @@ void ProcessNet()
     }
 
 }
-inline uint64_t timenow()
-{
-    uint64_t _t;
-#ifdef __linux__
-                struct timeval t;
-                gettimeofday(&t, nullptr);
-                _t = ((uint64_t)t.tv_sec) * 1000 + t.tv_usec/1000;
-#elif WIN32
-                FILETIME ft;
-                SYSTEMTIME st;
-                GetSystemTime(&st);
-                SystemTimeToFileTime(&st, &ft);
-                _t = ((uint64_t)ft.dwHighDateTime) << 32 | ft.dwLowDateTime;
-                //const uint64_t offset = 116444736000000000;
-                _t -= (uint64)116444736000000000;
-                _t /= 10000;
-#endif
-    return _t;
-}
+
 
 uint64_t timebase = 0; 
 uint64_t frame_delay = 1000;
@@ -168,38 +150,21 @@ uint64_t current()
 void Update()
 {
 
-    auto start = timenow();
+    timebase =  timenow();
+    frameslap = current() + frame_delay;
     
     while (true)
     {
-        while(current() >= frameslap)
+        if(style == "s")
         {
-            frameslap += frame_delay;
-            tom::net::NetworkTraffic::instance().Report();
-
+            while(current() >= frameslap)
+            {
+                frameslap += frame_delay;
+                //tom::net::NetworkTraffic::instance().Report();
+            }
         }
         ProcessNet();
-        auto fn = [](){
-
-        };
-        //io_service_.post(std::move(fn));
-        std::this_thread::sleep_for(std::chrono::milliseconds(20));
-#if 0
-        if(style == "client")
-        {
-            for (auto handle : handles_)
-            
-                //SendInfoList(handle);
-            }
-            std::this_thread::sleep_for(std::chrono::milliseconds(20));
-        }
-
-        if(style == "server")
-        {
-            std::this_thread::sleep_for(std::chrono::milliseconds(5));
-        }
-#endif 
-
+        std::this_thread::sleep_for(std::chrono::milliseconds(3));
     }
 }
 
@@ -371,8 +336,7 @@ int main(int argc, char** argv)
     LocalQ_ = new tom::net::MessageQueue();
 
     //Timer();
-    timebase =  timenow();
-    frameslap = current() + frame_delay;
+
     Update();
 
     return 0;

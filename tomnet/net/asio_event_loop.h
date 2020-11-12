@@ -33,7 +33,6 @@ namespace net
 		asio::io_service io_service_;
 		std::shared_ptr<asio::io_service::work> io_work_;
 		std::thread::id tid_;
-		std::mutex mutex_;
 		std::atomic<bool> notified_;
 		moodycamel::ConcurrentQueue<Functor>* pending_functors_;
 		std::atomic<int> pending_functor_count_;

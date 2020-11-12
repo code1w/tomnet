@@ -26,9 +26,6 @@ namespace net{
 	{
 		status_.store(kStarting);
 		tid_ = std::this_thread::get_id();
-#ifdef  TOM_NET_DEBUG
-		printf("AsioEventLoop Run , tid %d \n", tid_);
-#endif
 		status_.store(kRunning);
 		io_service_.run();
 
@@ -141,8 +138,9 @@ namespace net{
 		if(it != handlers_.end())
 		{
 			return it->second;
+
 		}
-		return NULL;
+		return nullptr;
 	}
 
 	void AsioEventLoop::RemoveHandler(uint64_t hid)
@@ -150,6 +148,7 @@ namespace net{
 		auto it = handlers_.find(hid);
 		if(it != handlers_.end())
 		{
+			delete it->second;
 			handlers_.erase(it);
 		}
 	}

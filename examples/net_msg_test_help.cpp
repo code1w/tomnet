@@ -24,11 +24,33 @@ extern tom::pb::ProtobufDispatcher gDispatcher_;
 extern size_t total_count;
 extern asio::io_service io_service_;
 extern std::vector<uint32_t> handles_;
+extern std::string style ;
+std::unordered_map<std::string , uint64_t> gtimes_;
 
 char * teststr = "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890";
 
 }
 using namespace net_test;
+
+uint64_t timenow()
+{
+    uint64_t _t;
+#ifdef __linux__
+                struct timeval t;
+                gettimeofday(&t, nullptr);
+                _t = ((uint64_t)t.tv_sec) * 1000 + t.tv_usec/1000;
+#elif WIN32
+                FILETIME ft;
+                SYSTEMTIME st;
+                GetSystemTime(&st);
+                SystemTimeToFileTime(&st, &ft);
+                _t = ((uint64_t)ft.dwHighDateTime) << 32 | ft.dwLowDateTime;
+                //const uint64_t offset = 116444736000000000;
+                _t -= (uint64)116444736000000000;
+                _t /= 10000;
+#endif
+    return _t;
+}
 
 void OnAccept(uint32_t handle,void* ud, const tom::BufferPtr& msg) {
 	tom::net::NetworkTraffic::instance().FetchAddLinks();
@@ -47,7 +69,7 @@ void DelaySend(const std::error_code& error)
 void OnConnected(uint32_t handle, void* ud, const tom::BufferPtr& msg) {
 	Client* c = (Client*)ud;
 	tom::net::NetworkTraffic::instance().FetchAddLinks();
-	SendReqLogin(handle);
+	SendTestEcho(handle);
 }
 
 void OnReConnected(uint32_t handle,void* ud, const tom::BufferPtr& msg) {
@@ -90,6 +112,38 @@ void OnReqLogin(uint32_t handle, void* ud, const std::shared_ptr<Tom::ReqLogin>&
 
 }
 
+int64_t sendsize = 0;
+
+void OnTestEcho(uint32_t handle, void* ud, const std::shared_ptr<Tom::TestEcho>& message)
+{
+	static int64_t spackage = 0;
+	if(style == "c")
+	{
+		static int64_t timebase = timenow();
+		if(timenow() - timebase >= 1000)
+		{
+			int64_t tt = timenow() - message->time();
+			std::cout << "Echo RTT " << tt << " ms"<< std::endl;
+			std::cout << "Echo Package  " << spackage << " n/s"<< std::endl;
+			std::cout << "Echo Package Len " << (sendsize/1024) << "kB/s" << std::endl;
+			spackage = 0;
+			timebase = timenow(); 
+			sendsize = 0;
+
+		}
+		SendTestEcho(handle);
+		spackage++;
+	}
+	else if(style == "s")
+	{
+		//SendTestEcho(handle, message);
+		tom::SendMsg(handle, *(message.get()));
+		tom::net::NetworkTraffic::instance().FetchAddRecvByte(message->ByteSizeLong());
+	}
+
+
+}
+
 
 void RegisterCb()
 {
@@ -99,6 +153,9 @@ void RegisterCb()
 
 	gDispatcher_.registerMessageCallback<Tom::ReqLogin>(
 		std::bind(OnReqLogin, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+
+	gDispatcher_.registerMessageCallback<Tom::TestEcho>(
+		std::bind(OnTestEcho, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 }
 
 void SendReqLogin(uint32_t handle)
@@ -116,6 +173,36 @@ void SendReqLogin(uint32_t handle)
 	tom::net::NetworkTraffic::instance().FetchAddSendByte(req.ByteSizeLong());
 	tom::net::NetworkTraffic::instance().FetchAddSendPacket();
 }
+
+void SendTestEcho(uint32_t handle, const std::shared_ptr<Tom::TestEcho>& message)
+{
+	static int32_t x = 1;
+    char index[128];
+	sprintf(index, "%u", x);
+	Tom::TestEcho req;
+	req.set_index(index);
+	req.set_msg(teststr);
+	if(message)
+	{
+		req.set_time(message->time());
+	}
+	else{
+
+		// 客户端连接后发本地时间
+		int64_t time = timenow();
+		req.set_time(time);
+	}
+
+	tom::SendMsg(handle, req);
+
+	if(style == "c")
+	{
+		sendsize+=req.ByteSizeLong();
+	}
+	
+	x++;
+}
+
 
 void SendInfoList(uint32_t handle)
 {

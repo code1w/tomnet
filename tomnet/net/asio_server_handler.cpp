@@ -38,14 +38,13 @@ namespace net {
 		{
 			msgqueue_->PushMessage(packet);
 		}
-		HandlerManager::instance().LinkDown(handler_);
+		//HandlerManager::instance().LinkDown(handler_);
 		return 0;
 	}
 
 	int32_t AsioServerHandler::OnAccept()
 	{
 		handler_ = GetHandler();
-
 		NetContext context;
 		context.handler_ = handler_;
 		context.evetype_ = EVENT_ACCEPT;
@@ -112,7 +111,7 @@ namespace net {
 	void AsioServerHandler::CloseLink(uint32_t handle)
 	{
 		channel_->Close(handle);
-		HandlerManager::instance().LinkDown(handler_);
+		//HandlerManager::instance().LinkDown(handler_);
 	}
 	
 	void AsioServerHandler::FreePackage(const std::shared_ptr<tom::Buffer>& package)

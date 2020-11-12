@@ -7,7 +7,7 @@ if(NOT WIN32)
 
    message("${CMAKE_BUILD_TYPE}")
     if(CMAKE_BUILD_TYPE MATCHES "release")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -g")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g")
     else()
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g")
     endif()

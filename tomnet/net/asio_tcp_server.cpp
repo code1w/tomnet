@@ -17,7 +17,6 @@ namespace tom
 			,msgqueue_(msgqueue)
 			,loop_(loop)
 		{
-			
 		}
 
 		bool AsioTcpServer::Start(const char* address, uint16_t port)
@@ -33,6 +32,7 @@ namespace tom
 			{
 				return false;
 			}
+			
 			acceptorptr_->listen();
 			auto fn = [this]()
 			{
@@ -57,37 +57,29 @@ namespace tom
 				return;
 			}
 
-			auto handler = new AsioServerHandler(loop, msgqueue_);
-			auto fn = [handle, handler, loop](){
-				loop->AddHandler(handle,handler);
-			};
-			loop->RunInIoService(std::move(fn));
-
-			if (handler)
+			AsioServerHandler* handler = new AsioServerHandler(loop, msgqueue_);
+			if(!handler)
 			{
-				handler->SetHandler(handle);
-				handler->SetMsgHeaderProtocal(headprotol_);
-				handler->SetUserData(GetUserdata());
-				acceptorptr_->async_accept(handler->Socket(),
-					[this,handler](const std::error_code& error)
-					{
-						if (!error)
-						{
-							AsyncAcceptCallback(handler);
-						}
-					});
+				return;
 			}
+			handler->SetHandler(handle);
+			handler->SetMsgHeaderProtocal(headprotol_);
+			handler->SetUserData(GetUserdata());
 
+			loop->AddHandler(handle,handler);
+
+			acceptorptr_->async_accept(handler->Socket(),
+				[this, handler](const std::error_code& error)
+				{
+					if (!error)
+					{
+						AsyncAcceptCallback(handler);
+					}
+				});
 		}
 
 		void AsioTcpServer::AsyncAcceptCallback(AsioServerHandler* handler)
 		{
-			//uint64_t handle = HandlerManager::instance().AllocateHandlerId();
-			//handler->SetHandler(handle);
-			//handler->SetMsgHeaderProtocal(headprotol_);
-			//handler->SetUserData(GetUserdata());
-
-			//HandlerManager::instance().LinkHandler(handler);
 			handler->OnAccept();
 			max_connect_++;
 			Accept();
