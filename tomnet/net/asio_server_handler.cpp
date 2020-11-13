@@ -38,7 +38,21 @@ namespace net {
 		{
 			msgqueue_->PushMessage(packet);
 		}
-		//HandlerManager::instance().LinkDown(handler_);
+
+		auto fa = [this](){
+			channel_->Close(handle);
+		};
+		loop_->RunInIoService(std::move(fa));
+
+		// 回收资源
+
+		auto fb = [this](){
+			uint64_t handle = GetHandler();
+			loop_->RemoveHandler(handle);
+		};
+
+		loop_->RunInIoService(std::move(fb));
+
 		return 0;
 	}
 

@@ -372,7 +372,6 @@ namespace tom
 		void AsioChannel::Close(uint32_t handle)
 		{
 			assert(handle == handler_);
-			socket_.cancel();
 			handler_ = 0;
 			std::error_code err;
 			socket_.shutdown(asio::ip::tcp::socket::shutdown_both, err);

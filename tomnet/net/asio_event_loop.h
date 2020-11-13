@@ -14,7 +14,7 @@
 #include "base/noncopyable.h"
 #include "asio/asio.hpp"
 #include "base/tomnet_malloc.h"
-#include "asio_handler.h"
+
 
 #include <functional>
 #include <mutex>
@@ -25,6 +25,7 @@ namespace tom
 {
 namespace net
 {
+	class AsiokHandler;
 	class AsioEventLoop : public ServerStatus
 	{
 	public:
