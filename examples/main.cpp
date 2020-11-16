@@ -44,7 +44,6 @@ asio::io_service io_service_;
 tom::net::IMessageQueue* Q_ = nullptr;
 tom::pb::ProtobufDispatcher gDispatcher_;
 size_t total_count = 1;
-std::vector<uint32_t> handles_;
 asio::steady_timer* timer_ = nullptr;
 tom::net::IMessageQueue* LocalQ_ = nullptr;
 

@@ -80,6 +80,7 @@ namespace tom
 
 		void AsioTcpServer::AsyncAcceptCallback(AsioServerHandler* handler)
 		{
+			std::cout << "accept " << handler->GetHandler() << std::endl;
 			handler->OnAccept();
 			max_connect_++;
 			Accept();

@@ -21,8 +21,8 @@ namespace net {
 
 	AsioServerHandler::~AsioServerHandler()
 	{
-		printf("~AsioServerHandler()");
 		//channel_.reset();
+		channel_ = nullptr;
 	}
 
 	int32_t AsioServerHandler::OnDisConnected()
@@ -40,7 +40,7 @@ namespace net {
 		}
 
 		auto fa = [this](){
-			channel_->Close(handle);
+			channel_->Close(handler_);
 		};
 		loop_->RunInIoService(std::move(fa));
 

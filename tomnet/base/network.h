@@ -3,12 +3,11 @@
 #include <memory>
 #include <unordered_map>
 #include <unordered_set>
-#include "net/pb_dispatcher.h"
+#include "pb_dispatcher.h"
 
 
 namespace tom {
 
-}  // namespace container
 namespace net {
 
 class Network 
@@ -28,16 +27,16 @@ class Network
 
  private:
 
-    void ProcessNetEvent(const std::shared_ptr<gamesh::Buffer>& event);
-    void OnAccept(gamesh::net::NetContext* ctx);
-    void OnClose(gamesh::net::NetContext* ctx);
-    void OnConnected(gamesh::net::NetContext* ctx);
-    void OnReConnected(gamesh::net::NetContext* ctx);
+    void ProcessNetEvent(const std::shared_ptr<tom::Buffer>& event);
+    void OnAccept(tom::net::NetContext* ctx);
+    void OnClose(tom::net::NetContext* ctx);
+    void OnConnected(tom::net::NetContext* ctx);
+    void OnReConnected(tom::net::NetContext* ctx);
 
-    //void OnNetMsg(gamesh::net::NetContext* ctx, const std::shared_ptr<cmd_proto::CommonMessage>& msg);
+    //void OnNetMsg(tom::net::NetContext* ctx, const std::shared_ptr<cmd_proto::CommonMessage>& msg);
 
 
-    gamesh::net::IMessageQueue* net_event_queue_ = nullptr;
-    gamesh::pb::ProtobufDispatcher dispatcher_;
+    tom::net::IMessageQueue* net_event_queue_ = nullptr;
+    tom::pb::ProtobufDispatcher dispatcher_;
 };
 }}

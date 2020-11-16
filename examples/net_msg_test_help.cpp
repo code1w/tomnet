@@ -16,14 +16,20 @@
 
 #include <vector>
 #include <chrono>
+#include <unordered_map>
 
 namespace net_test {
 
+struct ClientData
+{
+uint32_t handle  = 0;
+int32_t echotimes = 0;
+};
 
 extern tom::pb::ProtobufDispatcher gDispatcher_;
 extern size_t total_count;
 extern asio::io_service io_service_;
-extern std::vector<uint32_t> handles_;
+std::unordered_map<uint32_t, ClientData*> handles_;
 extern std::string style ;
 std::unordered_map<std::string , uint64_t> gtimes_;
 
@@ -54,6 +60,10 @@ uint64_t timenow()
 
 void OnAccept(uint32_t handle,void* ud, const tom::BufferPtr& msg) {
 	tom::net::NetworkTraffic::instance().FetchAddLinks();
+	ClientData * data = new ClientData;
+	data->handle = handle;
+	data->echotimes = 0;
+	handles_[handle] = data;
 	tom::net::LinkReady(handle, NULL);
 }
 
@@ -136,8 +146,28 @@ void OnTestEcho(uint32_t handle, void* ud, const std::shared_ptr<Tom::TestEcho>&
 	}
 	else if(style == "s")
 	{
-		//SendTestEcho(handle, message);
-		tom::SendMsg(handle, *(message.get()));
+		static int64_t stimebase = timenow();
+		if(timenow() - stimebase >= 1000)
+		{
+			auto it = handles_.begin();
+			for(; it != handles_.end(); ++it)
+			{
+				if(it->second->echotimes<=0)
+				{
+					std::cout << "handle timeout : " << it->first << std::endl;
+				}
+				else{
+					std::cout << "echo handle  : " << it->first << ", "<<it->second->echotimes<<  std::endl;
+					it->second->echotimes = 0;
+				}
+			}
+
+			stimebase = timenow(); 
+
+		}
+		handles_[handle]->echotimes++;
+		SendTestEcho(handle, message);
+		//tom::SendMsg(handle, *(message.get()));
 		tom::net::NetworkTraffic::instance().FetchAddRecvByte(message->ByteSizeLong());
 	}
 

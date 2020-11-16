@@ -1,8 +1,11 @@
 #include "network.h"
-#include "net/net_base.h"
-#include "net/pb_codec.h"
-#include "loging.h"
+#include "net/tomnet.h"
+#include "pb_codec.h"
+//#include "loging.h"
+namespace tom {
 
+
+namespace net {
 Network::Network()
 {
 }
@@ -14,18 +17,18 @@ Network::~Network()
 
 bool Network::Init(int netthread)
 {
-    gamesh::net::CreateNetwork(gamesh::net::asio);
-    gamesh::net::InitNetwork(netthread);
+    tom::net::CreateNetwork(tom::net::asio);
+    tom::net::InitNetwork(netthread);
 
     return true;
 }
 
 bool Network::TcpServer(const std::string& ip, int port)
 {
-    auto ret = gamesh::net::StartNetService(ip.c_str(), port, &net_event_queue_, 10000, 250000, 100, gamesh::net::nametype, nullptr);
+    auto ret = tom::net::StartNetService(ip.c_str(), port, &net_event_queue_, 10000, 250000, 100, tom::net::nametype, nullptr);
     if (ret == 0)
     {
-        LOG_TRACE << "Network::TcpServer 失败! " << ip.c_str() << ":" << port;
+        //LOG_TRACE << "Network::TcpServer 失败! " << ip.c_str() << ":" << port;
         return false;
     }
     return true;
@@ -33,10 +36,10 @@ bool Network::TcpServer(const std::string& ip, int port)
 
 bool Network::TcpClient(const std::string& ip, int port, void* ud)
 {
-    auto ret =  gamesh::net::Connect(ip.c_str(), port, &net_event_queue_, 10000, 25000, gamesh::net::nametype,ud);
+    auto ret =  tom::net::Connect(ip.c_str(), port, &net_event_queue_, 10000, 25000, tom::net::nametype,ud);
     if(ret < 0)
     {
-        LOG_TRACE << "Network::TcpClient 失败! " << ip.c_str() << ":" << port;
+        //LOG_TRACE << "Network::TcpClient 失败! " << ip.c_str() << ":" << port;
         return false;
     }
     return true;
@@ -57,10 +60,10 @@ void Network::Update()
 
 }
 
-void Network::ProcessNetEvent(const std::shared_ptr<gamesh::Buffer>& event)
+void Network::ProcessNetEvent(const std::shared_ptr<tom::Buffer>& event)
 {
-    gamesh::net::NetContext* ctx = (gamesh::net::NetContext*)event->peek();
-    event->retrieve(sizeof(gamesh::net::NetContext));
+    tom::net::NetContext* ctx = (tom::net::NetContext*)event->peek();
+    event->retrieve(sizeof(tom::net::NetContext));
 
     // GALOG_DEBUG("%s ud=%p event_type=%d", __FUNCTION__, ctx->ud_, ctx->evetype_);
 
@@ -88,11 +91,11 @@ void Network::ProcessNetEvent(const std::shared_ptr<gamesh::Buffer>& event)
         break;
         case EVENT_NETMSG:
         {
-            static auto header = std::make_shared<gamesh::net::MessageHeader>();
-            auto msg = gamesh::pb::decode(event, header, gamesh::net::nametype);
+            static auto header = std::make_shared<tom::net::MessageHeader>();
+            auto msg = tom::pb::decode(event, header, tom::net::nametype);
             if (msg)
             {
-                dispatcher_.onMessage(ctx->handler_, ctx->ud_, header, msg);
+                dispatcher_.onMessage(ctx->handler_, ctx->ud_, msg);
             }
             else
             {
@@ -108,50 +111,51 @@ void Network::ProcessNetEvent(const std::shared_ptr<gamesh::Buffer>& event)
     }  // switch
 }
 
-void Network::OnAccept(gamesh::net::NetContext* ctx)
+void Network::OnAccept(tom::net::NetContext* ctx)
 {
     const uint32_t net_handler_id = ctx->handler_;
     printf("%s handler=%lu\n", __FUNCTION__, net_handler_id);
 
     //auto player = std::make_unique<Player>(net_handler_id);  // new player
 
-    gamesh::net::LinkReady(net_handler_id, nullptr);
+    tom::net::LinkReady(net_handler_id, nullptr);
 }
 
-void Network::OnClose(gamesh::net::NetContext* ctx)
+void Network::OnClose(tom::net::NetContext* ctx)
 {
     const uint32_t net_handler_id = ctx->handler_;
     printf("%s handler=%lu\n", __FUNCTION__, net_handler_id);
 
-    gamesh::net::SetUserData(net_handler_id, nullptr);
+    tom::net::SetUserData(net_handler_id, nullptr);
 }
 
 
-void Network::OnConnected(gamesh::net::NetContext* ctx)
+void Network::OnConnected(tom::net::NetContext* ctx)
 {
     const uint32_t net_handler_id = ctx->handler_;
     printf("%s handler=%lu\n", __FUNCTION__, net_handler_id);
 
-    gamesh::net::SetUserData(net_handler_id, nullptr);
+    tom::net::SetUserData(net_handler_id, nullptr);
 }
 
-void Network::OnReConnected(gamesh::net::NetContext* ctx)
+void Network::OnReConnected(tom::net::NetContext* ctx)
 {
     const uint32_t net_handler_id = ctx->handler_;
     printf("%s handler=%lu\n", __FUNCTION__, net_handler_id);
 
-    gamesh::net::SetUserData(net_handler_id, nullptr);
+    tom::net::SetUserData(net_handler_id, nullptr);
 }
 
 
 bool Network::SendMessage(uint32_t net_handler_id, const google::protobuf::Message& msg)
 {
-    gamesh::Buffer buf;
-    gamesh::pb::encode(msg, &buf, gamesh::net::seqidzip);
+    tom::Buffer buf;
+    tom::pb::encode(msg, &buf);
 
     const uint16_t size = buf.readableBytes();
-    gamesh::net::SendPacket(net_handler_id, buf.peek(), size);
+    tom::net::SendPacket(net_handler_id, buf.peek(), size);
     return true;
 }
 
 
+}}

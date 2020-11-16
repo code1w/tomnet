@@ -25,7 +25,6 @@ namespace tom
 
 		AsioChannel::~AsioChannel()
 		{
-			printf("~AsioChannel()");
 			std::shared_ptr<tom::Buffer> next;
 			while (wbufferlist_.try_dequeue(next))
 			{
@@ -106,11 +105,13 @@ namespace tom
 			socket_.set_option(no_delay);
 			asio::socket_base::receive_buffer_size recvbuf(MAX_PACKET_SIZE);
 			socket_.set_option(recvbuf);
-			asio::socket_base::receive_buffer_size sendbuf(MAX_PACKET_SIZE);
+			asio::socket_base::send_buffer_size sendbuf(MAX_PACKET_SIZE);
 			socket_.set_option(sendbuf);
 			asio::socket_base::reuse_address reuse(true);
 			socket_.set_option(reuse);
 			socket_.non_blocking(true);
+			asio::socket_base::keep_alive keepalive(true);
+			socket_.set_option(keepalive);
 		}
 
         void AsioChannel::ResetBuffer()
