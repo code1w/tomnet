@@ -63,5 +63,6 @@
         "typeinfo": "cpp",
         "shared_mutex": "cpp",
         "*.ipp": "cpp"
-    }
+    },
+    "cmake.configureOnOpen": false
 }

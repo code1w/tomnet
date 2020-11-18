@@ -2,3 +2,5 @@
 .git
 build
 bin
+3rd/protobuf-3.12.0
+3rd/jemalloc-5.2.1

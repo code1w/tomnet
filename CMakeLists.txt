@@ -15,6 +15,10 @@ if(CMAKE_PROJECT_NAME STREQUAL "tomnet")
 	option(TOMNET_BUILD_EXAMPLES "Build Tomnet examples" ON)
 endif()
 
+if(NOT WIN32)
+execute_process(COMMAND bash ../3rd/3rd-build.sh)
+endif()
+
 include_directories(${PROJECT_SOURCE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/3rd/)
 include_directories(${PROJECT_SOURCE_DIR}/3rd/asio/)
