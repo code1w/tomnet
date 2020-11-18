@@ -25,15 +25,17 @@ include_directories(${PROJECT_SOURCE_DIR}/3rd/asio/)
 include_directories(${PROJECT_SOURCE_DIR}/tomnet/)
 
 if(NOT WIN32)
-include_directories(${PROJECT_SOURCE_DIR}/3rd/jemalloc/include/)
-include_directories(${PROJECT_SOURCE_DIR}/3rd/tbb/)
+set(jemalloc "jemalloc-5.2.1")
+set(protobuf "protobuf-3.12.0")
+include_directories(${PROJECT_SOURCE_DIR}/3rd/${jemalloc}/include/)
+include_directories(${PROJECT_SOURCE_DIR}/3rd/${protobuf}/src/)
 endif()
 
 
 
 if(NOT WIN32)
-link_directories(${PROJECT_SOURCE_DIR}/3rd/libs/x64-linux/)
-link_directories(${PROJECT_SOURCE_DIR}/3rd/jemalloc/lib/)
+link_directories(${PROJECT_SOURCE_DIR}/3rd/${jemalloc}/lib/)
+link_directories(${PROJECT_SOURCE_DIR}/3rd/${protobuf}/src/.libs/)
 else()
 link_directories(${PROJECT_SOURCE_DIR}/3rd/libs/x64-windows/)
 endif()
