@@ -25,6 +25,7 @@ namespace tom
 
 		AsioChannel::~AsioChannel()
 		{
+			std::cerr << "~AsioChannel" << '\n';
 			std::shared_ptr<tom::Buffer> next;
 			while (wbufferlist_.try_dequeue(next))
 			{
@@ -101,17 +102,24 @@ namespace tom
 
 		void AsioChannel::SetSocketOpt()
 		{
-			asio::ip::tcp::no_delay no_delay(true);
-			socket_.set_option(no_delay);
-			asio::socket_base::receive_buffer_size recvbuf(MAX_PACKET_SIZE);
-			socket_.set_option(recvbuf);
-			asio::socket_base::send_buffer_size sendbuf(MAX_PACKET_SIZE);
-			socket_.set_option(sendbuf);
-			asio::socket_base::reuse_address reuse(true);
-			socket_.set_option(reuse);
-			socket_.non_blocking(true);
-			asio::socket_base::keep_alive keepalive(true);
-			socket_.set_option(keepalive);
+			try 
+			{
+				asio::ip::tcp::no_delay no_delay(true);
+				socket_.set_option(no_delay);
+				asio::socket_base::receive_buffer_size recvbuf(SOCKET_BUFSIZE);
+				socket_.set_option(recvbuf);
+				asio::socket_base::send_buffer_size sendbuf(SOCKET_BUFSIZE);
+				socket_.set_option(sendbuf);
+				asio::socket_base::reuse_address reuse(true);
+				socket_.set_option(reuse);
+				socket_.non_blocking(true);
+				asio::socket_base::keep_alive keepalive(true);
+				socket_.set_option(keepalive);
+			}
+			catch(const std::system_error& e)
+			{
+				std::cerr << e.what() << '\n';
+			}
 		}
 
         void AsioChannel::ResetBuffer()
@@ -140,15 +148,21 @@ namespace tom
 			socket_.async_read_some(asio::buffer(inputbuf_),
 				[self = shared_from_this()](const std::error_code& err, size_t readsize)
 			{
-				if (err)
+				try
 				{
-					self->AsyncReadError(err);
-					return;
+					if (err)
+					{
+						self->AsyncReadError(err);
+						return;
+					}
+					self->recvbuf_.append(self->inputbuf_.data(), readsize);
+					self->AsyncRead();
+					self->TryCeneratePacket();
 				}
-
-				self->recvbuf_.append(self->inputbuf_.data(), readsize);
-				self->AsyncRead();
-				self->TryCeneratePacket();
+				catch(const std::system_error& e)
+				{
+					std::cerr << e.what() << '\n';
+				}
 			});
 		}
 
@@ -364,19 +378,28 @@ namespace tom
 
 		void AsioChannel::CloseSocket()
 		{
-			socket_.cancel();
-			std::error_code err;
-			socket_.shutdown(asio::ip::tcp::socket::shutdown_both, err);
-			socket_.close();
+			//socket_.cancel();
+			auto fn = [this]()
+			{
+				handler_ = 0;
+				std::error_code err;
+				socket_.shutdown(asio::ip::tcp::socket::shutdown_both, err);
+				socket_.close();
+			};
+			loop_->RunInIoService(std::move(fn));
 		}
 
 		void AsioChannel::Close(uint32_t handle)
 		{
-			assert(handle == handler_);
-			handler_ = 0;
-			std::error_code err;
-			socket_.shutdown(asio::ip::tcp::socket::shutdown_both, err);
-			socket_.close();
+			//socket_.cancel();
+			auto fn = [this]()
+			{
+				handler_ = 0;
+				std::error_code err;
+				socket_.shutdown(asio::ip::tcp::socket::shutdown_both, err);
+				socket_.close();
+			};
+			loop_->RunInIoService(std::move(fn));
 		}
 
 		void AsioChannel::FreePackage(const std::shared_ptr<tom::Buffer>& package)

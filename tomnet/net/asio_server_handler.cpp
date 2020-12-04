@@ -124,7 +124,17 @@ namespace net {
 
 	void AsioServerHandler::CloseLink(uint32_t handle)
 	{
-		channel_->Close(handle);
+		if(handle != handler_)
+		{
+			return;
+		}
+		auto fn = [this]() {
+			channel_->Close(handler_);
+		};
+		
+		assert(loop_ != nullptr);
+		loop_->RunInIoService(std::move(fn));
+
 		//HandlerManager::instance().LinkDown(handler_);
 	}
 	

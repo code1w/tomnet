@@ -65,6 +65,7 @@ void OnAccept(uint32_t handle,void* ud, const tom::BufferPtr& msg) {
 	data->echotimes = 0;
 	handles_[handle] = data;
 	tom::net::LinkReady(handle, NULL);
+	tom::net::CloseLink(handle);
 }
 
 void DelaySend(const std::error_code& error)
@@ -79,7 +80,8 @@ void DelaySend(const std::error_code& error)
 void OnConnected(uint32_t handle, void* ud, const tom::BufferPtr& msg) {
 	Client* c = (Client*)ud;
 	tom::net::NetworkTraffic::instance().FetchAddLinks();
-	SendTestEcho(handle);
+	//SendTestEcho(handle);
+	//tom::net::CloseLink(handle);
 }
 
 void OnReConnected(uint32_t handle,void* ud, const tom::BufferPtr& msg) {
