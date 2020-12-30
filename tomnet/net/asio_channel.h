@@ -41,6 +41,7 @@ namespace tom
 			MessageHeader headerbuffer_{0,0};
 			tom::Buffer recvbuf_;
 			std::array<char, 4096> inputbuf_;
+			tom::Buffer writebuf_;
 			uint32_t handler_ = 0;
 			std::thread::id tid_;
 			ConnectedCallback connectedcb_;
@@ -55,14 +56,12 @@ namespace tom
 			uint16_t remoteport_;
 			asio::steady_timer reconnectimer_;
 
-			std::queue<std::shared_ptr<tom::Buffer>> waitwriteq_;
-			std::atomic<bool> sendding_{false};
 			std::atomic<bool> start_{ false };
 			std::atomic<bool> closeing_{ false };
 		private:
 			uint32_t PostPacket(const std::shared_ptr<tom::Buffer>& packet);
-			void AsyncWriteSomeCallback(const std::error_code& error, const std::shared_ptr<tom::Buffer>& packet, std::size_t bytes_transferred);
-			void AsyncSendData(const std::shared_ptr<tom::Buffer>& packet);
+			void AsyncWriteSomeCallback(const std::error_code& error,  std::size_t bytes_transferred);
+			void AsyncSendData();
 			void AsyncReadError(const std::error_code& error);
 		public:
 		 	AsioChannel(AsioEventLoop* loop, std::size_t block_size);

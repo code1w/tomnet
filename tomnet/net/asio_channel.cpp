@@ -28,13 +28,7 @@ namespace tom
 		#ifdef DEBUG_NET
 			printf("%s:%s\n",__FILE__, __FUNCTION__);
 		#endif 
-			while (!waitwriteq_.empty())
-			{
-				auto pkg = waitwriteq_.front(); 
-				waitwriteq_.pop();
-				pkg = nullptr;
-			}
-
+			loop_ = nullptr;
 		}
 
 		void AsioChannel::Connect(const std::string& ip, uint16_t port, bool tryconnect)
@@ -241,49 +235,31 @@ namespace tom
 		{
 			if(closeing_.load())
 			{
-				// 正在关闭禁止发包
 				return -1;
 			}
 			
-			auto packet = std::make_shared<tom::Buffer>();
-			packet->ensureWritableBytes(size);
-			packet->append(data, size);
- 
-			if (sendding_.load())
-			{
-				waitwriteq_.push(packet);
-			}
-			else
-			{
-				AsyncSendData(packet);
-			}
+			
+			writebuf_.ensureWritableBytes(size);
+			writebuf_.append(data, size);
+			AsyncSendData();
 			return 0;
 		}
 
 		int32_t AsioChannel::SendPacket(const std::shared_ptr<tom::Buffer>& packet, uint16_t size)
 		{
-
 			if(closeing_.load())
 			{
 				// 正在关闭禁止发包
 				return -1;
 			}
-
-
-			if (sendding_.load())
-			{
-				waitwriteq_.push(packet);
-			}
-			else
-			{
-				AsyncSendData(packet);
-			}
-
+			writebuf_.ensureWritableBytes(packet->readableBytes());
+			writebuf_.append(packet->peek(), packet->readableBytes());
+			AsyncSendData();
 			return 0;
 		}
 
 
-		void  AsioChannel::AsyncWriteSomeCallback(const std::error_code& error, const std::shared_ptr<tom::Buffer>& packet, std::size_t writen)
+		void  AsioChannel::AsyncWriteSomeCallback(const std::error_code& error, std::size_t writen)
 		{
 			if (error)
 			{
@@ -293,39 +269,25 @@ namespace tom
 					socketwriteerrcb_(error.value());
 				}
 
-				printf("TomNet AsioChannel AsyncWriteSomeCallback  %d, Error %d", handler_, error.value() );
+				printf("GameshNet AsioChannel AsyncWriteSomeCallback  %d, Error %d", handler_, error.value() );
 				return;
 			}
  
-			if (writen < packet->readableBytes())
+			writebuf_.retrieve(writen);
+			if(writebuf_.readableBytes() > 0)
 			{
-				packet->retrieve(writen);
-				AsyncSendData(packet);
-			}
-			else
-			{
-				if(!waitwriteq_.empty())
-				{
-					auto next = waitwriteq_.front();
-					waitwriteq_.pop();
-					AsyncSendData(next);
-				}
-				else
-				{
-					sendding_.store(false);
-				}
+				AsyncSendData();
 			}
 
 		}
 
-		void AsioChannel::AsyncSendData(const std::shared_ptr<tom::Buffer>& packet)
+		void AsioChannel::AsyncSendData()
 		{
-			sendding_.store(true);
 			auto self = shared_from_this();
-			socket_.async_write_some(asio::buffer(packet->peek(), packet->readableBytes()),
-				[self, packet](const std::error_code& err, std::size_t writen)
+			socket_.async_write_some(asio::buffer(writebuf_.peek(), writebuf_.readableBytes()),
+				[self](const std::error_code& err, std::size_t writen)
 				{
-					self->AsyncWriteSomeCallback(err,packet,writen);
+					self->AsyncWriteSomeCallback(err,writen);
 				});
 		}
 
