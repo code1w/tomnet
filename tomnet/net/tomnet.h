@@ -151,13 +151,12 @@ class IMessageQueue {
  TOM_TOM_NET_DLL_C_DECL uint64_t (*StartNetService)(const char* address, uint16_t port, IMessageQueue** q, uint32_t , uint32_t , uint16_t, MsgHeaderProtocal, void*);
  TOM_TOM_NET_DLL_C_DECL int32_t (*CloseNetService)(uint64_t server_h);
  TOM_TOM_NET_DLL_C_DECL int32_t (*Connect)(const char* ip, uint16_t port,IMessageQueue** q,uint32_t , uint32_t , MsgHeaderProtocal, void*);
- TOM_TOM_NET_DLL_C_DECL int32_t (*SendPacket)(uint32_t handle, const char* data,uint16_t size);
+ TOM_TOM_NET_DLL_C_DECL int32_t (*SendPacket)(uint32_t handle, const char* data,uint32_t size);
  TOM_TOM_NET_DLL_C_DECL int32_t (*SendBuffer)(uint32_t handle, const tom::Buffer& b1,const tom::Buffer& b2);
  TOM_TOM_NET_DLL_C_DECL int32_t (*CloseLink)(uint32_t handle);
  TOM_TOM_NET_DLL_C_DECL int32_t (*SetUserData)(uint32_t handle, void* ud);
  TOM_TOM_NET_DLL_C_DECL int32_t (*LinkReady)(uint32_t handle, void* ud);
  TOM_TOM_NET_DLL_C_DECL MsgHeaderProtocal (*GetLinkMsgHeaderProtocal)(uint32_t handle);
- TOM_TOM_NET_DLL_C_DECL void (*FreeNetPackage)(uint32_t handle, const std::shared_ptr<tom::Buffer>& package);
  TOM_TOM_NET_DLL_C_DECL bool CreateNetwork(NetDriver);
  TOM_TOM_NET_DLL_C_DECL void DestroyNetwork();
 

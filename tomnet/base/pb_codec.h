@@ -163,22 +163,26 @@ namespace tom {
 
         static void decode_header(const std::shared_ptr<tom::Buffer>& buf, tom::net::MessageHeader* header, tom::net::MsgHeaderProtocal headprotol = tom::net::nametype)
         {
-            switch(headprotol)
+            if(headprotol == tom::net::nametype)
             {
-                case tom::net::nametype:
+                if(buf->readableBytes() < sizeof(int32_t) * 3)
                 {
-                    header->size_ = buf->readInt32();
-                    header->u.type_name.type_ = buf->readInt32();
-                    header->u.type_name.namelen_ = buf->readInt32();
-                    std::string name = buf->retrieveAsString(header->u.type_name.namelen_);
-                    strcpy(header->u.type_name.name,name.c_str());
+                    return ;
                 }
-                break;
-                default:
+                header->size_ = buf->readInt32();
+                header->u.type_name.type_ = buf->readInt32();
+                uint32_t namelen =  buf->readInt32();
+                header->u.type_name.namelen_ = namelen;
+                if(buf->readableBytes() < namelen)
                 {
-
+                    return ;
                 }
-                break;
+                std::string name = buf->retrieveAsString(namelen);
+                if(name.size() > MAXMSGNAMELEN)
+                {
+                    return ;
+                }
+                strcpy(header->u.type_name.name,name.c_str());
             }
         }
 

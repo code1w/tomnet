@@ -12,7 +12,6 @@ target_link_libraries(
 	${projectName}
 	protobuf
 	tomnet
-	jemalloc
 )
 else()
 target_link_libraries(

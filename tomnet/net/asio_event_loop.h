@@ -14,7 +14,7 @@
 #include "base/noncopyable.h"
 #include "asio/asio.hpp"
 #include "base/tomnet_malloc.h"
-
+#include "dll_export.h"
 
 #include <functional>
 #include <mutex>
@@ -26,7 +26,7 @@ namespace tom
 namespace net
 {
 	class AsiokHandler;
-	class AsioEventLoop : public ServerStatus
+	TOM_TOM_NET_DLL_C_DECL class AsioEventLoop : public ServerStatus
 	{
 	public:
 		typedef std::function<void()> Functor;
@@ -34,10 +34,11 @@ namespace net
 		asio::io_service io_service_;
 		std::shared_ptr<asio::io_service::work> io_work_;
 		std::thread::id tid_;
+		std::mutex mutex_;
 		std::atomic<bool> notified_;
 		moodycamel::ConcurrentQueue<Functor>* pending_functors_;
 		std::atomic<int> pending_functor_count_;
-		std::unordered_map<uint64_t, AsiokHandler*> handlers_;
+		std::unordered_map<uint32_t, std::shared_ptr<AsiokHandler>> handlers_;
 
 	public:
 		AsioEventLoop();
@@ -53,9 +54,9 @@ namespace net
 		void RunInIoService(const Functor& handler);
 		void RunInIoService(Functor&& handler);
 
-		void AddHandler(uint64_t, AsiokHandler*);
-		AsiokHandler* FetchAsioHandler(uint64_t);
-		void RemoveHandler(uint64_t);
+		void AddHandler(uint32_t, const std::shared_ptr<AsiokHandler>&);
+		std::shared_ptr<AsiokHandler> FetchAsioHandler(uint32_t);
+		void RemoveHandler(uint32_t);
 
 	private:
 		void Init();
@@ -64,7 +65,7 @@ namespace net
 		std::size_t GetPendingQueueSize();
 		bool IsPendingQueueEmpty();
 	public:
-		// TODO : timer
+		// TODO(zxb): timer
 		//InvokeTimerPtr RunAfter(double delay_ms, const Functor& f);
 		//InvokeTimerPtr RunAfter(Duration delay, const Functor& f);
 		//InvokeTimerPtr RunEvery(Duration interval, const Functor& f);

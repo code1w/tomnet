@@ -1,6 +1,7 @@
-
 #!/bin/bash
 dir=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
+echo "insall autoconf ..."
+yum install -y autoconf 
 echo $dir
 cd $dir
 echo "shell build protobuf ...."
@@ -23,7 +24,3 @@ if [ ! -d "jemalloc-5.2.1" ]; then
     ./configure --with-jemalloc-prefix=je_
     make -j4
 fi
-
-
-
-

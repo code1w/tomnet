@@ -28,7 +28,6 @@ namespace net{
 		tid_ = std::this_thread::get_id();
 		status_.store(kRunning);
 		io_service_.run();
-
 		status_.store(kStopped);
 	}
 
@@ -36,6 +35,7 @@ namespace net{
 	{
 		io_work_.reset();
 		io_service_.reset();
+		io_service_.stop();
 		assert(status_.load() == kRunning);
 		status_.store(kStopping);
 		QueueInLoop(std::bind(&AsioEventLoop::StopInLoop, this));
@@ -123,33 +123,48 @@ namespace net{
 		return pending_functors_->size_approx() == 0;
 	}
 
-	void AsioEventLoop::AddHandler(uint64_t hid, AsiokHandler* handler)
+
+	// accept 线程调用
+	void AsioEventLoop::AddHandler(uint32_t hid, const std::shared_ptr<AsiokHandler>& handler)
 	{
-		auto it = handlers_.find(hid);
-		if(it == handlers_.end())
+		std::lock_guard<std::mutex> guard(mutex_);
+		if(hid > 0)
 		{
-			handlers_.emplace(hid, handler);
+			auto it = handlers_.find(hid);
+			if(it == handlers_.end())
+			{
+				handlers_.emplace(hid, handler);
+			}
 		}
 	}
 	
-	AsiokHandler* AsioEventLoop::FetchAsioHandler(uint64_t hid)
+	
+	std::shared_ptr<AsiokHandler> AsioEventLoop::FetchAsioHandler(uint32_t hid)
 	{
-		auto it = handlers_.find(hid);
-		if(it != handlers_.end())
+		std::lock_guard<std::mutex> guard(mutex_);
+		if(hid > 0)
 		{
-			return it->second;
+			auto it = handlers_.find(hid);
+			if(it != handlers_.end())
+			{
+				return it->second;
 
+			}
 		}
 		return nullptr;
 	}
 
-	void AsioEventLoop::RemoveHandler(uint64_t hid)
+	void AsioEventLoop::RemoveHandler(uint32_t hid)
 	{
-		auto it = handlers_.find(hid);
-		if(it != handlers_.end())
+		std::lock_guard<std::mutex> guard(mutex_);
+		if(hid > 0)
 		{
-			delete it->second;
-			handlers_.erase(it);
+			auto it = handlers_.find(hid);
+			if(it != handlers_.end())
+			{
+				it->second = nullptr;
+				handlers_.erase(it);
+			}
 		}
 	}
 }}

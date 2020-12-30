@@ -17,7 +17,7 @@ namespace tom
 	{
 		class AsioEventLoop;
 		
-		class AsioTcpServer : public std::enable_shared_from_this<AsioTcpServer>, noncopyable
+		class AsioTcpServer : public std::enable_shared_from_this<AsioTcpServer>, ServerStatus, noncopyable 
 		{
 		private:
 			uint32_t max_connect_;
@@ -26,30 +26,38 @@ namespace tom
 			EventLoopThread accept_thread_loop_;
 			bool reuse_addr_ = false;
 			MsgHeaderProtocal headprotol_ = nametype;
+			NetMessageCallback messagecb_ = nullptr;
 			void * ud_;
+			std::string ip_;
+			uint16_t port_;
+			std::string srvkey_;
+			std::vector<uint64_t> myhandlers_; // 连接到这个端口的连接
+
 		public:
 			IMessageQueue* msgqueue_ = nullptr;
 
 		public:
 			AsioTcpServer(AsioEventLoop* loop , IMessageQueue* queue, uint32_t maxconn);
+			AsioTcpServer(AsioEventLoop* loop , uint32_t maxconn);
 
 			~AsioTcpServer()
 			{
-				accept_thread_loop_.Stop(true);
 			};
 
 			bool Start(const char* address, uint16_t port);
 			void Stop();
 			void Accept();
-			void AsyncAcceptCallback(AsioServerHandler* handler);
+			void AsyncAcceptCallback(const std::shared_ptr<AsioServerHandler>& handler);
 			AsioEventLoop* GetAcceptLoop();
 			void SetReuseAddr(bool value){reuse_addr_ = value; }
 			void SetMsgHeaderProtocal(MsgHeaderProtocal type) { headprotol_ = type;}
 			MsgHeaderProtocal GetMsgHeaderProtocal(){return headprotol_;}
     		void SetUserData(void* ud) { ud_ = ud; }
 			void* GetUserdata() const { return ud_; }
+			void SetMessageCb(const NetMessageCallback& cb){messagecb_ = cb;}
 
 		};
+
 
 }
 }

@@ -12,19 +12,23 @@
 #include "asio_handler.h"
 #include "dll_export.h"
 #include "base/tomnet_malloc.h"
+#include "tcp_server_manager.h"
 
 namespace tom
 {
 namespace net
 {
-	static int32_t Asio_InitNetwork(uint32_t pool_size)
+	static  int32_t Asio_InitNetwork(uint32_t pool_size)
 	{
 		HandlerManager::instance().Initialize(5000);
 		EventLoopThreadPool::instance().Initialize(pool_size);
-		EventLoopThreadPool::instance().Start(true);
+		auto isok = EventLoopThreadPool::instance().Start(true);
+		if(isok)
+		{
+
+		}
 		return 0;
 	}
-
 
 	static uint64_t Asio_StartNetService(const char* address, uint16_t port, IMessageQueue** queue, uint32_t ping_invent, uint32_t timeout, uint16_t accepc_count,MsgHeaderProtocal headprotol = nametype, void* ud = nullptr)
 	{
@@ -39,15 +43,44 @@ namespace net
 		}
 
 		auto loop = EventLoopThreadPool::instance().GetNextLoop();
-		AsioTcpServer* tcpserver =  new AsioTcpServer(loop, *queue, accepc_count);
+		AsioTcpServer* tcpserver = new AsioTcpServer(loop, *queue, accepc_count);
 		tcpserver->SetReuseAddr(true);
 		tcpserver->SetMsgHeaderProtocal(headprotol);
 		tcpserver->SetUserData(ud);
 		if (!tcpserver->Start(address, port))
 		{
-			tcpserver = nullptr;
+			// TODO(zxb): Stop后在销毁
+			delete tcpserver;
 			return 0;
 		}
+
+		// 启动的服务添加到管理器
+		std::string srvkey(address);
+		srvkey = srvkey + ":" + std::to_string(port);
+		TcpServerManager::instance().AddSomePortTcpServer(srvkey, (uint64_t)tcpserver);
+
+		return (uint64_t)tcpserver;
+	}
+
+	static uint64_t Asio_StartNetServiceWithCb(const char* address, uint16_t port, const NetMessageCallback& cb, uint32_t ping_invent, uint32_t timeout, uint16_t accepc_count,MsgHeaderProtocal headprotol = nametype)
+	{
+		auto loop = EventLoopThreadPool::instance().GetNextLoop();
+		AsioTcpServer* tcpserver = new AsioTcpServer(loop, accepc_count);
+		tcpserver->SetReuseAddr(true);
+		tcpserver->SetMsgHeaderProtocal(headprotol);
+		tcpserver->SetMessageCb(cb);
+		if (!tcpserver->Start(address, port))
+		{
+			// TODO(zxb): Stop后在销毁
+			tcpserver->Stop();
+			delete tcpserver;
+			return 0;
+		}
+
+		// 启动的服务添加到管理器
+		std::string srvkey(address);
+		srvkey = srvkey + ":" + std::to_string(port);
+		TcpServerManager::instance().AddSomePortTcpServer(srvkey, (uint64_t)tcpserver);
 
 		return (uint64_t)tcpserver;
 	}
@@ -56,6 +89,8 @@ namespace net
 	{
 		AsioTcpServer* tcpserver = (AsioTcpServer*)server_ptr;
 		tcpserver->Stop();
+
+		// 
 		delete tcpserver;
 		return 0;
 	}
@@ -69,16 +104,14 @@ namespace net
 
 		uint32_t handle = HandlerManager::instance().AllocateHandlerId();
 		auto loop = EventLoopThreadPool::instance().GetNextLoopWithHash(handle);
-		AsioClientHandler* handler = new AsioClientHandler(loop, *queue, handle);
+		std::shared_ptr<AsioClientHandler> handler =std::make_shared<AsioClientHandler>(loop, *queue, handle);
 		if(!handler)
 		{
 			return -1;
 		}
 
-
 		std::string ip(address);
 		auto fn = [handle, handler,headprotol,ud, ip, port, loop](){
-			//std::weak_ptr<AsioClientHandler> wptr(handler);
 			loop->AddHandler(handle,handler);
 			handler->SetMsgHeaderProtocal(headprotol);
 			handler->SetUserData(ud);
@@ -88,10 +121,34 @@ namespace net
 		return handle;
 	}
 
-	static int32_t Asio_SendPacket(uint32_t handle, const char* data, uint16_t size)
+	static int32_t Asio_ConnectWithCb(const char* address, uint16_t port, const NetMessageCallback& cb, uint32_t ping_invent, uint32_t timeout, MsgHeaderProtocal headprotol = nametype, void* ud = nullptr)
+	{
+		uint32_t handle = HandlerManager::instance().AllocateHandlerId();
+		auto loop = EventLoopThreadPool::instance().GetNextLoopWithHash(handle);
+		std::shared_ptr<AsioClientHandler> handler =std::make_shared<AsioClientHandler>(loop,handle);
+		if(!handler)
+		{
+			return -1;
+		}
+
+		handler->SetMessageCb(cb);
+
+		std::string ip(address);
+		auto fn = [handle, handler,headprotol,ud, ip, port, loop](){
+			loop->AddHandler(handle,handler);
+			handler->SetMsgHeaderProtocal(headprotol);
+			handler->SetUserData(ud);
+			handler->AsyncConnect(ip.c_str(), port);
+		};
+		loop->RunInIoService(std::move(fn));
+		return handle;
+	}
+
+	static int32_t Asio_SendPacket(uint32_t handle, const char* data, uint32_t size)
 	{
 		if(size > MAX_PACKET_SIZE)
 		{
+			CloseLink(handle);
 			return -1;
 		}
 
@@ -100,20 +157,20 @@ namespace net
 		{
 			return -1;
 		}
-		
+
+		// TODO(zhangxiaobin): 如何减少内存分配次数,考虑复用buffer.
 		auto packet = std::make_shared<tom::Buffer>();
 		packet->ensureWritableBytes(size);
 		packet->append(data, size);
-		
-
-		auto fn = [handle, packet,size, loop](){
-			auto handler = loop->FetchAsioHandler(handle);
-			if(handler)
-			{
+		auto handler = loop->FetchAsioHandler(handle);
+		if(handler)
+		{
+			auto fn = [handler,packet,size](){
 				handler->SendPacket(packet ,size);
-			}
-		};
-		loop->RunInIoService(std::move(fn));
+			};
+			loop->RunInIoService(std::move(fn));
+
+		}
 		return 0;
 
 	}
@@ -127,7 +184,6 @@ namespace net
 		}
 
 		std::shared_ptr<tom::Buffer> buf = std::make_shared<tom::Buffer>();
-
 		buf->ensureWritableBytes(b1.readableBytes() + b2.readableBytes());
 		buf->append(b1.peek(), b1.readableBytes());
 		buf->append(b2.peek(), b2.readableBytes());
@@ -161,14 +217,11 @@ namespace net
 		{
 			return -1;
 		}
-		auto fn = [handle, loop](){
-			auto handler = loop->FetchAsioHandler(handle);
-			if (handler)
-			{
-				handler->CloseLink(handle);
-			}
-		};
-		loop->RunInIoService(std::move(fn));
+		auto handler = loop->FetchAsioHandler(handle);
+		if (handler)
+		{
+			handler->CloseLink();
+		}
 		return 0;
 	}
 
@@ -193,32 +246,7 @@ namespace net
 
 	static MsgHeaderProtocal Asio_GetLinkMsgHeaderProtocal(uint32_t handle)
 	{
-		#if 0
-		auto handler = HandlerManager::instance().FectHandler(handle);
-		if (handler)
-		{
-			return handler->GetMsgHeaderProtocal();
-		}
-		#endif 
 		return nametype;
-	}
-
-
-	static void Asio_FreeNetPackage(uint32_t handle, const std::shared_ptr<tom::Buffer>& package)
-	{
-		auto loop = EventLoopThreadPool::instance().GetNextLoopWithHash(handle);
-		if(!loop)
-		{
-			return;
-		}
-		auto fn = [handle, loop, package](){
-			auto handler = loop->FetchAsioHandler(handle);
-			if (handler)
-			{
-				handler->FreePackage(package);
-			}
-		};
-		loop->RunInIoService(std::move(fn));
 	}
 
 	static int32_t Asio_LinkReady(uint32_t handle,void* ud)
@@ -229,6 +257,7 @@ namespace net
 			return -1;
 		}
 
+
 		auto fn = [handle, loop, ud](){
 			auto handler = loop->FetchAsioHandler(handle);
 			if(handler)
@@ -238,7 +267,6 @@ namespace net
 			}
 		};
 		loop->RunInIoService(std::move(fn));
-
 		return 0;
 	}
 

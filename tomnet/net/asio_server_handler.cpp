@@ -13,20 +13,53 @@ namespace net {
 		:msgqueue_(queue)
 		, loop_(loop)
 	{
-		channel_.reset(new AsioChannel(loop_, 1024));
+		channel_ = std::make_shared<AsioChannel>(loop_, 1024);
 		channel_->SetMessageCb(std::bind(&AsioServerHandler::OnRecvMessage, this, std::placeholders::_1));
 		channel_->SetErrorCb(std::bind(&AsioServerHandler::OnError, this, std::placeholders::_1));
 		channel_->SetCloseCb(std::bind(&AsioServerHandler::OnDisConnected, this));
+		channel_->SetWriteErrorCb(std::bind(&AsioServerHandler::OnWriteError, this, std::placeholders::_1));
 	}
 
 	AsioServerHandler::~AsioServerHandler()
 	{
-		//channel_.reset();
-		channel_ = nullptr;
+		#ifdef DEBUG_NET
+			printf("%s:%s\n",__FILE__, __FUNCTION__);
+		#endif 
+	}
+
+
+	int32_t AsioServerHandler::OnAccept()
+	{
+
+		handler_ = GetHandler();
+
+		NetContext context;
+		context.handler_ = handler_;
+		context.evetype_ = EVENT_ACCEPT;
+		context.ud_ = nullptr;
+		auto packet = std::make_shared<tom::Buffer>();
+		packet->append(static_cast<const void*>(&context), sizeof(NetContext));
+
+		// ==================
+		// 回调函数存在直接调用它
+		if(messagecb_)
+		{
+			messagecb_(packet);
+		}
+		else if (msgqueue_)
+		{
+			msgqueue_->PushMessage(packet);
+		}
+		auto self = shared_from_this();
+		channel_->RegisterHandler(self);
+		return 0;
 	}
 
 	int32_t AsioServerHandler::OnDisConnected()
 	{
+		#ifdef DEBUG_NET
+		printf("%s:%s:%d\n",__FILE__, __FUNCTION__,__LINE__);
+		#endif 
 		NetContext context;
 		context.handler_ = handler_;
 		context.evetype_ = EVENT_CLOSE;
@@ -34,50 +67,34 @@ namespace net {
 
 		auto packet = std::make_shared<tom::Buffer>();
 		packet->append(static_cast<const void*>(&context), sizeof(NetContext));
-		if (msgqueue_)
+		// ==================
+		// 回调函数存在直接调用它
+		if(messagecb_)
+		{
+			messagecb_(packet);
+		}
+		else if (msgqueue_)
 		{
 			msgqueue_->PushMessage(packet);
 		}
-
-		auto fa = [this](){
-			channel_->Close(handler_);
-		};
-		loop_->RunInIoService(std::move(fa));
-
-		// 回收资源
-
-		auto fb = [this](){
-			uint64_t handle = GetHandler();
-			loop_->RemoveHandler(handle);
-		};
-
-		loop_->RunInIoService(std::move(fb));
-
+		OnError(0);  // 服务端手动对端断开连接的消息,销毁连接
 		return 0;
 	}
 
-	int32_t AsioServerHandler::OnAccept()
-	{
-		handler_ = GetHandler();
-		NetContext context;
-		context.handler_ = handler_;
-		context.evetype_ = EVENT_ACCEPT;
-		context.ud_ = nullptr;
-		auto packet = std::make_shared<tom::Buffer>();
-		packet->append(static_cast<const void*>(&context), sizeof(NetContext));
-		if (msgqueue_)
-		{
-			msgqueue_->PushMessage(packet);
-		}
-		return 0;
-	}
 
 	int32_t AsioServerHandler::OnRecvMessage(const std::shared_ptr<tom::Buffer>& data)
 	{
 		NetContext* context = (NetContext*)data->peek();
 		context->headerprotocal_ = GetMsgHeaderProtocal();
 		context->ud_ = GetUserdata();
-		if (msgqueue_)
+
+		// ==================
+		// 回调函数存在直接调用它
+		if(messagecb_)
+		{
+			messagecb_(data);
+		}
+		else if (msgqueue_)
 		{
 			msgqueue_->PushMessage(data);
 		}
@@ -91,6 +108,24 @@ namespace net {
 
 	int32_t AsioServerHandler::OnError(int32_t error)
 	{
+		#ifdef DEBUG_NET
+		printf("%s:%s\n",__FILE__, __FUNCTION__);
+		#endif
+
+		auto self = shared_from_this();
+		auto fa = [self](){
+			auto handler = std::dynamic_pointer_cast<AsioServerHandler>(self);
+			handler->channel_->CloseSocket();
+		};
+		loop_->RunInIoService(fa);
+
+		uint64_t handle = GetHandler();
+		auto fb = [self, handle](){
+			auto handler = std::dynamic_pointer_cast<AsioServerHandler>(self);
+			handler->loop_->RemoveHandler(handle);
+		};
+		loop_->RunInIoService(fb);
+
 		return 0;
 	}
 
@@ -110,49 +145,104 @@ namespace net {
 		return channel_->Socket();
 	}
 
-	int32_t AsioServerHandler::SendPacket(const char* data, uint16_t size)
+	int32_t AsioServerHandler::SendPacket(const char* data, uint32_t size)
 	{
 		int32_t ret = channel_->SendPacket(data, size);
 		return ret;
 	}
 
-	int32_t AsioServerHandler::SendPacket(const std::shared_ptr<tom::Buffer>& pPacket, uint16_t size)
+	int32_t AsioServerHandler::SendPacket(const std::shared_ptr<tom::Buffer>& pPacket, uint32_t size)
 	{
 		int32_t ret = channel_->SendPacket(pPacket, size);
 		return ret;
 	}
 
-	void AsioServerHandler::CloseLink(uint32_t handle)
+	void AsioServerHandler::CloseLink()
 	{
-		if(handle != handler_)
-		{
-			return;
-		}
-		auto fn = [this]() {
-			channel_->Close(handler_);
-		};
-		
-		assert(loop_ != nullptr);
-		loop_->RunInIoService(std::move(fn));
+		// 服务器主动断开时在向上通知EVENT_CLOSE事件
+		#ifdef DEBUG_NET
+		printf("%s:%s:%d\n",__FILE__, __FUNCTION__,__LINE__);
+		#endif
+		NetContext context;
+		context.handler_ = handler_;
+		context.evetype_ = EVENT_CLOSE;
+		context.ud_ = GetUserdata();
 
-		//HandlerManager::instance().LinkDown(handler_);
-	}
-	
-	void AsioServerHandler::FreePackage(const std::shared_ptr<tom::Buffer>& package)
-	{
-		channel_->FreePackage(package);
+		auto packet = std::make_shared<tom::Buffer>();
+		packet->append(static_cast<const void*>(&context), sizeof(NetContext));
+		// ==================
+		// 回调函数存在直接调用它
+		if(messagecb_)
+		{
+			messagecb_(packet);
+		}
+		else if (msgqueue_)
+		{
+			msgqueue_->PushMessage(packet);
+		}
+
+		auto self = shared_from_this();
+		auto fa = [self](){
+			auto handler = std::dynamic_pointer_cast<AsioServerHandler>(self);
+			handler->channel_->CloseSocket();
+		};
+		loop_->RunInIoService(fa);
+
+		uint64_t handle = GetHandler();
+		auto fb = [self, handle](){
+			auto handler = std::dynamic_pointer_cast<AsioServerHandler>(self);
+			handler->loop_->RemoveHandler(handle);
+		};
+		loop_->RunInIoService(fb);
+
 	}
 
 	int32_t AsioServerHandler::LinkReady()
 	{
-		auto fn = [this]() {
-			channel_->SetHandler(handler_);
-			channel_->Start();
-		};
-		
-		assert(loop_ != nullptr);
-		loop_->RunInIoService(std::move(fn));
+		channel_->SetHandler(handler_);
+		channel_->Start();
 		return 0;
+	}
+
+	void AsioServerHandler::CleanChannelCallback()
+	{
+		channel_->CleanCallback();
+	}
+	
+	void AsioServerHandler::OnWriteError(int32_t error)
+	{
+		auto self = shared_from_this();
+		auto fa = [self](){
+			auto handler = std::dynamic_pointer_cast<AsioServerHandler>(self);
+			handler->channel_->CloseSocket();
+		};
+		loop_->RunInIoService(fa);
+
+		uint64_t handle = GetHandler();
+		auto fb = [self, handle](){
+			auto handler = std::dynamic_pointer_cast<AsioServerHandler>(self);
+			handler->loop_->RemoveHandler(handle);
+		};
+		loop_->RunInIoService(fb);
+	}
+
+	bool AsioServerHandler::PostPacketToUpstream(const std::shared_ptr<tom::Buffer>& packet)
+	{
+		bool ret = true;
+		if(messagecb_)
+		{
+			messagecb_(packet);
+		}
+		else if (msgqueue_)
+		{
+			msgqueue_->PushMessage(packet);
+		}
+		else
+		{
+			printf("TomNet AsioServerHandler PostUpstreamPacket Error Handle %d ", GetHandler());
+			ret = false;
+		}
+		return ret;
 	}
 
 }

@@ -25,23 +25,16 @@ namespace tom
 
 		AsioChannel::~AsioChannel()
 		{
-			std::cerr << "~AsioChannel" << '\n';
-			std::shared_ptr<tom::Buffer> next;
-			while (wbufferlist_.try_dequeue(next))
+		#ifdef DEBUG_NET
+			printf("%s:%s\n",__FILE__, __FUNCTION__);
+		#endif 
+			while (!waitwriteq_.empty())
 			{
-				if(next)
-				{
-					next.reset();
-				}
+				auto pkg = waitwriteq_.front(); 
+				waitwriteq_.pop();
+				pkg = nullptr;
 			}
 
-			while (freepacket_.try_dequeue(next))
-			{
-				if(next)
-				{
-					next.reset();
-				}
-			}
 		}
 
 		void AsioChannel::Connect(const std::string& ip, uint16_t port, bool tryconnect)
@@ -51,15 +44,25 @@ namespace tom
 
 			std::error_code ec;
 			asio::ip::address_v4 addr(asio::ip::address_v4::from_string(ip, ec));
+			auto self = shared_from_this();
 			socket_.async_connect(asio::ip::tcp::endpoint(addr, port),
-				[tryconnect, self = shared_from_this()](const std::error_code& error)
+				[self, tryconnect](const std::error_code& error)
 			{
 
-				if(error && self->connectedcb_)
+				if(error)
 				{
-					self->connectedcb_(EVENT_CONNECT_FAIL);
+					auto handptr = self->handleweakptr_.lock();
+					if(self->connectedcb_ && handptr)
+					{
+						self->connectedcb_(EVENT_CONNECT_FAIL);
+					}
+
+					printf("TomNet AsioChannel Connect %d, Error %d ", self->handler_, error.value());
+					return;
 				}
-				else if(self->connectedcb_)
+
+				auto handptr = self->handleweakptr_.lock();
+				if(self->connectedcb_ && handptr)
 				{
 					self->Start();
 					self->connectedcb_(EVENT_CONNECT_SUCCESS); 
@@ -74,25 +77,41 @@ namespace tom
 
 		void AsioChannel::AsyncReadError(const std::error_code& err)
 		{
+			
 			switch(err.value())
 			{
 			case asio::error::connection_reset:
 			case asio::error::eof:
-			case asio::error::operation_aborted:
-			case asio::error::bad_descriptor:
-			case asio::error::connection_aborted:
 			{
-				recycle_.store(true);
-				CloseSocket();
-				if(disconnectcb_)
+				printf("TomNet AsioChannel AsyncReadError %d, %s", handler_, err.message().c_str());
+				auto handptr = handleweakptr_.lock();
+				if(disconnectcb_ && handptr)
 				{
 					disconnectcb_();
 				}
-
-				if(reconnectedcb_)
+				
+				if(reconnectedcb_ && handptr)
 				{
-					DoReConnect(remoteip_, remoteport_);
+					// 客户端默认设置重连回调函数
+					CloseSocket();
+					auto self = shared_from_this();
+					auto fn = [self](){
+						self->DoReConnect(self->remoteip_, self->remoteport_);
+					};
+					loop_->RunInIoService(fn);
 				}
+			}
+			break;
+			case asio::error::bad_descriptor:
+			case asio::error::connection_aborted:
+			case asio::error::operation_aborted:
+			{
+				auto handptr = handleweakptr_.lock();
+				if( errorcb_ && handptr)
+				{
+					errorcb_(err.value());
+				}
+				printf("TomNet AsioChannel AsyncReadError %d, %d", handler_, err.message().c_str());
 			}
 			break;
 			default:
@@ -102,107 +121,96 @@ namespace tom
 
 		void AsioChannel::SetSocketOpt()
 		{
-			try 
+			try
 			{
 				asio::ip::tcp::no_delay no_delay(true);
 				socket_.set_option(no_delay);
-				asio::socket_base::receive_buffer_size recvbuf(SOCKET_BUFSIZE);
+				asio::socket_base::receive_buffer_size recvbuf(MAX_PACKET_SIZE);
 				socket_.set_option(recvbuf);
-				asio::socket_base::send_buffer_size sendbuf(SOCKET_BUFSIZE);
+				asio::socket_base::receive_buffer_size sendbuf(MAX_PACKET_SIZE);
 				socket_.set_option(sendbuf);
 				asio::socket_base::reuse_address reuse(true);
 				socket_.set_option(reuse);
 				socket_.non_blocking(true);
-				asio::socket_base::keep_alive keepalive(true);
-				socket_.set_option(keepalive);
 			}
 			catch(const std::system_error& e)
 			{
-				std::cerr << e.what() << '\n';
+				printf("TomNet AsioChannel SetSocketOpt %d, Error %s", handler_, e.what() );
 			}
+			
 		}
 
-        void AsioChannel::ResetBuffer()
-		{
-			recvbuf_.retrieveAll();
-		}
 
 		void AsioChannel::Start()
 		{
-			if (!start_)
+			if (socket_.is_open())
 			{
 				SetSocketOpt();
 				tid_ = std::this_thread::get_id();
-			    ResetBuffer();	
 				AsyncRead();
 				start_ = true;
-
-#ifdef  TOM_NET_TRAFFIC
-				NetworkTraffic::instance().FetchAddLinks();
-#endif 
+			}
+			else 
+			{
+				printf("TomNet AsioChannel Repeat Start Error %d", handler_);
 			}
 		}
 
 		void AsioChannel::AsyncRead()
 		{
+			auto self = shared_from_this(); 
 			socket_.async_read_some(asio::buffer(inputbuf_),
-				[self = shared_from_this()](const std::error_code& err, size_t readsize)
+			[self](const std::error_code& err, size_t readsize)
 			{
-				try
+				if (err)
 				{
-					if (err)
-					{
-						self->AsyncReadError(err);
-						return;
-					}
-					self->recvbuf_.append(self->inputbuf_.data(), readsize);
-					self->AsyncRead();
-					self->TryCeneratePacket();
+					self->AsyncReadError(err);
+					return;
 				}
-				catch(const std::system_error& e)
-				{
-					std::cerr << e.what() << '\n';
-				}
+
+				self->recvbuf_.append(self->inputbuf_.data(), readsize);
+				self->AsyncRead();
+				self->TryCeneratePacket();
 			});
 		}
 
 		void AsioChannel::TryCeneratePacket()
 		{
-			int readable = recvbuf_.readableBytes();
-
-			while (readable > sizeof(int))
+			int32_t readable = recvbuf_.readableBytes();
+			while (readable > sizeof(int32_t))
 			{
-				int packetlen = recvbuf_.peekInt32();
-				if (readable < packetlen + sizeof(int))
+				int32_t packetlen = recvbuf_.peekInt32();
+				if (packetlen < 0 || packetlen > MAX_PACKET_SIZE)
 				{
-					break;
+					auto handptr = handleweakptr_.lock();
+					if(disconnectcb_ && handptr)
+					{
+						disconnectcb_();
+					}
+					return;
 				}
 
-				if (packetlen > 64 * 1024)
+				if (readable < packetlen + sizeof(int32_t))
 				{
 					break;
 				}
 
 				packetlen = recvbuf_.readInt32();
-
 				NetContext context;
 				context.handler_ = handler_;
 				context.evetype_ = EVENT_NETMSG;
 				context.headerprotocal_ = nametype;
 				context.ud_ = nullptr;
 
-				std::shared_ptr<tom::Buffer> post = FethFreePackage();
-				if(!post)
-				{
-					post = std::make_shared<tom::Buffer>();
-				}
-				post->ensureWritableBytes(sizeof(NetContext) + packetlen + sizeof(int));
-				post->append(static_cast<const void*>(&context), sizeof(NetContext));
-				post->appendInt32(packetlen);
-				post->append(recvbuf_.peek(), packetlen);
+				auto package = std::make_shared<tom::Buffer>();
+				package->ensureWritableBytes(sizeof(NetContext) + packetlen + sizeof(int32_t));
+				package->append(static_cast<const void*>(&context), sizeof(NetContext));
+				package->appendInt32(packetlen);
+				package->append(recvbuf_.peek(), packetlen);
 				recvbuf_.retrieve(packetlen);
+
 				readable = recvbuf_.readableBytes();
-				PostPacket(post);
+				PostPacket(package);
 			}
 		}
 
@@ -213,11 +221,9 @@ namespace tom
 			{
 			case EVENT_NETMSG:
 			{
-				if (messagecb_)
+				auto handptr = handleweakptr_.lock();
+				if (messagecb_ && handptr)
 				{
-#ifdef  TOM_NET_TRAFFIC
-					NetworkTraffic::instance().FetchAddPostMsg();
-#endif 
 					messagecb_(packet);
 				}
 				failed_count_ = failed_count_ > 0 ? (failed_count_ - 1) : 0;
@@ -231,14 +237,11 @@ namespace tom
 		}
 
 
-		int32_t AsioChannel::SendPacket(const char* data, uint16_t size)
+		int32_t AsioChannel::SendPacket(const char* data, uint32_t size)
 		{
-			if (size > MAX_PACKET_SIZE)
+			if(closeing_.load())
 			{
-				if (errorcb_)
-				{
-					errorcb_( TOM_NET_ERROR_PACKET_INVALID);
-				}
+				// 正在关闭禁止发包
 				return -1;
 			}
 			
@@ -246,49 +249,35 @@ namespace tom
 			packet->ensureWritableBytes(size);
 			packet->append(data, size);
  
-
-			auto fn = [self = shared_from_this(), packet]()
+			if (sendding_.load())
 			{
-				if (self->sendding_.load())
-				{
-					self->wbufferlist_.enqueue(packet);
-				}
-				else
-				{
-					self->AsyncSendData(packet);
-				}
-			};
-
-			loop_->RunInIoService(std::move(fn));
-
+				waitwriteq_.push(packet);
+			}
+			else
+			{
+				AsyncSendData(packet);
+			}
 			return 0;
 		}
 
 		int32_t AsioChannel::SendPacket(const std::shared_ptr<tom::Buffer>& packet, uint16_t size)
 		{
-			if (size > MAX_PACKET_SIZE)
+
+			if(closeing_.load())
 			{
-				if (errorcb_)
-				{
-					errorcb_( TOM_NET_ERROR_PACKET_INVALID);
-				}
+				// 正在关闭禁止发包
 				return -1;
 			}
- 
-			
-			auto fn = [self = shared_from_this(), packet]()
-			{
-				if (self->sendding_.load())
-				{
-					self->wbufferlist_.enqueue(packet);
-				}
-				else
-				{
-					self->AsyncSendData(packet);
-				}
-			};
 
-			loop_->RunInIoService(std::move(fn));
+
+			if (sendding_.load())
+			{
+				waitwriteq_.push(packet);
+			}
+			else
+			{
+				AsyncSendData(packet);
+			}
 
 			return 0;
 		}
@@ -298,14 +287,16 @@ namespace tom
 		{
 			if (error)
 			{
-				if (errorcb_)
+				auto handptr = handleweakptr_.lock();
+				if(socketwriteerrcb_ && handptr)
 				{
-					//errorcb_(error.value());
+					socketwriteerrcb_(error.value());
 				}
 
+				printf("TomNet AsioChannel AsyncWriteSomeCallback  %d, Error %d", handler_, error.value() );
 				return;
 			}
-
+ 
 			if (writen < packet->readableBytes())
 			{
 				packet->retrieve(writen);
@@ -313,27 +304,26 @@ namespace tom
 			}
 			else
 			{
-				if (wbufferlist_.size_approx() != 0)
+				if(!waitwriteq_.empty())
 				{
-					std::shared_ptr<tom::Buffer> next;
-					wbufferlist_.try_dequeue(next);
-					if(next)
-					{
-						AsyncSendData(next);
-					}
+					auto next = waitwriteq_.front();
+					waitwriteq_.pop();
+					AsyncSendData(next);
 				}
 				else
 				{
 					sendding_.store(false);
 				}
 			}
+
 		}
 
 		void AsioChannel::AsyncSendData(const std::shared_ptr<tom::Buffer>& packet)
 		{
 			sendding_.store(true);
+			auto self = shared_from_this();
 			socket_.async_write_some(asio::buffer(packet->peek(), packet->readableBytes()),
-				[self = shared_from_this(), packet](const std::error_code& err, std::size_t writen)
+				[self, packet](const std::error_code& err, std::size_t writen)
 				{
 					self->AsyncWriteSomeCallback(err,packet,writen);
 				});
@@ -341,18 +331,19 @@ namespace tom
 
 		void AsioChannel::DoReConnect(const std::string& ip, uint16_t port)
 		{ 
-			recvbuf_.retrieveAll();
 			start_ = false;
 			std::error_code ec;
 			asio::ip::address_v4 addr(asio::ip::address_v4::from_string(ip, ec));
-
+			auto self = shared_from_this();
 			socket_.async_connect(asio::ip::tcp::endpoint(addr, port),
-				[self = shared_from_this(), ip, port](const std::error_code& error){
+				[self, ip, port](const std::error_code& error){
 				if (!error)
 				{
 					self->reconnectimer_.cancel();
+					//self->closeing_.store(false);
 					self->Start();
-					if(self->reconnectedcb_)
+					auto handptr = self->handleweakptr_.lock();
+					if(self->reconnectedcb_ && handptr)
 					{
 						self->reconnectedcb_(EVENT_RECONNECTED); 
 					}
@@ -368,64 +359,70 @@ namespace tom
 		void AsioChannel::DelayReConnect(const std::string& ip, uint16_t port)
 		{
 			reconnectimer_.expires_from_now(std::chrono::milliseconds(RECONNECTTIME));
+			auto self = shared_from_this();
 			reconnectimer_.async_wait(
-				[self = shared_from_this(), ip, port](const std::error_code& error)
+				[self, ip, port](const std::error_code& error)
 			{
 				self->DoReConnect(ip ,port);
 			});
 
 		}
 
+		
 		void AsioChannel::CloseSocket()
 		{
-			//socket_.cancel();
-			auto fn = [this]()
+			try
 			{
-				handler_ = 0;
-				std::error_code err;
-				socket_.shutdown(asio::ip::tcp::socket::shutdown_both, err);
-				socket_.close();
-			};
-			loop_->RunInIoService(std::move(fn));
-		}
-
-		void AsioChannel::Close(uint32_t handle)
-		{
-			//socket_.cancel();
-			auto fn = [this]()
-			{
-				handler_ = 0;
-				std::error_code err;
-				socket_.shutdown(asio::ip::tcp::socket::shutdown_both, err);
-				socket_.close();
-			};
-			loop_->RunInIoService(std::move(fn));
-		}
-
-		void AsioChannel::FreePackage(const std::shared_ptr<tom::Buffer>& package)
-		{
-			return ;
-			package->retrieveAll();
-			if (!freepacket_.enqueue(package))
-			{
-				// error
+				#ifdef DEBUG_NET
+				printf("%s:%s:%d\n",__FILE__, __FUNCTION__,__LINE__);
+				#endif 
+				if(socket_.is_open() && !closeing_.load())
+				{
+					#ifdef DEBUG_NET
+					printf("%s:%s:%d\n",__FILE__, __FUNCTION__,__LINE__);
+					#endif 
+					printf("TomNet AsioChannel CloseSocket %d", handler_);
+					closeing_.store(true);
+					auto self = shared_from_this();
+					socket_.cancel();
+					std::error_code shutdownerr;
+					self->socket_.shutdown(asio::ip::tcp::socket::shutdown_both, shutdownerr);
+					if(shutdownerr)
+					{
+						#ifdef DEBUG_NET
+						// shutdownerr.value() = 107
+						printf("%s:%s:%d, %d, %d \n",__FILE__, __FUNCTION__,__LINE__,shutdownerr.value(), self->handler_);
+						#endif 
+						printf("TomNet AsioChannel CloseSocket %d, Socket ShutDown Error %d", handler_, shutdownerr.value());
+					}
+					std::error_code closeerr;
+					self->socket_.close(closeerr);
+					if(closeerr)
+					{
+						#ifdef DEBUG_NET
+						printf("%s:%s:%d, %d ,%d \n",__FILE__, __FUNCTION__,__LINE__,closeerr.value(), self->handler_);
+						#endif 
+						printf("TomNet AsioChannel CloseSocket %d, Socket Close Error %d", handler_, closeerr.value());
+					}
+				}
 			}
-			else {
-				freeqsize_.fetch_add(1);
-			}
-		}
-
-		std::shared_ptr<tom::Buffer> AsioChannel::FethFreePackage()
-		{
-
-			std::shared_ptr<tom::Buffer> empty;
-			if (freeqsize_.load() > 0)
+			catch(const std::system_error& e)
 			{
-				freepacket_.try_dequeue(empty);
-				freeqsize_.fetch_sub(1);
+				printf("TomNet AsioChannel CloseSocket Catch Error %s", e.what());
 			}
-			return empty;
+			
 		}
+
+		// 关闭服务器时清理回调
+		void AsioChannel::CleanCallback()
+		{
+			connectedcb_ = nullptr;
+			reconnectedcb_ = nullptr;
+			messagecb_ = nullptr;
+			errorcb_ = nullptr;
+			disconnectcb_ = nullptr;
+		}
+
 }
 
 }

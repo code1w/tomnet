@@ -11,8 +11,7 @@ namespace tom {
 class Buffer;
 namespace net {
 	class AsioEventLoop;
-	class AsioClientHandler : public AsiokHandler, 
-		std::enable_shared_from_this<AsioClientHandler>
+	class AsioClientHandler : public AsiokHandler
 	{
 	private:
 		asio::steady_timer timer_;
@@ -25,6 +24,7 @@ namespace net {
 
 	public:
 		AsioClientHandler(AsioEventLoop* loop, IMessageQueue* queue, uint32_t handle);
+		AsioClientHandler(AsioEventLoop* loop, uint32_t handle);
 		~AsioClientHandler();
 
 	public:
@@ -32,19 +32,19 @@ namespace net {
 		 int32_t OnRecvMessage(const std::shared_ptr<tom::Buffer>& msg);
 		 int32_t OnSendMessage(const std::shared_ptr<tom::Buffer>& msg);
 		 int32_t OnError(int32_t error);
+		 void OnWriteError(int32_t error);
 		 int32_t OnConnected(uint32_t);
 		 int32_t OnDisConnected();
 		 int32_t OnReConnected(uint32_t);
-		 int32_t SendPacket(const char* data, uint16_t size);
-	     int32_t SendPacket(const std::shared_ptr<tom::Buffer>& pPacket, uint16_t size);
-
-		 void  CloseLink(uint32_t handle);
+		 int32_t SendPacket(const char* data, uint32_t size);
+		 int32_t SendPacket(const std::shared_ptr<tom::Buffer>& pPacket, uint32_t size);
+		 void    CloseLink();
 		 void  SetHandler(uint32_t handler);
 		uint64_t AsyncConnect(const char* addr, uint16_t port);
-		 void FreePackage(const std::shared_ptr<tom::Buffer>&);
+		void CleanChannelCallback();
+		bool PostPacketToUpstream(const std::shared_ptr<tom::Buffer>& packet);
 
 	};
-
 }
 }
 
