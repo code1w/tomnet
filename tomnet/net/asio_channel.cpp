@@ -69,7 +69,7 @@ namespace tom
 			return socket_;
 		}
 
-		void AsioChannel::AsyncReadError(const std::error_code& err)
+		void AsioChannel::HandleReadError(const std::error_code& err)
 		{
 			
 			switch(err.value())
@@ -152,20 +152,21 @@ namespace tom
 
 		void AsioChannel::AsyncRead()
 		{
-			auto self = shared_from_this(); 
 			socket_.async_read_some(asio::buffer(inputbuf_),
-			[self](const std::error_code& err, size_t readsize)
-			{
-				if (err)
-				{
-					self->AsyncReadError(err);
-					return;
-				}
+				std::bind(&AsioChannel::HandleRead, shared_from_this(), std::placeholders::_1, std::placeholders::_2));
+		}
 
-				self->recvbuf_.append(self->inputbuf_.data(), readsize);
-				self->AsyncRead();
-				self->TryCeneratePacket();
-			});
+		void AsioChannel::HandleRead(const std::error_code& error, size_t readsize)
+		{
+			if (error)
+			{
+				HandleReadError(error);
+				return;
+			}
+
+			recvbuf_.append(inputbuf_.data(), readsize);
+			AsyncRead();
+			TryCeneratePacket();
 		}
 
 		void AsioChannel::TryCeneratePacket()
@@ -237,8 +238,6 @@ namespace tom
 			{
 				return -1;
 			}
-			
-			
 			writebuf_.ensureWritableBytes(size);
 			writebuf_.append(data, size);
 			AsyncSendData();
@@ -249,7 +248,6 @@ namespace tom
 		{
 			if(closeing_.load())
 			{
-				// 正在关闭禁止发包
 				return -1;
 			}
 			writebuf_.ensureWritableBytes(packet->readableBytes());
@@ -259,7 +257,7 @@ namespace tom
 		}
 
 
-		void  AsioChannel::AsyncWriteSomeCallback(const std::error_code& error, std::size_t writen)
+		void  AsioChannel::HandleWrite(const std::error_code& error, std::size_t writen)
 		{
 			if (error)
 			{
@@ -283,12 +281,8 @@ namespace tom
 
 		void AsioChannel::AsyncSendData()
 		{
-			auto self = shared_from_this();
 			socket_.async_write_some(asio::buffer(writebuf_.peek(), writebuf_.readableBytes()),
-				[self](const std::error_code& err, std::size_t writen)
-				{
-					self->AsyncWriteSomeCallback(err,writen);
-				});
+				std::bind(&AsioChannel::HandleWrite, shared_from_this(), std::placeholders::_1, std::placeholders::_2));
 		}
 
 		void AsioChannel::DoReConnect(const std::string& ip, uint16_t port)

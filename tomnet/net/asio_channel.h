@@ -38,31 +38,33 @@ namespace tom
 			asio::ip::tcp::socket socket_;
 			std::size_t  block_size_;
 			uint32_t failed_count_ = 0; 
-			MessageHeader headerbuffer_{0,0};
 			tom::Buffer recvbuf_;
 			std::array<char, 4096> inputbuf_;
 			tom::Buffer writebuf_;
 			uint32_t handler_ = 0;
 			std::thread::id tid_;
+
 			ConnectedCallback connectedcb_;
 			ConnectedCallback reconnectedcb_;
 			NetMessageCallback messagecb_;
 			NetErrorCallback errorcb_;
 			NetCloseCallback disconnectcb_;
 			NetWriteErrorCallback socketwriteerrcb_;
+
 			std::weak_ptr<AsiokHandler> handleweakptr_;
 			int32_t nsize_ = 0;
 			std::string remoteip_;
 			uint16_t remoteport_;
 			asio::steady_timer reconnectimer_;
-
 			std::atomic<bool> start_{ false };
 			std::atomic<bool> closeing_{ false };
 		private:
 			uint32_t PostPacket(const std::shared_ptr<tom::Buffer>& packet);
-			void AsyncWriteSomeCallback(const std::error_code& error,  std::size_t bytes_transferred);
+			void HandleRead(const std::error_code& error,  std::size_t bytes_transferred);
+			void HandleReadError(const std::error_code& error);
+			void HandleWrite(const std::error_code& error,  std::size_t bytes_transferred);
+			void HandleConnect(const std::error_code& error);
 			void AsyncSendData();
-			void AsyncReadError(const std::error_code& error);
 		public:
 		 	AsioChannel(AsioEventLoop* loop, std::size_t block_size);
 			~AsioChannel();
