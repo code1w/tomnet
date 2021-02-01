@@ -22,6 +22,7 @@
 #include <queue>
 #include <functional>
 #include <array>
+#include <list>
 #include "asio_handler.h"
 
 namespace tom
@@ -40,7 +41,7 @@ namespace tom
 			uint32_t failed_count_ = 0; 
 			tom::Buffer recvbuf_;
 			std::array<char, 4096> inputbuf_;
-			tom::Buffer writebuf_;
+			std::list<std::shared_ptr<tom::Buffer>> sendbuffer_;
 			uint32_t handler_ = 0;
 			std::thread::id tid_;
 
@@ -58,13 +59,14 @@ namespace tom
 			asio::steady_timer reconnectimer_;
 			std::atomic<bool> start_{ false };
 			std::atomic<bool> closeing_{ false };
+			bool issending_=false;
 		private:
 			uint32_t PostPacket(const std::shared_ptr<tom::Buffer>& packet);
 			void HandleRead(const std::error_code& error,  std::size_t bytes_transferred);
 			void HandleReadError(const std::error_code& error);
-			void HandleWrite(const std::error_code& error,  std::size_t bytes_transferred);
+			void HandleWrite(const std::error_code& error,  std::size_t actuallen, std::shared_ptr<tom::Buffer> packet);
 			void HandleConnect(const std::error_code& error);
-			void AsyncSendData();
+			void AsyncSendData(std::shared_ptr<tom::Buffer>);
 		public:
 		 	AsioChannel(AsioEventLoop* loop, std::size_t block_size);
 			~AsioChannel();
@@ -73,7 +75,7 @@ namespace tom
 			void Connect(const std::string& ip, uint16_t port, bool tryconnect = false);
 			void Start();
 			int32_t SendPacket(const char* data, uint32_t len);
-			int32_t SendPacket(const std::shared_ptr<tom::Buffer>& pPacket, uint16_t size);
+			int32_t SendPacket(std::shared_ptr<tom::Buffer> packet, uint16_t size);
 			bool IsConnect() {return handler_ == 0;	}
 			void SetHandler(uint32_t handler) { handler_ = handler; }
 			void Close(uint32_t handle);

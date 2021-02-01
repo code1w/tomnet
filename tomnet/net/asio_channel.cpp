@@ -238,26 +238,39 @@ namespace tom
 			{
 				return -1;
 			}
-			writebuf_.ensureWritableBytes(size);
-			writebuf_.append(data, size);
-			AsyncSendData();
+			auto packet = std::make_shared<tom::Buffer>();
+			packet->ensureWritableBytes(size);
+			packet->append(data);
+			if(issending_)
+			{
+					sendbuffer_.push_back(packet);
+			}
+			else
+			{
+					AsyncSendData(packet);
+			}
 			return 0;
 		}
 
-		int32_t AsioChannel::SendPacket(const std::shared_ptr<tom::Buffer>& packet, uint16_t size)
+		int32_t AsioChannel::SendPacket(std::shared_ptr<tom::Buffer> packet, uint16_t size)
 		{
 			if(closeing_.load())
 			{
 				return -1;
 			}
-			writebuf_.ensureWritableBytes(packet->readableBytes());
-			writebuf_.append(packet->peek(), packet->readableBytes());
-			AsyncSendData();
+			if(issending_)
+			{
+					sendbuffer_.push_back(packet);
+			}
+			else
+			{
+					AsyncSendData(packet);
+			}
 			return 0;
 		}
 
 
-		void  AsioChannel::HandleWrite(const std::error_code& error, std::size_t writen)
+		void  AsioChannel::HandleWrite(const std::error_code& error, std::size_t actuallen, std::shared_ptr<tom::Buffer> package)
 		{
 			if (error)
 			{
@@ -270,19 +283,42 @@ namespace tom
 				printf("GameshNet AsioChannel AsyncWriteSomeCallback  %d, Error %d", handler_, error.value() );
 				return;
 			}
- 
-			writebuf_.retrieve(writen);
-			if(writebuf_.readableBytes() > 0)
+			if(actuallen != package->readableBytes())
 			{
-				AsyncSendData();
+				auto handptr = handleweakptr_.lock();
+				if(socketwriteerrcb_ && handptr)
+				{
+					socketwriteerrcb_(error.value());
+				}
+				printf("GameshNet AsioChannel AsyncWriteSomeCallback  %d, Error %d", handler_, error.value() );
+				return;
 			}
+
+			if(sendbuffer_.size() > 0)
+			{
+					auto it = sendbuffer_.front();
+					sendbuffer_.pop_front();
+					AsyncSendData(it);
+			}
+			else
+			{
+					issending_ = false;
+			}
+
+	
 
 		}
 
-		void AsioChannel::AsyncSendData()
+		void AsioChannel::AsyncSendData(std::shared_ptr<tom::Buffer> package)
 		{
-			socket_.async_write_some(asio::buffer(writebuf_.peek(), writebuf_.readableBytes()),
-				std::bind(&AsioChannel::HandleWrite, shared_from_this(), std::placeholders::_1, std::placeholders::_2));
+			issending_=true;
+			auto self(shared_from_this());
+			asio::async_write(
+						socket_, 
+						asio::buffer(package->peek(), package->readableBytes()),
+						[this, self, package](const std::error_code& ec, size_t actuallen){
+						HandleWrite(ec, actuallen, package);
+						});
 		}
 
 		void AsioChannel::DoReConnect(const std::string& ip, uint16_t port)
