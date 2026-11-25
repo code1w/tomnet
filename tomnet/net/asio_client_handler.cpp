@@ -154,8 +154,10 @@ namespace net {
 		//printf("%s:%s\n",__FILE__, __FUNCTION__);
 		printf("TomNet AsioClientHandler OnError %d ", error);
 		uint64_t handle = GetHandler();
-		auto fn = [this, handle](){
-			loop_->RemoveHandler(handle);
+		// 不能直接捕获 this: 投递出去后 handler 可能已被其它路径销毁
+		auto self = std::dynamic_pointer_cast<AsioClientHandler>(shared_from_this());
+		auto fn = [self, handle](){
+			self->loop_->RemoveHandler(handle);
 		};
 		loop_->RunInIoService(fn);
 		return 0;

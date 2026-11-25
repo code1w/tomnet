@@ -158,7 +158,6 @@ namespace net
 			return -1;
 		}
 
-		// TODO(zhangxiaobin): 如何减少内存分配次数,考虑复用buffer.
 		auto packet = std::make_shared<tom::Buffer>();
 		packet->ensureWritableBytes(size);
 		packet->append(data, size);
@@ -217,11 +216,14 @@ namespace net
 		{
 			return -1;
 		}
-		auto handler = loop->FetchAsioHandler(handle);
-		if (handler)
-		{
-			handler->CloseLink();
-		}
+		auto fn = [handle, loop](){
+			auto handler = loop->FetchAsioHandler(handle);
+			if (handler)
+			{
+				handler->CloseLink();
+			}
+		};
+		loop->RunInIoService(std::move(fn));
 		return 0;
 	}
 

@@ -105,10 +105,37 @@ namespace tom
 				{
 					errorcb_(err.value());
 				}
-				printf("TomNet AsioChannel AsyncReadError %d, %d", handler_, err.message().c_str());
+				printf("TomNet AsioChannel AsyncReadError %d, %s", handler_, err.message().c_str());
 			}
 			break;
 			default:
+			{
+				// 其它错误(如 ETIMEDOUT、WSAECONNRESET 变体等)按连接失效处理,
+				// 否则连接会一直留在 handlers_ 里泄漏
+				printf("TomNet AsioChannel AsyncReadError %d, %d, %s", handler_, err.value(), err.message().c_str());
+				auto handptr = handleweakptr_.lock();
+				if(!handptr)
+				{
+					return;
+				}
+				if(disconnectcb_)
+				{
+					disconnectcb_();
+				}
+				if(reconnectedcb_)
+				{
+					CloseSocket();
+					auto self = shared_from_this();
+					auto fn = [self](){
+						self->DoReConnect(self->remoteip_, self->remoteport_);
+					};
+					loop_->RunInIoService(fn);
+				}
+				else
+				{
+					CloseSocket();
+				}
+			}
 			break;
 			}
 		}
@@ -177,6 +204,8 @@ namespace tom
 				int32_t packetlen = recvbuf_.peekInt32();
 				if (packetlen < 0 || packetlen > MAX_PACKET_SIZE)
 				{
+					printf("TomNet AsioChannel Bad PacketLen %d, %d", handler_, packetlen);
+					CloseSocket();
 					auto handptr = handleweakptr_.lock();
 					if(disconnectcb_ && handptr)
 					{
@@ -240,7 +269,7 @@ namespace tom
 			}
 			auto packet = std::make_shared<tom::Buffer>();
 			packet->ensureWritableBytes(size);
-			packet->append(data);
+			packet->append(data, size);
 			if(issending_)
 			{
 					sendbuffer_.push_back(packet);
@@ -274,6 +303,10 @@ namespace tom
 		{
 			if (error)
 			{
+				// 写失败后 socket 状态不可信,清空发送队列避免 issending_ 卡死、
+				// 队列无限增长
+				sendbuffer_.clear();
+				issending_ = false;
 				auto handptr = handleweakptr_.lock();
 				if(socketwriteerrcb_ && handptr)
 				{
@@ -332,7 +365,7 @@ namespace tom
 				if (!error)
 				{
 					self->reconnectimer_.cancel();
-					//self->closeing_.store(false);
+					self->closeing_.store(false);
 					self->Start();
 					auto handptr = self->handleweakptr_.lock();
 					if(self->reconnectedcb_ && handptr)

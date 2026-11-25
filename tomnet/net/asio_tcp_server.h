@@ -21,9 +21,11 @@ namespace tom
 		{
 		private:
 			uint32_t max_connect_;
-			std::shared_ptr<asio::ip::tcp::acceptor> acceptorptr_; 
 			AsioEventLoop* loop_;
 			EventLoopThread accept_thread_loop_;
+			// acceptor 绑定在 accept_thread_loop_ 的 io_service 上,必须在其之后声明,
+			// 保证析构时 acceptor 先于 io_service 销毁
+			std::shared_ptr<asio::ip::tcp::acceptor> acceptorptr_;
 			bool reuse_addr_ = false;
 			MsgHeaderProtocal headprotol_ = nametype;
 			NetMessageCallback messagecb_ = nullptr;

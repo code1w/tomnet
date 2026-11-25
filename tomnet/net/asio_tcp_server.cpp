@@ -145,6 +145,17 @@ namespace tom
 		void AsioTcpServer::Stop()
 		{
 			accept_thread_loop_.Stop(true);
+			// accept 线程退出后再释放 acceptor, 避免与 accept 回调并发访问
+			if (acceptorptr_)
+			{
+				std::error_code ec;
+				acceptorptr_->close(ec);
+				if (ec)
+				{
+					printf("TomNet AsioTcpServer Close Acceptor Error %s", ec.message().c_str());
+				}
+				acceptorptr_.reset();
+			}
 		}
 
 	}
