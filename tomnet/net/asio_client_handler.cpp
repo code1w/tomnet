@@ -213,6 +213,8 @@ namespace net {
 		// 作为客户端主动断开连接的时候, 取消重连
 		channel_->SetReConnnectedCb(nullptr);
 		channel_->CloseSocket();
+		// 断线等待重连期间没有挂起的读, 不会经 OnError 移除, 这里直接移除
+		loop_->RemoveHandler(GetHandler());
 	}
 
 	void AsioClientHandler::CleanChannelCallback()

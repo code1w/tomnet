@@ -69,37 +69,67 @@ namespace tom
 			return socket_;
 		}
 
+		// 每段连接生命周期内只通知一次断开,读/写错误路径都收敛到这里
+		void AsioChannel::NotifyDisconnected()
+		{
+			if (disconnected_.exchange(true))
+			{
+				return;
+			}
+			auto handptr = handleweakptr_.lock();
+			if (disconnectcb_ && handptr)
+			{
+				disconnectcb_();
+			}
+		}
+
+		// 连接失效的公共处理: 通知上层断开, 客户端按配置重连
+		void AsioChannel::HandleDisconnected()
+		{
+			NotifyDisconnected();
+			auto handptr = handleweakptr_.lock();
+			if (!handptr)
+			{
+				return;
+			}
+			if (reconnectedcb_)
+			{
+				// 客户端默认设置重连回调函数
+				CloseSocket();
+				auto self = shared_from_this();
+				auto fn = [self](){
+					self->DoReConnect(self->remoteip_, self->remoteport_);
+				};
+				loop_->RunInIoService(fn);
+			}
+			else
+			{
+				CloseSocket();
+			}
+		}
+
 		void AsioChannel::HandleReadError(const std::error_code& err)
 		{
-			
+
 			switch(err.value())
 			{
 			case asio::error::connection_reset:
 			case asio::error::eof:
 			{
 				printf("TomNet AsioChannel AsyncReadError %d, %s", handler_, err.message().c_str());
-				auto handptr = handleweakptr_.lock();
-				if(disconnectcb_ && handptr)
-				{
-					disconnectcb_();
-				}
-				
-				if(reconnectedcb_ && handptr)
-				{
-					// 客户端默认设置重连回调函数
-					CloseSocket();
-					auto self = shared_from_this();
-					auto fn = [self](){
-						self->DoReConnect(self->remoteip_, self->remoteport_);
-					};
-					loop_->RunInIoService(fn);
-				}
+				HandleDisconnected();
 			}
 			break;
 			case asio::error::bad_descriptor:
 			case asio::error::connection_aborted:
 			case asio::error::operation_aborted:
 			{
+				// connection_aborted 是对端/协议栈中断(Windows 10053), 不是本端主动关闭,
+				// 上层需要收到断开通知; 本端主动关闭时 closeing_ 已置位, 不重复通知
+				if (err.value() == asio::error::connection_aborted && !closeing_.load())
+				{
+					NotifyDisconnected();
+				}
 				auto handptr = handleweakptr_.lock();
 				if( errorcb_ && handptr)
 				{
@@ -113,28 +143,7 @@ namespace tom
 				// 其它错误(如 ETIMEDOUT、WSAECONNRESET 变体等)按连接失效处理,
 				// 否则连接会一直留在 handlers_ 里泄漏
 				printf("TomNet AsioChannel AsyncReadError %d, %d, %s", handler_, err.value(), err.message().c_str());
-				auto handptr = handleweakptr_.lock();
-				if(!handptr)
-				{
-					return;
-				}
-				if(disconnectcb_)
-				{
-					disconnectcb_();
-				}
-				if(reconnectedcb_)
-				{
-					CloseSocket();
-					auto self = shared_from_this();
-					auto fn = [self](){
-						self->DoReConnect(self->remoteip_, self->remoteport_);
-					};
-					loop_->RunInIoService(fn);
-				}
-				else
-				{
-					CloseSocket();
-				}
+				HandleDisconnected();
 			}
 			break;
 			}
@@ -170,6 +179,8 @@ namespace tom
 				tid_ = std::this_thread::get_id();
 				AsyncRead();
 				start_ = true;
+				// 新一段连接生命周期, 允许再次通知断开
+				disconnected_.store(false);
 			}
 			else 
 			{
@@ -206,11 +217,7 @@ namespace tom
 				{
 					printf("TomNet AsioChannel Bad PacketLen %d, %d", handler_, packetlen);
 					CloseSocket();
-					auto handptr = handleweakptr_.lock();
-					if(disconnectcb_ && handptr)
-					{
-						disconnectcb_();
-					}
+					NotifyDisconnected();
 					return;
 				}
 
@@ -314,6 +321,13 @@ namespace tom
 				}
 
 				printf("GameshNet AsioChannel AsyncWriteSomeCallback  %d, Error %d", handler_, error.value() );
+				// 服务端的写错误回调会关闭 socket, 挂起的读随之以 operation_aborted 结束,
+				// 读路径就不会再通知断开, 所以这里要补发一次。
+				// 带重连回调的客户端不在这里处理, 由读错误路径统一通知并重连。
+				if (!reconnectedcb_ && !closeing_.load() && error.value() != asio::error::operation_aborted)
+				{
+					NotifyDisconnected();
+				}
 				return;
 			}
 			if(actuallen != package->readableBytes())
@@ -357,11 +371,23 @@ namespace tom
 		void AsioChannel::DoReConnect(const std::string& ip, uint16_t port)
 		{ 
 			start_ = false;
+			// 重连回调被清空表示用户已 CloseLink, 不再重连
+			if (!reconnectedcb_)
+			{
+				return;
+			}
 			std::error_code ec;
 			asio::ip::address_v4 addr(asio::ip::address_v4::from_string(ip, ec));
 			auto self = shared_from_this();
 			socket_.async_connect(asio::ip::tcp::endpoint(addr, port),
 				[self, ip, port](const std::error_code& error){
+				if (!self->reconnectedcb_)
+				{
+					// 重连过程中用户调用了 CloseLink: 这条连接已无人管理, 必须关掉
+					std::error_code ignore;
+					self->socket_.close(ignore);
+					return;
+				}
 				if (!error)
 				{
 					self->reconnectimer_.cancel();

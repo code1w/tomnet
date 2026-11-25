@@ -59,10 +59,13 @@ namespace tom
 			asio::steady_timer reconnectimer_;
 			std::atomic<bool> start_{ false };
 			std::atomic<bool> closeing_{ false };
+			// 保证每段连接生命周期内 disconnectcb_ 只触发一次
+			std::atomic<bool> disconnected_{ false };
 			bool issending_=false;
 		private:
 			uint32_t PostPacket(const std::shared_ptr<tom::Buffer>& packet);
 			void HandleRead(const std::error_code& error,  std::size_t bytes_transferred);
+			void HandleDisconnected();
 			void HandleReadError(const std::error_code& error);
 			void HandleWrite(const std::error_code& error,  std::size_t actuallen, std::shared_ptr<tom::Buffer> packet);
 			void HandleConnect(const std::error_code& error);
@@ -86,6 +89,8 @@ namespace tom
 			void AsyncRead();
 			void TryCeneratePacket();
 			void CleanCallback();
+			// 每段连接生命周期内只触发一次 disconnectcb_
+			void NotifyDisconnected();
 	
 		public:
 			void SetConnnectedCb(const ConnectedCallback& cb) { connectedcb_ = cb; }

@@ -159,42 +159,9 @@ namespace net {
 
 	void AsioServerHandler::CloseLink()
 	{
-		// 服务器主动断开时在向上通知EVENT_CLOSE事件
-		#ifdef DEBUG_NET
-		printf("%s:%s:%d\n",__FILE__, __FUNCTION__,__LINE__);
-		#endif
-		NetContext context;
-		context.handler_ = handler_;
-		context.evetype_ = EVENT_CLOSE;
-		context.ud_ = GetUserdata();
-
-		auto packet = std::make_shared<tom::Buffer>();
-		packet->append(static_cast<const void*>(&context), sizeof(NetContext));
-		// ==================
-		// 回调函数存在直接调用它
-		if(messagecb_)
-		{
-			messagecb_(packet);
-		}
-		else if (msgqueue_)
-		{
-			msgqueue_->PushMessage(packet);
-		}
-
-		auto self = shared_from_this();
-		auto fa = [self](){
-			auto handler = std::dynamic_pointer_cast<AsioServerHandler>(self);
-			handler->channel_->CloseSocket();
-		};
-		loop_->RunInIoService(fa);
-
-		uint64_t handle = GetHandler();
-		auto fb = [self, handle](){
-			auto handler = std::dynamic_pointer_cast<AsioServerHandler>(self);
-			handler->loop_->RemoveHandler(handle);
-		};
-		loop_->RunInIoService(fb);
-
+		// 服务器主动断开: 走 channel 的单次断开通知, 由 OnDisConnected 上报 EVENT_CLOSE
+		// 并关闭/移除连接, 避免与对端断开的通知重复
+		channel_->NotifyDisconnected();
 	}
 
 	int32_t AsioServerHandler::LinkReady()
