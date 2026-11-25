@@ -7,18 +7,11 @@ source_group_by_dir("${ALL_FILES}")
 add_executable(${projectName} ${ALL_FILES})
 
 
-if(NOT WIN32)
+
 target_link_libraries(
 	${projectName}
-	protobuf
-	tomnet
-)
-else()
-target_link_libraries(
-	${projectName}
-	libprotobuf
+	protobuf::libprotoc protobuf::libprotobuf protobuf::libprotobuf-lite
     tomnet
 )
 
-endif()
 

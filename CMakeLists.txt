@@ -1,14 +1,15 @@
 cmake_minimum_required(VERSION 2.8.7)
 set(CMAKE_MACOSX_RPATH 1)
-include(${CMAKE_ROOT}/Modules/ExternalProject.cmake)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")                              # 设置cmake模块路径
 
-project(tomnet CXX)
-
+project(tomnet)
+set(CMAKE_CXX_STANDARD 20)   
 enable_testing()
-
-include(${PROJECT_SOURCE_DIR}/cmake/build_config.cmake)
+include(compiler)
+include(build_third_party)
+include(build_config)
 #include(${PROJECT_SOURCE_DIR}/cmake/tomvcpkg.cmake)
-include(${PROJECT_SOURCE_DIR}/cmake/vs_dir_proj.cmake)
+include(vs_dir_proj)
 
 
 if(CMAKE_PROJECT_NAME STREQUAL "tomnet")
@@ -23,23 +24,10 @@ include_directories(${PROJECT_SOURCE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/3rd/)
 include_directories(${PROJECT_SOURCE_DIR}/3rd/asio/)
 include_directories(${PROJECT_SOURCE_DIR}/tomnet/)
-
-set(jemalloc "jemalloc-5.2.1")
-set(protobuf "protobuf-3.12.0")
 if(NOT WIN32)
 include_directories(${PROJECT_SOURCE_DIR}/3rd/${jemalloc}/include/)
 include_directories(${PROJECT_SOURCE_DIR}/3rd/${protobuf}/src/)
 endif()
-
-
-
-if(NOT WIN32)
-link_directories(${PROJECT_SOURCE_DIR}/3rd/${jemalloc}/lib/)
-link_directories(${PROJECT_SOURCE_DIR}/3rd/${protobuf}/src/.libs/)
-else()
-link_directories(${PROJECT_SOURCE_DIR}/3rd/libs/x64-windows/)
-endif()
-
 
 
 if(TOMNET_BUILD_EXAMPLES)

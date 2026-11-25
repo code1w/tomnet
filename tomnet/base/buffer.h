@@ -13,8 +13,8 @@
 #include <iostream>
 #include <stdio.h>
 
-#ifdef WIN32
-#include <WinSock2.h>  // for ntohl()
+#ifdef _WIN32
+#include "os.h"
 #else
 #include <arpa/inet.h>  // for ntohl()
 #endif  // _WIN32
