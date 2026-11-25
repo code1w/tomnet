@@ -14,6 +14,7 @@ include(vs_dir_proj)
 
 if(CMAKE_PROJECT_NAME STREQUAL "tomnet")
 	option(TOMNET_BUILD_EXAMPLES "Build Tomnet examples" ON)
+	option(TOMNET_BUILD_BENCHMARK "Build Tomnet benchmark" ON)
 endif()
 
 if(NOT WIN32)
@@ -32,7 +33,11 @@ endif()
 
 if(TOMNET_BUILD_EXAMPLES)
   add_subdirectory(examples)
-endif() 
+endif()
+
+if(TOMNET_BUILD_BENCHMARK)
+  add_subdirectory(benchmark)
+endif()
 
 add_subdirectory(tomnet/net)
 add_subdirectory(tomnet/base)
